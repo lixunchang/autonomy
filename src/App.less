@@ -1,10 +1,25 @@
 .App {
-  text-align: center;
-}
+  height: 100%;
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+  .dragArea {
+    height: 26px;
+    cursor: move;
+    -webkit-app-region: drag;
+  }
+
+  .empty {
+    width: 100%;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .emptyWord {
+      color: #999;
+      margin-top: 8px;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

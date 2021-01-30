@@ -1,0 +1,23 @@
+
+.taskList {
+  height: calc(100% - 34px);
+  transition: background-color 0.2s ease;
+}
+
+.Task {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+  padding: 6px 10px;
+  border: 1px solid #e2e2e2;
+  transition: background-color 0.2s ease;
+  .content {
+    width: calc(100% - 80px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+

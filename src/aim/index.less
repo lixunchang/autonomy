@@ -1,0 +1,204 @@
+.Aim {
+  display: flex;
+  height: calc(100% - 58px);
+  .leftList {
+    height: 100%;
+  }
+  .content {
+    flex: 1;
+    padding: 36px;
+    overflow: scroll;
+  }
+
+  .empty {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .emptyWord {
+      color: #bfbfbf;
+      margin-top: 8px;
+    }
+  }
+}
+
+.SecondList {
+  width: 258px;
+  min-width: 258px;
+  height: 100%;
+  background-color: #eee;
+  padding-bottom: 36px;
+  .search {
+    display: flex;
+    padding: 16px;
+    align-items: center;
+    border-bottom: 1px solid #e2e2e2;
+  }
+  .top {
+    position: relative;
+    &:before {
+      content: '';
+      height: 0;
+      color: white;
+      border: 6px solid #57bd69;
+      border-left-color: transparent;
+      border-bottom-color: transparent; // 去掉可以制作标签效果
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+  .secondItem {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e2e2e2;
+    cursor: pointer;
+    &:hover {
+      background: #f2f2f2;
+    }
+    .item {
+      padding: 0 16px;
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      .title {
+        font-size: 16px;
+        font-weight: bold;
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .desc {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .enter {
+        color: #c2c2c2;
+        margin-right: 4px;
+        &:hover {
+          color: #999;
+        }
+      }
+    }
+  }
+  .active {
+    background: #f5f5f5;
+  }
+  .close {
+    position: absolute;
+    font-size: 20px;
+    bottom: 0;
+    width: 258px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    color: #fff;
+    cursor: pointer;
+    &:hover {
+      color: #999;
+    }
+  }
+}
+
+.EditAim {
+  width: 100%;
+
+  .aimTitle {
+    width: 60%;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    .edit {
+      font-size: 14px;
+      color: #c2c2c2;
+      font-weight: normal;
+      &:hover {
+        color: #1890ff;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .formItem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    .branchTitle {
+      display: flex;
+      justify-content: space-between;
+      width: 60%;
+      .branchTimes {
+        display: flex;
+        align-items: center;
+        min-width: 156px;
+      }
+    }
+    .label {
+      display: inline-block;
+      width: 70px;
+      text-align: right;
+      color: #c2c2c2;
+    }
+    .dateTimes {
+      width: 60%;
+      display: flex;
+      .times {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  .leftQuick {
+    color: #76ca87;
+  }
+  .quickButton {
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.AimList {
+  width: calc(60% + 70px);
+  margin: 20px auto;
+
+  .item {
+    display: flex;
+    align-items: center;
+
+    .titleDes {
+      width: calc(100% - 60px);
+      padding-left: 16px;
+      word-wrap: break-word;
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .branchTitle {
+        font-size: 16px;
+      }
+      .desc {
+        color: #999;
+      }
+    }
+    .status {
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      background: rgb(87, 189, 105);
+      line-height: 60px;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+    }
+  }
+}

@@ -1,0 +1,37 @@
+.FileList {
+  background: #6e6e6e;
+  color: white;
+  text-align: left;
+
+  :global {
+    .ant-tree.ant-tree-directory .ant-tree-treenode-selected:hover::before,
+    .ant-tree.ant-tree-directory .ant-tree-treenode-selected::before {
+      background-color: #3e3e3e9c;
+    }
+    .ant-tree.ant-tree-directory .ant-tree-treenode:hover::before {
+      background-color: #5e5e5e;
+    }
+    .ant-tree .ant-tree-node-content-wrapper {
+      padding: 0 4px 0 0;
+    }
+    .ant-tree .ant-tree-treenode {
+      padding: 0 8px 4px 12px;
+    }
+    .ant-tree-switcher {
+      width: 10px;
+    }
+    .ant-tree-switcher .ant-tree-switcher-icon,
+    .ant-tree-switcher .ant-select-tree-switcher-icon {
+      font-size: 10px;
+    }
+    .ant-tree .ant-tree-node-content-wrapper .ant-tree-iconEle {
+      width: 20px;
+      margin-right: 4px;
+    }
+  }
+  .ant-input-affix-wrapper > input.ant-input {
+    background-color: #5e5e5e;
+    border-color: #4e4e4e;
+    color: white;
+  }
+}

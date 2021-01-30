@@ -1,12 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'antd/dist/antd.css';
 import './index.css';
 import App from './App';
+import Setting from './setting';
+import Crash from './crash';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <App />
+        </Route>
+        <Route path="/setting">
+          <Setting />
+        </Route>
+        <Route path="/crash">
+          <Crash />
+        </Route>
+      </Switch>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );

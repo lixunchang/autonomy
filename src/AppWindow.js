@@ -9,18 +9,22 @@ class AppWindow extends BrowserWindow {
       // frame:false,
       titleBarStyle: 'hidden',
       webPreferences: {
-        nodeIntegration: true,
+        javascript: true,
+        plugins: true,
+        nodeIntegration: true, // 是否集成 Nodejs
         enableRemoteModule: true,
+        webSecurity: false,
+        // contextIsolation: false,
       },
-      show:false,
-      backgroundColor:'#efefef',
+      // show: false,
+      backgroundColor: '#efefef',
     };
-    const finalConfig = {...baseConfig,...config};
+    const finalConfig = { ...baseConfig, ...config };
     super(finalConfig);
     this.loadURL(urlLocation);
-    this.once('ready-to-show',()=>{
-      this.show()
-    })
+    this.once('ready-to-show', () => {
+      this.show();
+    });
   }
 }
 

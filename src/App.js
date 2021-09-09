@@ -22,7 +22,7 @@ import {
 import emptyImg from '../public/empty.png';
 import shortid from 'shortid';
 import fileHelper from './utils/fileHelper';
-import useIcpRenderer from './hooks/useIpcRenderer';
+import useIpcRenderer from './hooks/useIpcRenderer';
 // Node API
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
@@ -81,8 +81,9 @@ function App() {
 
   const openClickedFile = (id, isLoaded, path) => {
     const curFile = findItemById(files, id);
-    console.log('++++', path, id, curFile);
+    console.log('++++', path, id, curFile, isLoaded, getAutoSync());
     if (!isLoaded && path) {
+      // TODO
       if (getAutoSync()) {
         ipcRenderer.send('download-file', {
           key: `${curFile.title}.md`,
@@ -261,7 +262,7 @@ function App() {
       saveFile2Store(newFiles);
     });
   };
-  useIcpRenderer({
+  useIpcRenderer({
     'active-file-uploaded': activeFileUploaded,
     'file-downloaded': activeFileDownloaded,
     'save-edit-file': saveEditFile,
@@ -269,10 +270,14 @@ function App() {
   console.log('activeFileId', activeFile);
   return (
     <div className={styles.App}>
-      <Row style={{ height: '100%' }}>
-        <Col
-          span={5}
-          style={{ background: '#6E6E6E', color: 'white', minWidth: 260 }}
+      <div style={{ height: '100%', display: 'flex' }}>
+        <div
+          style={{
+            width: '28%',
+            background: '#6E6E6E',
+            color: 'white',
+            minWidth: 260,
+          }}
         >
           <div className={styles.dragArea} />
           <FileSearch
@@ -294,8 +299,8 @@ function App() {
             onFileDelete={deleteFile}
             onFileRename={renameFile}
           />
-        </Col>
-        <Col span={19} style={{ backgroundColor: '#fafbfc' }}>
+        </div>
+        <div style={{ flex: 1, backgroundColor: '#fafbfc' }}>
           {!activeFile ? (
             <div className={styles.empty}>
               <div
@@ -310,16 +315,20 @@ function App() {
               <h1
                 className={styles.dragArea}
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   height: 58,
-                  lineHeight: '58px',
                   padding: '0 58px',
-                  textAlign: 'center',
                   fontSize: 26,
                   fontWeight: 600,
                   margin: 0,
                   backgroundColor: '#fafbfc',
                 }}
               >
+                {unsavedFileIds.includes(activeFileId) && (
+                  <span className={styles.unsaveIcon} />
+                )}
                 {activeFile.title}
               </h1>
               {activeFile.type === 'todo' ? (
@@ -337,8 +346,8 @@ function App() {
               )}
             </>
           )}
-        </Col>
-      </Row>
+        </div>
+      </div>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import styles from './FileSearch.less';
 import { Input, Button } from 'antd';
 import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
 import useKeyPressed from '../hooks/useKeyPressed';
-import useIcpRenderer from '../hooks/useIpcRenderer';
+import useIpcRenderer from '../hooks/useIpcRenderer';
 
 const FileSearch = ({ title, onFileSearch }) => {
   const [inputActive, setInputActive] = useState(false);
@@ -31,7 +31,7 @@ const FileSearch = ({ title, onFileSearch }) => {
     }
   }, [inputActive]);
 
-  useIcpRenderer({
+  useIpcRenderer({
     'search-file': () => {
       setInputActive(true);
     },

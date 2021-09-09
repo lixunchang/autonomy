@@ -162,6 +162,7 @@ module.exports = function (webpackEnv) {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
     bail: isEnvProduction,
+    // target: 'electron-main', // 'electron-renderer',
     devtool: isEnvProduction
       ? shouldUseSourceMap
         ? 'source-map'
@@ -333,6 +334,10 @@ module.exports = function (webpackEnv) {
         ...(isEnvProductionProfile && {
           'react-dom$': 'react-dom/profiling',
           'scheduler/tracing': 'scheduler/tracing-profiling',
+          snapsvg: path.join(
+            __dirname,
+            '../src/components/muya/lib/assets/libs/snap.svg-min.js'
+          ),
         }),
         ...(modules.webpackAliases || {}),
       },

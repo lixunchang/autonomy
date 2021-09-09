@@ -1,60 +1,62 @@
-
 .Note {
   width: 100%;
   height: calc(100% - 58px);
   position: relative;
   text-align: left;
 
-  :global {
-    .vditor {
-      width: 100%;
-      height: 100%;
-      border: none;
-      position: relative;
-      .vditor-outline {
-        width: 250px;
-        position: absolute;
-        transition: width 0.2s ease;
-        border: none;
-        height: 100%;
-        z-index: 555;
-        right: 0;
-        top: 0;
-      }
-    }
+  .container {
+    outline: none;
   }
 
-  .outline {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    right: 0;
-    padding: 7px 10px;
-    z-index: 666;
-    color: #f5f5f5;
+  // :global {
+  //   .vditor {
+  //     width: 100%;
+  //     height: 100%;
+  //     border: none;
+  //     position: relative;
+  //     .vditor-outline {
+  //       width: 250px;
+  //       position: absolute;
+  //       transition: width 0.2s ease;
+  //       border: none;
+  //       height: 100%;
+  //       z-index: 555;
+  //       right: 0;
+  //       top: 0;
+  //     }
+  //   }
+  // }
 
-    :hover {
-      color: #e2e2e2;
-    }
-  }
+  // .outline {
+  //   position: absolute;
+  //   cursor: pointer;
+  //   top: 0;
+  //   right: 0;
+  //   padding: 7px 10px;
+  //   z-index: 666;
+  //   color: #f5f5f5;
+
+  //   :hover {
+  //     color: #e2e2e2;
+  //   }
+  // }
 }
 
-.showOutline {
-  :global {
-    .vditor-ir {
-      margin-right: 250px;
-    }
-    .vditor-outline {
-      border-left: 1px solid #e2e2e2 !important;
-    }
-  }
-}
-.hideOutline {
-  :global {
-    .vditor-outline {
-      width: 0 !important;
-      // display: none !important;
-    }
-  }
-}
-
+// .showOutline {
+//   :global {
+//     .vditor-ir {
+//       margin-right: 250px;
+//     }
+//     .vditor-outline {
+//       border-left: 1px solid #e2e2e2 !important;
+//     }
+//   }
+// }
+// .hideOutline {
+//   :global {
+//     .vditor-outline {
+//       width: 0 !important;
+//       // display: none !important;
+//     }
+//   }
+// }

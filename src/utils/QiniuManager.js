@@ -2,7 +2,6 @@ const qiniu = require('qiniu');
 const axios = require('axios');
 const moment = require('moment');
 const fs = require('fs');
-const resolve = require('resolve');
 
 class QiniuManager {
   constructor(accessKey, secretKey, bucket) {

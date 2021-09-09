@@ -4,7 +4,7 @@ import { getChildNode } from '../utils/helper';
 import { switchFileIcons } from '../utils/treeHelper';
 import styles from './FileList.less';
 import useContextMenu from '../hooks/useContextMenu';
-import useIcpRenderer from '../hooks/useIpcRenderer';
+import useIpcRenderer from '../hooks/useIpcRenderer';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -121,7 +121,7 @@ const FileList = ({
         break;
     }
   };
-  useIcpRenderer({
+  useIpcRenderer({
     'create-new-todo': () => createNewFile('todo', 'todo', true),
     'create-new-note': () => createNewFile('note', 'note', true),
     'create-new-aim': () => createNewFile('aim', 'aim', true),

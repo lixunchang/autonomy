@@ -9,21 +9,19 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <App />
-        </Route>
-        <Route path="/setting">
-          <Setting />
-        </Route>
-        <Route path="/crash">
-          <Crash />
-        </Route>
-      </Switch>
-    </Router>
-  </React.StrictMode>,
+  <Router>
+    <Switch>
+      <Route exact path="/">
+        <App />
+      </Route>
+      <Route path="/setting">
+        <Setting />
+      </Route>
+      <Route path="/crash">
+        <Crash />
+      </Route>
+    </Switch>
+  </Router>,
   document.getElementById('root')
 );
 

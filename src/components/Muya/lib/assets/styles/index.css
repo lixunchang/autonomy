@@ -622,7 +622,7 @@ pre.ag-front-matter span.ag-code-content:first-of-type:empty::after {
 }
 
 pre[data-role$='code'] span.ag-language-input:empty::after {
-  content: 'Input Language Identifier...';
+  content: 'language';
   color: var(--editorColor10);
 }
 
@@ -668,11 +668,11 @@ pre.ag-fence-code > code::before {
 }
 
 pre.ag-active.ag-fence-code > code::before {
-  content: 'fence';
+  content2: 'fence';
 }
 
 pre.ag-active.ag-indent-code > code::before {
-  content: 'indent';
+  content2: 'indent';
 }
 
 pre > code {

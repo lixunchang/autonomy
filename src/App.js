@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import styles from './App.less';
-import { Row, Col } from 'antd';
 import moment from 'moment';
 import FileSearch from './components/FileSearch';
 import FileList from './components/FileList';
-import Note from './note';
+import Note from './note/index3';
 import Todo from './todo';
 import Aim from './aim';
 import {
@@ -23,6 +22,7 @@ import emptyImg from '../public/empty.png';
 import shortid from 'shortid';
 import fileHelper from './utils/fileHelper';
 import useIpcRenderer from './hooks/useIpcRenderer';
+import Draggable from 'react-draggable';
 // Node API
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
@@ -36,7 +36,9 @@ const getAutoSync = () =>
   ['accessKey', 'secretKey', 'bucket', 'enableAutoSync'].every(
     (key) => !!settingStore.get(key)
   );
-
+const defaultSiderWidth = 260;
+const miniSiderWidth = 0;
+const maxSiderWidth = 360;
 /**
  * state分析
  * - 文件列表 【】
@@ -51,6 +53,7 @@ function App() {
   const [openedFileIds, setOpenedFileIds] = useState([]);
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
   const [newFile, setNewFile] = useState(null);
+  const [siderWidth, setSiderWidth] = useState(defaultSiderWidth);
 
   const activeFile = findItemById(files, activeFileId);
   const openedFiles = findItemsByIds(files, openedFileIds);
@@ -176,6 +179,7 @@ function App() {
   const saveEditFile = () => {
     const { path, body, title } = activeFile;
     if (activeFile.type === 'note') {
+      console.log('保存文件，我执行了', path, body);
       fileHelper.writeFile(path, body).then(() => {
         setUnsavedFileIds(unsavedFileIds.filter((id) => id !== activeFileId));
         if (getAutoSync()) {
@@ -262,6 +266,12 @@ function App() {
       saveFile2Store(newFiles);
     });
   };
+
+  const handleDrag = (_, ui) => {
+    const dragWidth = ui.x + defaultSiderWidth;
+    setSiderWidth(dragWidth);
+  };
+
   useIpcRenderer({
     'active-file-uploaded': activeFileUploaded,
     'file-downloaded': activeFileDownloaded,
@@ -273,10 +283,11 @@ function App() {
       <div style={{ height: '100%', display: 'flex' }}>
         <div
           style={{
-            width: '28%',
+            width: siderWidth,
             background: '#6E6E6E',
             color: 'white',
-            minWidth: 260,
+            minWidth: siderWidth,
+            position: 'relative',
           }}
         >
           <div className={styles.dragArea} />
@@ -299,8 +310,21 @@ function App() {
             onFileDelete={deleteFile}
             onFileRename={renameFile}
           />
+          <Draggable
+            axis="x"
+            bounds={{
+              left: miniSiderWidth - defaultSiderWidth,
+              right: maxSiderWidth - defaultSiderWidth,
+            }}
+            defaultPosition={{ x: 0, y: 0 }}
+            onDrag={handleDrag}
+          >
+            <div className={styles.handle} />
+          </Draggable>
         </div>
-        <div style={{ flex: 1, backgroundColor: '#fafbfc' }}>
+        <div
+          style={{ flex: 1, backgroundColor: '#fafbfc', overflow: 'hidden' }}
+        >
           {!activeFile ? (
             <div className={styles.empty}>
               <div

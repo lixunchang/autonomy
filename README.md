@@ -1,3 +1,7 @@
+## 开发日常交接
+
+1. 图片上传，寻找图片上传的方法
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

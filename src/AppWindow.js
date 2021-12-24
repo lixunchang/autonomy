@@ -1,4 +1,4 @@
-const { BrowserWindow } = require('electron');
+const { BrowserWindow, protocol } = require('electron');
 
 class AppWindow extends BrowserWindow {
   constructor(config, urlLocation) {
@@ -25,6 +25,19 @@ class AppWindow extends BrowserWindow {
     this.once('ready-to-show', () => {
       this.show();
     });
+    //===========自定义file:///协议的解析=======================
+    protocol.interceptFileProtocol(
+      'file',
+      (req, callback) => {
+        const url = req.url.substr(8);
+        callback(decodeURI(url));
+      },
+      (error) => {
+        if (error) {
+          console.error('Failed to register protocol');
+        }
+      }
+    );
   }
 }
 

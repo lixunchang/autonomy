@@ -181,7 +181,7 @@ const formatCtrl = (ContentState) => {
     const neighbors = [];
     let tokens = [];
     if (start.key === end.key) {
-      const { text } = startBlock;
+      const { text } = startBlock || {};
       tokens = tokenizer(text, {
         options: this.muya.options,
       });

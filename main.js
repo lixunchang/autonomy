@@ -18,7 +18,7 @@ const createManager = () => {
 
 app.on('ready', () => {
   const mainWindowConfig = {
-    width: 1440,
+    width: 1200,
     height: 768,
   };
   const mainUrlLocation = isDev

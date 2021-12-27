@@ -174,7 +174,7 @@ const backspaceCtrl = (ContentState) => {
       }
     }
     // fix: #897
-    const { text } = startBlock;
+    const { text } = startBlock || {};
     const tokens = tokenizer(text, {
       options: this.muya.options,
     });
@@ -329,7 +329,7 @@ const backspaceCtrl = (ContentState) => {
       event.preventDefault();
       event.stopPropagation();
 
-      const { text } = startBlock;
+      const { text } = startBlock || {};
       startBlock.text = text.substring(0, text.length - 1);
       const key = startBlock.key;
       const offset = startBlock.text.length;

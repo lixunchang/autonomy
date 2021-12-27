@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Muya from '../components/muya/lib';
 import TablePicker from '../components/muya/lib/ui/tablePicker';
@@ -65,15 +66,14 @@ Muya.use(FootnoteTool);
 Muya.use(TableBarTools);
 
 const Note = ({ activeFile, onChange }) => {
-  const { id, body } = activeFile;
-  const [cursor, setCursor] = useState();
+  const { id, body = '', isLoaded = false } = activeFile;
   const editorWrapRef = useRef(null);
   const editorRef = useRef(null);
-  let editor = editorRef.current;
+  // let editor = editorRef.current;
 
   const setCompareOption = (value, oldValue, key) => {
-    if (value !== oldValue && editor) {
-      editor.setOptions({ [key]: value });
+    if (value !== oldValue && editorRef.current) {
+      editorRef.current.setOptions({ [key]: value });
     }
   };
 
@@ -84,12 +84,10 @@ const Note = ({ activeFile, onChange }) => {
   };
 
   const scrollToCursor = (duration = 300) => {
-    console.log('oooscroll', editor);
-    if (!editor) {
-      return;
-    }
-    const { container } = editor;
-    const { y } = editor.getSelection().cursorCoords;
+    console.log('oooscroll', editorRef.current);
+    if (!editorRef.current) return;
+    const { container } = editorRef.current;
+    const { y } = editorRef.current.getSelection().cursorCoords;
     console.log(
       'ooo0000我执行了2',
       container,
@@ -98,14 +96,13 @@ const Note = ({ activeFile, onChange }) => {
     );
     animatedScrollTo(container, container.scrollTop + y - STANDAR_Y, duration);
   };
-  const setMarkdownToEditor = ({ id, markdown, cursor }) => {
-    const { editor } = this;
-    if (editor) {
-      editor.clearHistory();
+  const setMarkdownToEditor = ({ markdown, cursor }) => {
+    if (editorRef.current) {
+      editorRef.current.clearHistory();
       if (cursor) {
-        editor.setMarkdown(markdown, cursor, true);
+        editorRef.current.setMarkdown(markdown, cursor, true);
       } else {
-        editor.setMarkdown(markdown);
+        editorRef.current.setMarkdown(markdown);
       }
     }
   };
@@ -177,25 +174,22 @@ const Note = ({ activeFile, onChange }) => {
   );
 
   const handleContentChange = (data) => {
-    const { markdown, cursor } = data;
-    if (markdown.length > 1) {
-      console.log('ooo=', data, markdown, '=', cursor);
+    const { markdown } = data;
+    if (markdown !== body && markdown !== '\n') {
       onChange(id, markdown);
-      setCursor(cursor);
-      // editorRef.current.setMarkdown(markdown, cursor);
     }
   };
 
   const closeMuya = () => {
-    if (!editor) {
+    if (!editorRef.current) {
       return;
     }
-    editor.off('change', handleContentChange);
-    editor.destroy();
-    editor = null;
+    editorRef.current.off('change', handleContentChange);
+    editorRef.current.destroy();
   };
 
   const initMuya = () => {
+    if (!editorWrapRef.current) return;
     editorRef.current = new Muya(editorWrapRef.current, {
       ...options,
       markdown: body,
@@ -204,22 +198,17 @@ const Note = ({ activeFile, onChange }) => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      initMuya();
-    }, 100);
-
-    console.log('ooouseeff');
+    initMuya();
     return () => {
       closeMuya();
     };
-  }, []);
+  }, [id]);
 
-  // useEffect(() => {
-  //   console.log('ooosetmarkdown', body);
-  //   editorRef.current.setMarkdown(body, cursor, true);
-  //   scrollToCursor();
-  // }, [body]);
-  console.log('ooobody', editor, body);
+  useEffect(() => {
+    if (editorRef.current) {
+      setMarkdownToEditor({ markdown: body });
+    }
+  }, [isLoaded]);
   return (
     <div className={styles.Note}>
       <div

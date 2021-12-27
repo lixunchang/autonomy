@@ -4,7 +4,7 @@ const emojiCtrl = (ContentState) => {
   ContentState.prototype.setEmoji = function (item) {
     let { key, offset } = this.cursor.start;
     const startBlock = this.getBlock(key);
-    const { text } = startBlock;
+    const { text } = startBlock || {};
     const tokens = tokenizer(text, {
       options: this.muya.options,
     });

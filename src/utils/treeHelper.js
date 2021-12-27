@@ -73,7 +73,7 @@ export const deleteItemById = (arr, id) => {
 export const createItemByFatherId = (arr, fatherId, data) => {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].id === fatherId) {
-      arr[i].children.push(data);
+      arr[i].children = [...(arr[i].children || []), data]; // .push(data);
       break;
     }
     if (arr[i].children) {

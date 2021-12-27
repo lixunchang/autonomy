@@ -397,12 +397,8 @@ const importRegister = (ContentState) => {
 
         case 'loose_item_start':
         case 'list_item_start': {
-          const {
-            listItemType,
-            bulletMarkerOrDelimiter,
-            checked,
-            type,
-          } = token;
+          const { listItemType, bulletMarkerOrDelimiter, checked, type } =
+            token;
           block = this.createBlock('li', {
             listItemType: checked !== undefined ? 'task' : listItemType,
             bulletMarkerOrDelimiter,
@@ -467,8 +463,8 @@ const importRegister = (ContentState) => {
     const { anchor, focus } = this.cursor;
     const anchorBlock = this.getBlock(anchor.key) || {};
     const focusBlock = this.getBlock(focus.key) || {};
-    const { text: anchorText } = anchorBlock;
-    const { text: focusText } = focusBlock;
+    const { text: anchorText = '' } = anchorBlock;
+    const { text: focusText = '' } = focusBlock;
     if (anchor.key === focus.key) {
       const minOffset = Math.min(anchor.offset, focus.offset);
       const maxOffset = Math.max(anchor.offset, focus.offset);

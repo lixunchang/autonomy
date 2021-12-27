@@ -10,7 +10,8 @@ import {
 
 // const CAN_NEST_RULES = ['strong', 'em', 'link', 'del', 'a_link', 'reference_link', 'html_tag']
 // disallowed html tags in https://github.github.com/gfm/#raw-html
-const disallowedHtmlTag = /(?:title|textarea|style|xmp|iframe|noembed|noframes|script|plaintext)/i;
+const disallowedHtmlTag =
+  /(?:title|textarea|style|xmp|iframe|noembed|noframes|script|plaintext)/i;
 const validateRules = Object.assign({}, inlineRules);
 delete validateRules.em;
 delete validateRules.strong;
@@ -38,7 +39,7 @@ const correctUrl = (token) => {
 };
 
 const tokenizerFac = (
-  src,
+  src = '',
   beginRules,
   inlineRules,
   pos = 0,
@@ -121,7 +122,7 @@ const tokenizerFac = (
     }
   }
 
-  while (src.length) {
+  while (src && src.length) {
     // backlash
     const backTo = inlineRules.backlash.exec(src);
     if (backTo) {

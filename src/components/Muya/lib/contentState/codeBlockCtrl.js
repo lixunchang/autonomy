@@ -17,7 +17,7 @@ const codeBlockCtrl = (ContentState) => {
 
     const paragraph = document.querySelector(`#${start.key}`);
     let lang = '';
-    const { text } = startBlock;
+    const { text } = startBlock || {};
     if (startBlock.type === 'span') {
       if (startBlock.functionType === 'languageInput') {
         lang = text.trim();

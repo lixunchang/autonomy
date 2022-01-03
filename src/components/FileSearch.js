@@ -52,11 +52,19 @@ const FileSearch = ({ title, onFileSearch }) => {
       ) : (
         <div className={styles.inputActive}>
           <Input
-            style={{ width: 'calc(100% - 30px)' }}
-            placeholder="请输入"
+            placeholder="搜索我的文档"
             ref={node}
             value={value}
             onChange={(e) => setValue(e.target.value)}
+            style={{
+              width: 'calc(100% - 30px)',
+              height: 24,
+              padding: '0 4px',
+              background: '#5e5e5e',
+              borderColor: '#9e9e9e',
+              color: '#fff',
+              caretColor: '#fff',
+            }}
           />
           <Button
             style={{ width: 24 }}

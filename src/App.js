@@ -3,7 +3,7 @@ import styles from './App.less';
 import moment from 'moment';
 import FileSearch from './components/FileSearch';
 import FileList from './components/FileList';
-import Note from './note/index3';
+import Note from './note';
 import Todo from './todo';
 import Aim from './aim';
 import {
@@ -14,6 +14,7 @@ import {
   createItemByFatherId,
   deleteItemById,
   findItemsByIds,
+  getChildrenFilePath,
   getIconByFileType,
   deleteExtraAttr,
   deepClone,
@@ -23,21 +24,19 @@ import shortid from 'shortid';
 import fileHelper from './utils/fileHelper';
 import useIpcRenderer from './hooks/useIpcRenderer';
 import Draggable from 'react-draggable';
+import { getSaveLocation, getAutoSync } from './utils/helper';
 // Node API
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
 const Store = window.require('electron-store');
 
 const fileStore = new Store({ name: 'Files Data' });
-const settingStore = new Store({ name: 'settings' });
-// fileStore.delete('files');
+// fileStore.set('files', defaultFiles); //重置操作
 
-const getAutoSync = () =>
-  ['accessKey', 'secretKey', 'bucket', 'enableAutoSync'].every(
-    (key) => !!settingStore.get(key)
-  );
+const savedLocation = getSaveLocation();
+
 const defaultSiderWidth = 260;
-const miniSiderWidth = 0;
+const miniSiderWidth = 190;
 const maxSiderWidth = 360;
 /**
  * state分析
@@ -56,11 +55,8 @@ function App() {
   const [siderWidth, setSiderWidth] = useState(defaultSiderWidth);
 
   const activeFile = findItemById(files, activeFileId);
-  const openedFiles = findItemsByIds(files, openedFileIds);
-  const unsavedFiles = findItemsByIds(files, unsavedFileIds);
-  const savedLocation =
-    settingStore.get('savedFileLocatiion') ||
-    `${remote.app.getPath('documents')}/cloud-note/`;
+  // const openedFiles = findItemsByIds(files, openedFileIds);
+  // const unsavedFiles = findItemsByIds(files, unsavedFileIds);
 
   const saveFile2Store = (data) => {
     const newData = deleteExtraAttr(deepClone(data));
@@ -82,9 +78,19 @@ function App() {
     }
   };
 
+  const saveBeforSwitchFile = (id, isLoaded, path) => {
+    if (activeFile) {
+      saveEditFile().then(() => {
+        openClickedFile(id, isLoaded, path);
+      });
+    } else {
+      openClickedFile(id, isLoaded, path);
+    }
+  };
+
   const openClickedFile = (id, isLoaded, path) => {
+    const isExists = fileHelper.exists(path);
     const curFile = findItemById(files, id);
-    console.log('++++', path, id, curFile, isLoaded, getAutoSync());
     if (!isLoaded && path) {
       // TODO
       if (getAutoSync()) {
@@ -95,17 +101,30 @@ function App() {
           updatedAt: curFile.updatedAt,
         });
       } else {
-        fileHelper.readFile(path).then((val) => {
-          console.log('readFile-222', path, val);
-          const newFiles = editItemById(files, id, {
-            body: val,
-            isLoaded: true,
+        if (!isExists) {
+          fileHelper.writeFile(path, '').then(() => {
+            const newFiles = editItemById(files, id, {
+              body: '',
+              isLoaded: true,
+            });
+            setFiles(newFiles);
+            if (!openedFileIds.includes(id)) {
+              setOpenedFileIds([...openedFileIds, id]);
+            }
           });
-          setFiles(newFiles);
-          if (!openedFileIds.includes(id)) {
-            setOpenedFileIds([...openedFileIds, id]);
-          }
-        });
+        } else {
+          fileHelper.readFile(path).then((val) => {
+            console.log('readFile-222', path, val);
+            const newFiles = editItemById(files, id, {
+              body: val,
+              isLoaded: true,
+            });
+            setFiles(newFiles);
+            if (!openedFileIds.includes(id)) {
+              setOpenedFileIds([...openedFileIds, id]);
+            }
+          });
+        }
       }
       setActiveFileId(id);
     } else {
@@ -115,58 +134,100 @@ function App() {
       }
     }
   };
-  const deleteFile = (id, path) => {
-    fileHelper.deleteFile(path).then(() => {
-      const newFiles = deleteItemById(files, id);
-      saveFile2Store(newFiles);
-      setFiles(newFiles);
-      closeOpenedFile(id);
-      clearUnsavedFile(id);
-    });
+  const deleteFile = (id, path, isLeaf = false) => {
+    if (isLeaf && isLeaf !== 'false') {
+      fileHelper.deleteFile(path).then(() => {
+        const newFiles = deleteItemById(files, id);
+        saveFile2Store(newFiles);
+        setFiles(newFiles);
+        closeOpenedFile(id);
+        clearUnsavedFile(id);
+      });
+    } else {
+      const curFolder = findItemById(files, id);
+      const allDeletePath = getChildrenFilePath(curFolder.children);
+      Promise.all(
+        allDeletePath.map((path) => fileHelper.deleteFile(path))
+      ).then(() => {
+        const newFiles = deleteItemById(files, id);
+        saveFile2Store(newFiles);
+        setFiles(newFiles);
+        closeOpenedFile(id);
+        clearUnsavedFile(id);
+      });
+    }
   };
   const createNewFile = (fatherId, type, isLeaf) => {
-    const folder = isLeaf ? {} : { children: [] };
     const newId = shortid.generate();
     const newPath = join(
-      savedLocation,
+      `${savedLocation}${type}/`,
       `${newId}${type === 'note' ? '.md' : '.json'}`
     );
+    const defalutBody = type === 'note' ? '##### 请输入markdown' : '';
+    const folder = isLeaf
+      ? {
+          path: newPath,
+          body: defalutBody,
+        }
+      : { children: [] };
     const newFile = {
       id: newId,
       title: '',
-      path: newPath,
       key: newId,
       type,
       icon: getIconByFileType(type, isLeaf),
       createAt: moment().valueOf(),
       isLeaf,
       isSync: false,
+      isLoaded: true,
       updatedAt: 0,
       ...folder,
     };
     const newFiles = createItemByFatherId(files, fatherId, newFile);
-    fileHelper
-      .writeFile(newPath, type === 'note' ? '## 请输入markdown' : '{}')
-      .then((res) => {
-        console.log('新建', newFiles, res);
+    if (isLeaf) {
+      fileHelper.writeFile(newPath, defalutBody).then((res) => {
         setNewFile(newFile);
         setFiles(newFiles);
+        // 默认打开 openClickedFile(newId, true, newPath);
+        setActiveFileId(newId);
+        if (!openedFileIds.includes(newId)) {
+          setOpenedFileIds([...openedFileIds, newId]);
+        }
       });
+    } else {
+      setNewFile(newFile);
+      setFiles(newFiles);
+    }
   };
-  const renameFile = (id, path, title, type) => {
-    const newPath = `${dirname(path)}/${title}${
-      type === 'note' ? '.md' : '.json'
-    }`;
-    fileHelper.renameFile(path, newPath).then(() => {
-      const newFiles = editItemById(files, id, { title, path: newPath });
+  const renameFile = (id, path, title, type, isLeaf = false) => {
+    if (isLeaf) {
+      const newPath = `${dirname(path)}/${title}${
+        type === 'note' ? '.md' : '.json'
+      }`;
+      fileHelper.renameFile(path, newPath).then(() => {
+        const newFiles = editItemById(files, id, { title, path: newPath });
+        // 默认打开 openClickedFile(newId, true, newPath);
+        setActiveFileId(id);
+        if (!openedFileIds.includes(id)) {
+          setOpenedFileIds([...openedFileIds, id]);
+        }
+        saveFile2Store(newFiles);
+        setFiles(newFiles);
+        setNewFile(null);
+      });
+    } else {
+      const newFiles = editItemById(files, id, { title });
       saveFile2Store(newFiles);
       setFiles(newFiles);
       setNewFile(null);
-    });
+    }
   };
 
   const fileChange = (id, value) => {
     console.log('fileChange', id, value);
+    if (typeof value !== 'string') {
+      value = JSON.stringify(value);
+    }
     if (value !== activeFile.body) {
       const newFiles = editItemById(files, id, { body: value });
       setFiles(newFiles);
@@ -177,19 +238,20 @@ function App() {
   };
 
   const saveEditFile = () => {
+    console.log('我要开始执行save了');
     const { path, body, title } = activeFile;
-    if (activeFile.type === 'note') {
-      console.log('保存文件，我执行了', path, body);
-      fileHelper.writeFile(path, body).then(() => {
-        setUnsavedFileIds(unsavedFileIds.filter((id) => id !== activeFileId));
-        if (getAutoSync()) {
-          ipcRenderer.send('upload-file', {
-            key: `${title}.md`,
-            path: path,
-          });
-        }
-      });
-    }
+    // if (activeFile.type === 'note') {
+    console.log('保存文件，我执行了', path, body);
+    return fileHelper.writeFile(path, body).then(() => {
+      setUnsavedFileIds(unsavedFileIds.filter((id) => id !== activeFileId));
+      if (getAutoSync()) {
+        ipcRenderer.send('upload-file', {
+          key: `${title}.md`,
+          path: path,
+        });
+      }
+    });
+    // }
   };
 
   const onImportFiles = (id, type) => {
@@ -277,7 +339,7 @@ function App() {
     'file-downloaded': activeFileDownloaded,
     'save-edit-file': saveEditFile,
   });
-  console.log('activeFileId', activeFile);
+  console.log('activeFileId', activeFile, files);
   return (
     <div className={styles.App}>
       <div style={{ height: '100%', display: 'flex' }}>
@@ -301,11 +363,11 @@ function App() {
             activeId={activeFileId}
             files={deepClone(files)}
             newFile={newFile}
-            openedFiles={openedFiles}
+            // openedFiles={openedFiles}
             onImportFiles={onImportFiles}
             closeOpenedFile={closeOpenedFile}
             unsavedFileIds={unsavedFileIds}
-            onFileClick={openClickedFile}
+            onFileClick={saveBeforSwitchFile}
             createNewFile={createNewFile}
             onFileDelete={deleteFile}
             onFileRename={renameFile}

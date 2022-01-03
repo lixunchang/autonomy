@@ -162,7 +162,7 @@ module.exports = function (webpackEnv) {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
     bail: isEnvProduction,
-    // target: 'electron-main', // 'electron-renderer',
+    target: 'electron-renderer', //'electron-main', //
     devtool: isEnvProduction
       ? shouldUseSourceMap
         ? 'source-map'

@@ -22,8 +22,12 @@ const FileList = ({
 }) => {
   const [editStatus, setEditStatus] = useState('');
   const [inputValue, setInputValue] = useState('');
-  const handleSaveInput = (path, type) => {
-    onFileRename(editStatus, path, inputValue, type);
+  const [selectKey, setSelectKey] = useState([]);
+  const handleSaveInput = (path, type, isLeaf) => {
+    onFileRename(editStatus, path, inputValue, type, isLeaf);
+    if (isLeaf) {
+      setSelectKey([editStatus]);
+    }
     setEditStatus('');
     setInputValue('');
   };
@@ -89,7 +93,8 @@ const FileList = ({
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
             const { dataset } = getChildNode(current.childNodes, 'file-item');
-            onFileDelete(dataset.id, dataset.path);
+            console.log('移至回收站', dataset);
+            onFileDelete(dataset.id, dataset.path, dataset.isleaf);
           }
         },
       },
@@ -136,16 +141,26 @@ const FileList = ({
         }}
         defaultExpandAll
         // onSelect={(_, { isLeaf, id, path, isLoaded }) => {}}
-        selectedKeys={['012']}
-        selectable={false}
+        selectedKeys={selectKey}
+        selectable={true}
+        onSelect={(key, { node }) => {
+          if (editStatus) return;
+          console.log('xxxonselect', node);
+          const { isLeaf, id, path, isLoaded, type } = node;
+          setSelectKey(key);
+          onItemClick(isLeaf, id, path, isLoaded, type);
+        }}
         // onExpand={onExpand}
         treeData={switchFileIcons(files)}
         titleRender={({ key, title, id, type, isLeaf, isLoaded, path }) => {
           return (
-            <span
+            <div
               key={key}
-              className="file-item"
+              className={
+                type !== 'crash' && type !== 'import' ? 'file-item' : ''
+              }
               // data-isloaded={isLoaded}
+              data-isleaf={isLeaf} // 小写
               data-title={title}
               data-type={type}
               data-path={path}
@@ -153,11 +168,11 @@ const FileList = ({
             >
               {editStatus === id ? (
                 <Input
-                  // bordered={false}
+                  autoFocus
                   placeholder="请输入"
                   value={inputValue}
-                  onBlur={() => setEditStatus('')}
-                  onPressEnter={() => handleSaveInput(path, type)}
+                  // onBlur={() => setEditStatus('')}
+                  onPressEnter={() => handleSaveInput(path, type, isLeaf)}
                   onChange={(e) => setInputValue(e.target.value)}
                   style={{
                     width: '86%',
@@ -166,19 +181,15 @@ const FileList = ({
                     background: '#5e5e5e',
                     borderColor: '#9e9e9e',
                     color: '#fff',
+                    caretColor: '#fff',
                   }}
                 />
               ) : (
-                <span
-                  style={!title ? { color: 'blue' } : {}}
-                  onClick={() => {
-                    onItemClick(isLeaf, id, path, isLoaded, type);
-                  }}
-                >
+                <span style={!title ? { color: 'orangered' } : {}}>
                   {title || '未命名'}
                 </span>
               )}
-            </span>
+            </div>
           );
         }}
       />

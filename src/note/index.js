@@ -1,4 +1,5 @@
-import React, { Component, useRef } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Muya from '../components/muya/lib';
 import TablePicker from '../components/muya/lib/ui/tablePicker';
 import QuickInsert from '../components/muya/lib/ui/quickInsert';
@@ -17,15 +18,12 @@ import FrontMenu from '../components/muya/lib/ui/frontMenu';
 import { moveImageToFolder } from '../components/muya/lib/utils/fileSystem';
 import { guessClipboardFilePath, animatedScrollTo } from '../utils/clipboard';
 import styles from './index.less';
+import { getSaveLocation } from '../utils/helper';
 
 // Node API
 const { shell, remote } = window.require('electron');
-const Store = window.require('electron-store');
 
-const settingStore = new Store({ name: 'settings' });
-const savedLocation =
-  settingStore.get('savedFileLocatiion') ||
-  `${remote.app.getPath('documents')}/cloud-note/`;
+const savedLocation = getSaveLocation();
 
 const unsplashAccessKey =
   '123dd38b90fae4d7cb513b54d98612a4857eef30e7121aa46ebee6f0cad8404c';
@@ -64,121 +62,81 @@ Muya.use(LinkTools, {
 Muya.use(FootnoteTool);
 Muya.use(TableBarTools);
 
-class Note extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.editor = null;
-  }
+const Note = ({ activeFile, onChange }) => {
+  const { id, body = '', isLoaded = false } = activeFile;
+  const editorWrapRef = useRef(null);
+  const editorRef = useRef(null);
+  // let editor = editorRef.current;
 
-  // shouldComponentUpdate({ activeFile: nextFile }) {
-  //   const { activeFile } = this.props;
-  //   console.log(
-  //     'shouldComponentUpdate:if-closeMuya',
-  //     activeFile.id !== nextFile.id || activeFile.isLoaded !== nextFile.isLoaded
-  //   );
-  //   if (
-  //     activeFile.id !== nextFile.id ||
-  //     activeFile.isLoaded !== nextFile.isLoaded ||
-  //     activeFile.body !== nextFile.body
-  //   ) {
-  //     // this.openMuya();
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
-  handleContentChange = (data) => {
-    const { activeFile, onChange } = this.props;
-    console.log('oooo', data);
-    // onChange(activeFile.id, data.markdown);
-  };
-
-  handleImagePathPicker = async () => {
-    const { filePaths } = await remote.dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [
-        {
-          name: 'Images',
-          extensions: IMAGE_EXTENSIONS,
-        },
-      ],
-      message: '选择添加图片',
-    });
-    if (filePaths && filePaths[0]) {
-      return filePaths[0];
-    } else {
-      return '';
+  const setCompareOption = (value, oldValue, key) => {
+    if (value !== oldValue && editorRef.current) {
+      editorRef.current.setOptions({ [key]: value });
     }
   };
 
-  setCompareOption = (value, oldValue, key) => {
-    const { editor } = this;
-    if (value !== oldValue && editor) {
-      editor.setOptions({ [key]: value });
-    }
-  };
-
-  typewriter = (value) => {
+  const typewriter = (value) => {
     if (value) {
-      this.scrollToCursor();
+      scrollToCursor();
     }
   };
 
-  scrollToCursor = (duration = 300) => {
-    if (!this.editor) {
-      return;
-    }
-    const { container } = this.editor;
-    const { y } = this.editor.getSelection().cursorCoords;
+  const scrollToCursor = (duration = 300) => {
+    console.log('oooscroll', editorRef.current);
+    if (!editorRef.current) return;
+    const { container } = editorRef.current;
+    const { y } = editorRef.current.getSelection().cursorCoords;
     console.log(
-      '0000我执行了2',
+      'ooo0000我执行了2',
       container,
       y,
       container.scrollTop + y - STANDAR_Y
     );
     animatedScrollTo(container, container.scrollTop + y - STANDAR_Y, duration);
   };
+  const setMarkdownToEditor = ({ markdown, cursor }) => {
+    if (editorRef.current) {
+      editorRef.current.clearHistory();
+      if (cursor) {
+        editorRef.current.setMarkdown(markdown, cursor, true);
+      } else {
+        editorRef.current.setMarkdown(markdown);
+      }
+    }
+  };
 
-  openMuya = () => {
-    const { activeFile } = this.props;
-    this.editor = new Muya(document.querySelector('#container'), {
+  const options = useMemo(
+    () => ({
       preferLooseListItem: (v, ov) =>
-        this.setCompareOption(v, ov, 'preferLooseListItem'),
-      autoPairBracket: (v, ov) =>
-        this.setCompareOption(v, ov, 'autoPairBracket'),
+        setCompareOption(v, ov, 'preferLooseListItem'),
+      autoPairBracket: (v, ov) => setCompareOption(v, ov, 'autoPairBracket'),
       autoPairMarkdownSyntax: (v, ov) =>
-        this.setCompareOption(v, ov, 'autoPairMarkdownSyntax'),
-      autoPairQuote: (v, ov) => this.setCompareOption(v, ov, 'autoPairQuote'),
+        setCompareOption(v, ov, 'autoPairMarkdownSyntax'),
+      autoPairQuote: (v, ov) => setCompareOption(v, ov, 'autoPairQuote'),
       trimUnnecessaryCodeBlockEmptyLines: (v, ov) =>
-        this.setCompareOption(v, ov, 'trimUnnecessaryCodeBlockEmptyLines'),
-      bulletListMarker: (v, ov) =>
-        this.setCompareOption(v, ov, 'bulletListMarker'),
+        setCompareOption(v, ov, 'trimUnnecessaryCodeBlockEmptyLines'),
+      bulletListMarker: (v, ov) => setCompareOption(v, ov, 'bulletListMarker'),
       orderListDelimiter: (v, ov) =>
-        this.setCompareOption(v, ov, 'orderListDelimiter'),
-      tabSize: (v, ov) => this.setCompareOption(v, ov, 'tabSize'),
-      fontSize: (v, ov) => this.setCompareOption(v, ov, 'fontSize'),
-      lineHeight: (v, ov) => this.setCompareOption(v, ov, 'lineHeight'),
+        setCompareOption(v, ov, 'orderListDelimiter'),
+      tabSize: (v, ov) => setCompareOption(v, ov, 'tabSize'),
+      fontSize: (v, ov) => setCompareOption(v, ov, 'fontSize'),
+      lineHeight: (v, ov) => setCompareOption(v, ov, 'lineHeight'),
       codeBlockLineNumbers: (v, ov) =>
-        this.setCompareOption(v, ov, 'codeBlockLineNumbers'),
-      listIndentation: (v, ov) =>
-        this.setCompareOption(v, ov, 'listIndentation'),
-      frontmatterType: (v, ov) =>
-        this.setCompareOption(v, ov, 'frontmatterType'),
-      superSubScript: (v, ov) => this.setCompareOption(v, ov, 'superSubScript'),
-      footnote: (v, ov) => this.setCompareOption(v, ov, 'footnote'),
+        setCompareOption(v, ov, 'codeBlockLineNumbers'),
+      listIndentation: (v, ov) => setCompareOption(v, ov, 'listIndentation'),
+      frontmatterType: (v, ov) => setCompareOption(v, ov, 'frontmatterType'),
+      superSubScript: (v, ov) => setCompareOption(v, ov, 'superSubScript'),
+      footnote: (v, ov) => setCompareOption(v, ov, 'footnote'),
       isGitlabCompatibilityEnabled: (v, ov) =>
-        this.setCompareOption(v, ov, 'isGitlabCompatibilityEnabled'),
+        setCompareOption(v, ov, 'isGitlabCompatibilityEnabled'),
       hideQuickInsertHint: (v, ov) =>
-        this.setCompareOption(v, ov, 'hideQuickInsertHint'),
-      hideLinkPopup: (v, ov) => this.setCompareOption(v, ov, 'hideLinkPopup'),
-      autoCheck: (v, ov) => this.setCompareOption(v, ov, 'autoCheck'),
-      sequenceTheme: (v, ov) => this.setCompareOption(v, ov, 'sequenceTheme'),
-      typewriter: this.typewriter,
+        setCompareOption(v, ov, 'hideQuickInsertHint'),
+      hideLinkPopup: (v, ov) => setCompareOption(v, ov, 'hideLinkPopup'),
+      autoCheck: (v, ov) => setCompareOption(v, ov, 'autoCheck'),
+      sequenceTheme: (v, ov) => setCompareOption(v, ov, 'sequenceTheme'),
+      typewriter: typewriter,
       clipboardFilePath: guessClipboardFilePath,
       disableHtml: false,
-      markdown: activeFile.body || '',
-      imageAction: async (image, id, alt = '') => {
+      imageAction: async (image, id, _alt = '') => {
         console.log('imageAction222', image);
         let result = image;
         if (!image.length) {
@@ -191,53 +149,77 @@ class Note extends Component {
         }
         return Promise.resolve(result);
       },
-      imagePathPicker: this.handleImagePathPicker,
-    });
+      imagePathPicker: async () => {
+        const { filePaths } = await remote.dialog.showOpenDialog({
+          properties: ['openFile'],
+          filters: [
+            {
+              name: 'Images',
+              extensions: IMAGE_EXTENSIONS,
+            },
+          ],
+          message: '选择添加图片',
+        });
+        if (filePaths && filePaths[0]) {
+          return filePaths[0];
+        } else {
+          return '';
+        }
+      },
+    }),
+    []
+  );
 
-    if (this.typewriter) {
-      this.scrollToCursor();
+  const handleContentChange = (data) => {
+    const { markdown } = data;
+    if (markdown !== body && markdown !== '\n') {
+      onChange(id, markdown);
     }
-    this.editor.on('change', this.handleContentChange);
   };
 
+  const closeMuya = () => {
+    if (!editorRef.current) {
+      return;
+    }
+    editorRef.current.off('change', handleContentChange);
+    editorRef.current.destroy();
+  };
 
+  const initMuya = () => {
+    if (!editorWrapRef.current) return;
+    editorRef.current = new Muya(editorWrapRef.current, {
+      ...options,
+      markdown: body,
+    });
+    editorRef.current.on('change', handleContentChange);
+  };
 
-  componentDidUpdate() {
-    console.log(
-      'componentDidUpdate:openMuya,scrollCursor',
-      this.props.activeFile
-    );
-    this.openMuya();
-    // if (this.typewriter) {
-    //   this.scrollToCursor();
-    // }
-  }
+  useEffect(() => {
+    initMuya();
+    return () => {
+      closeMuya();
+    };
+  }, [id]);
 
-  // componentDidMount() {
-  //   console.log('componentDidMount:openMuya', this.props.activeFile);
-  //   // this.openMuya();
-  // }
-
-  componentWillUnmount() {
-    console.log('componentWillUnmount:closeMuya');
-    this.closeMuya();
-  }
-
-  render() {
-    return (
-      <div className={styles.Note}>
-        <div
-          id="container"
-          style={{
-            padding: '6px 38px',
-            outline: 'none',
-            height: '100vh',
-            overflow: 'auto',
-          }}
-        />
-      </div>
-    );
-  }
-}
+  useEffect(() => {
+    if (editorRef.current) {
+      setMarkdownToEditor({ markdown: body });
+    }
+  }, [isLoaded]);
+  return (
+    <div className={styles.Note}>
+      <div
+        ref={editorWrapRef}
+        id="container"
+        style={{
+          padding: '6px 38px',
+          outline: 'none',
+          height: '100vh',
+          overflow: 'auto',
+        }}
+      />
+    </div>
+  );
+};
 
 export default Note;

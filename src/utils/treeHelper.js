@@ -1,4 +1,5 @@
 import antdIcons from './antdIcons';
+import { getSaveLocation } from './helper';
 
 export const findItemById = (arr, id) => {
   for (let i in arr) {
@@ -29,6 +30,26 @@ export const findItemsByIds = (arr, ids, result = []) => {
       return ids.find((id) => item.id === id);
     })
   );
+
+  return result;
+};
+
+/**
+ * 只搜索类型为file的
+ * @param {} arr
+ * @param {*} ids
+ * @param {*} result
+ */
+export const getChildrenFilePath = (arr, result = []) => {
+  // result.push(
+  arr.map((item) => {
+    if (item.children) {
+      return getChildrenFilePath(item.children, result);
+    }
+    result.push(item.path);
+    // return item.path;
+  });
+  // );
 
   return result;
 };
@@ -88,6 +109,7 @@ export const switchFileIcons = (arr) => {
     if (typeof arr[i].icon === 'string') {
       arr[i].icon = antdIcons[arr[i].icon];
     }
+    arr[i].selectable = arr[i].isLeaf || false;
     if (arr[i].children) {
       switchFileIcons(arr[i].children);
     }
@@ -110,7 +132,7 @@ export const deleteExtraAttr = (arr) => {
 export const deepClone = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
-
+const savedLocation = getSaveLocation();
 export const defaultFiles = [
   {
     id: 'todo',
@@ -125,6 +147,7 @@ export const defaultFiles = [
         key: '0-0-1',
         type: 'todo',
         icon: 'AimOutlined',
+        path: `${savedLocation}todo/today.json`,
         isLeaf: true,
       },
       {
@@ -133,6 +156,7 @@ export const defaultFiles = [
         key: '0-0-2',
         type: 'todo',
         icon: 'CalendarOutlined',
+        path: `${savedLocation}todo/week.json`,
         isLeaf: true,
       },
       {
@@ -140,7 +164,8 @@ export const defaultFiles = [
         title: '待整理',
         key: '0-0-3',
         type: 'todo',
-        icon: 'CheckCircleOutlined',
+        icon: 'QuestionCircleOutlined',
+        path: `${savedLocation}todo/question.json`,
         isLeaf: true,
       },
       {
@@ -149,6 +174,7 @@ export const defaultFiles = [
         key: '0-0-4',
         type: 'todo',
         icon: 'CheckCircleOutlined',
+        path: `${savedLocation}todo/done.json`,
         isLeaf: true,
       },
       {
@@ -269,14 +295,22 @@ export const defaultFiles = [
       // },
     ],
   },
-  // {
-  //   id: 'import',
-  //   title: '导入',
-  //   key: 'import',
-  //   type: 'import',
-  //   icon: 'ThunderboltFilled',
-  //   isLeaf: true,
-  // },
+  {
+    id: 'import',
+    title: '导入',
+    key: 'import',
+    type: 'import',
+    icon: 'ThunderboltFilled',
+    isLeaf: true,
+  },
+  {
+    id: 'photo',
+    title: '自拍壁纸',
+    key: 'photo',
+    type: 'photo',
+    icon: 'ThunderboltFilled',
+    isLeaf: false,
+  },
   {
     id: 'crash',
     title: '回收站',
@@ -285,14 +319,14 @@ export const defaultFiles = [
     icon: 'DeleteFilled',
     isLeaf: true,
   },
-  // {
-  //   id: 'setting',
-  //   title: '设置',
-  //   key: 'setting',
-  //   type: 'setting',
-  //   icon: 'SettingFilled',
-  //   isLeaf: true,
-  // },
+  {
+    id: 'setting',
+    title: '设置',
+    key: 'setting',
+    type: 'setting',
+    icon: 'SettingFilled',
+    isLeaf: true,
+  },
 ];
 
 export const getIconByFileType = (type, isLeaf) => {

@@ -1,18 +1,37 @@
-const fs = window.require('fs').promises;
+import { getSaveLocation } from './helper';
+
+const fs = window.require('fs');
+const fsPs = fs.promises;
 
 const fileHelper = {
   readFile: (path) => {
-    return fs.readFile(path, { encoding: 'utf-8' });
+    return fsPs.readFile(path, { encoding: 'utf-8' });
   },
   writeFile: (path, content) => {
-    return fs.writeFile(path, content, { encoding: 'utf-8' });
+    if (typeof content !== 'string') {
+      content = JSON.stringify(content);
+    }
+    return fsPs.writeFile(path, content, { encoding: 'utf-8' });
   },
   renameFile: (path, newPath) => {
     console.log(path, newPath);
-    return fs.rename(path, newPath);
+    return fsPs.rename(path, newPath);
   },
   deleteFile: (path) => {
-    return fs.unlink(path);
+    return fsPs.unlink(path);
+  },
+  exists: (path) => {
+    return fs.existsSync(path);
+  },
+  mkAppDirSync: (path) => {
+    const saveLoaction = getSaveLocation();
+    if(!fs.existsSync(saveLoaction)){
+      fs.mkdirSync(saveLoaction);
+    }
+    const targetLocation = `${saveLoaction}${path}`;
+    if (!fs.existsSync(targetLocation)) {
+      fs.mkdirSync(targetLocation);
+    }
   },
 };
 

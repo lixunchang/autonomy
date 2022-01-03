@@ -16,7 +16,7 @@ class AppWindow extends BrowserWindow {
         webSecurity: false,
         // contextIsolation: false,
       },
-      // show: false,
+      show: false,
       backgroundColor: '#efefef',
     };
     const finalConfig = { ...baseConfig, ...config };
@@ -26,18 +26,18 @@ class AppWindow extends BrowserWindow {
       this.show();
     });
     //===========自定义file:///协议的解析=======================
-    protocol.interceptFileProtocol(
-      'file',
-      (req, callback) => {
-        const url = req.url.substr(8);
-        callback(decodeURI(url));
-      },
-      (error) => {
-        if (error) {
-          console.error('Failed to register protocol');
-        }
-      }
-    );
+    // protocol.interceptFileProtocol(
+    //   'file',
+    //   (req, callback) => {
+    //     const url = req.url.substr(8);
+    //     callback(decodeURI(url));
+    //   },
+    //   (error) => {
+    //     if (error) {
+    //       console.error('Failed to register protocol');
+    //     }
+    //   }
+    // );
   }
 }
 

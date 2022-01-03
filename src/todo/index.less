@@ -1,37 +1,40 @@
+// .Todo {
+//   display: flex;
+//   height: calc(100% - 58px);
+//   text-align: left;
+//   .leftList {
+//     height: 100%;
+//   }
+// }
+
 .Todo {
+  width: 100%;
   display: flex;
+  flex-direction: column;
   height: calc(100% - 58px);
   text-align: left;
-  .leftList {
-    height: 100%;
-  }
-
-  .content {
-    flex: 1;
-    .inputSearch {
-      :global {
-        .ant-input-search-button {
-          padding: 0;
-          border: none;
-        }
+  .inputSearch {
+    :global {
+      .ant-input-search-button {
+        padding: 0;
+        border: none;
       }
     }
+  }
 
-    .title {
-      height: 45px;
-      line-height: 45px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-    }
+  .title {
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
 
-    .columns {
-      height: calc(100% - 100px);
-      display: flex;
-      justify-content: space-around;
-      min-height: 300px;
-    }
-    
+  .columns {
+    height: calc(100% - 100px);
+    display: flex;
+    justify-content: space-around;
+    min-height: 300px;
+    padding: 0 8px;
   }
 }
-

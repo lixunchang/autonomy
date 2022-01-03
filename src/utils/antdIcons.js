@@ -12,6 +12,7 @@ import {
   FolderOutlined,
   CheckCircleOutlined,
   WalletFilled,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 
 const antdIcons = {
@@ -28,6 +29,7 @@ const antdIcons = {
   FolderOutlined: <FolderOutlined />,
   CheckCircleOutlined: <CheckCircleOutlined />,
   WalletFilled: <WalletFilled />,
+  QuestionCircleOutlined: <QuestionCircleOutlined />,
 };
 
 export default antdIcons;

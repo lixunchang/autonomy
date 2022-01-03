@@ -1,0 +1,66 @@
+.Setting {
+  background: white;
+  display: flex;
+  height: 100%;
+  .dragArea {
+    width: 100%;
+    height: 26px;
+    cursor: move;
+    -webkit-app-region: drag;
+  }
+  :global {
+    .ant-btn-primary {
+      background-color: orangered;
+      border-color: orangered;
+    }
+    .ant-menu-item-selected::after {
+      left: 0;
+      right: auto;
+      border-color: orangered;
+    }
+    .ant-menu-submenu-selected .ant-menu-submenu-title {
+      color: orangered;
+    }
+    .ant-menu-item-selected {
+      background: #e2e2e2 !important;
+      color: orangered;
+    }
+    .ant-menu-inline {
+      background-color: #f0f0f0 !important;
+      &:hover {
+        .ant-menu-submenu-arrow {
+          color: orangered;
+          background: orangered;
+          background-color: orangered;
+        }
+      }
+    }
+
+    .ant-menu-submenu-title:hover {
+      background: #e2e2e2;
+      color: orangered;
+      .ant-menu-submenu-arrow {
+        color: orangered;
+        background: orangered;
+        background-color: orangered;
+      }
+    }
+    .ant-menu-item {
+      &:hover {
+        background: #e2e2e2;
+        color: orangered;
+      }
+    }
+  }
+  h3 {
+    height: 60px !important;
+    color: #333;
+    font-weight: 600;
+    padding: 16px 26px;
+    margin: 0;
+  }
+  h5 {
+    color: #666;
+    font-weight: 500;
+  }
+}

@@ -1,11 +1,12 @@
 {
-  "name": "cloud-note",
-  "version": "0.1.0",
+  "name": "autonomy",
+  "version": "1.0.0",
   "main": "main.js",
   "private": true,
+  "description":"自治领",
   "author": {
-    "name": "jack lee",
-    "email": "90@qq.com"
+    "name": "李行而上",
+    "email": "907203644@qq.com"
   },
   "dependencies": {
     "@octokit/rest": "^16.43.2",
@@ -110,8 +111,9 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "pack": "electron-builder --dir",
+    "package": "npm run build && electron-builder build --mac",
     "dist": "electron-builder",
-    "prepack": "num run build"
+    "prepack": "npm run build"
   },
   "eslintConfig": {
     "extends": [
@@ -133,10 +135,12 @@
   },
   "homepage": "./",
   "build": {
-    "appid": "",
-    "productName": "七牛云文档",
-    "copyright": "Copyright @ 2019 ${author}",
-    "extends": null,
+    "appId": "top.lixingli",
+    "productName": "自治领",
+    "copyright": "Copyright © 2022 ${author}",
+    "directories": {
+      "buildResources": "public"
+    },
     "files": [
       "build/**/*",
       "node_modules/**/*",
@@ -146,7 +150,43 @@
       "./src/menuTemplate.js",
       "./src/AppWindow.js",
       "./src/utils/QiniuManager.js"
-    ]
+    ],
+    "extends": null,  
+    "electronDownload": {
+      "mirror": "https://npm.taobao.org/mirrors/electron/"
+    },
+    "mac": {
+      "icon":"public/favicon.icns",
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "dmg": {
+      "background": "public/appdmg.jpg",
+      "icon": "public/favicon.icns",
+      "iconSize": 100,
+      "contents": [
+        {
+          "x": 380,
+          "y": 280,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 110,
+          "y": 280,
+          "type": "file"
+        }
+      ],
+      "window": {
+        "width": 500,
+        "height": 500
+      }
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false,
+      "perMachine": false
+    }
   },
   "devDependencies": {
     "concurrently": "^5.3.0",

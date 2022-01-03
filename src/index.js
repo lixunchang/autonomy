@@ -6,7 +6,12 @@ import App from './App';
 import Setting from './setting';
 import Crash from './crash';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { HashRouter as Router, Switch, Route } from 'react-router-dom'; // 只能用hash路由
+import fileHelper from './utils/fileHelper';
+
+fileHelper.mkAppDirSync('aim');
+fileHelper.mkAppDirSync('note');
+fileHelper.mkAppDirSync('todo');
 
 ReactDOM.render(
   <Router>
@@ -24,6 +29,8 @@ ReactDOM.render(
   </Router>,
   document.getElementById('root')
 );
+
+//ReactDOM.render(<App />, document.getElementById('root'));
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

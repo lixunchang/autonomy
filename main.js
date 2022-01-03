@@ -5,6 +5,7 @@ const AppWindow = require('./src/AppWindow');
 const Store = require('electron-store');
 const QiniuManager = require('./src/utils/QiniuManager');
 const path = require('path');
+const url = require('url');
 
 const settingsStore = new Store({ name: 'settings' });
 let mainWindow, newWindow;
@@ -19,30 +20,41 @@ const createManager = () => {
 app.on('ready', () => {
   const mainWindowConfig = {
     width: 1200,
-    height: 768,
+    height: 800,
   };
   const mainUrlLocation = isDev
-    ? 'http://localhost:3000'
-    : `file://${path.join(__dirname, './dist/index.html')}`;
+    ? 'http://localhost:3000/'
+    : url.format({
+        pathname: path.join(__dirname, './build/index.html'),
+        protocol: 'file:',
+        slashes: true,
+      });
   mainWindow = new AppWindow(mainWindowConfig, mainUrlLocation);
   mainWindow.on('close', () => {
     mainWindow = null;
   });
-
+ 
   // main event
-  ipcMain.on('open-new-window', (_, path) => {
-    console.log('opne-new-window-ipcrenderer', path);
+  ipcMain.on('open-new-window', (_, urlPath) => {
+    console.log('setting', urlPath);
     if (newWindow) {
       newWindow.close();
     }
     const newWindowConfig = {
-      width: 500,
-      height: 400,
+      width: 800,
+      height: 600,
       parent: mainWindow,
     };
-    const settingsUrlLocation = `http://localhost:3000/${path}`; // `file://${path.join(__dirname,'./settings.html')}`
+    const settingsUrlLocation = isDev
+      ? `http://localhost:3000/#/${urlPath}`
+      : url.format({
+          pathname: path.join(__dirname, '/build/index.html'),
+          protocol: 'file:',
+          slashes: true,
+          hash: 'setting',
+        });
     newWindow = new AppWindow(newWindowConfig, settingsUrlLocation);
-    if (path === 'settings') {
+    if (urlPath === 'setting') {
       newWindow.removeMenu();
     }
     newWindow.on('close', () => {

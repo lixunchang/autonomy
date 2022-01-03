@@ -40,16 +40,33 @@ const deleteColumnTask = (todoData, source) => ({
   }),
 });
 
-const sortTaskByRate = (columns)=>
+const sortTaskByRate = (columns) =>
   columns.map((column) => {
     column.tasks.sort((a, b) => b.rate - a.rate);
     return column;
   });
 
+const defalutColumns = [
+  {
+    id: 'column-todo',
+    name: '代办',
+    tasks: [],
+  },
+  {
+    id: 'column-inprogress',
+    name: '进行中',
+    tasks: [],
+  },
+  {
+    id: 'column-done',
+    name: '已完成',
+    tasks: [],
+  },
+];
 
 const TodoList = (props) => {
   const { todoData, onChange } = props;
-  const { columns = [] } = todoData;
+  const { columns = defalutColumns } = todoData;
   const [taskRate, setTaskRate] = useState(ERate.zero);
   const [inputTask, setInputTask] = useState('');
   const [taskRepeat, setTaskRepeat] = useState(ERepeat.once);
@@ -99,7 +116,7 @@ const TodoList = (props) => {
     });
     onChange({ ...todoData, columns });
     setInputTask('');
-    setTaskRate(ERate.one);
+    setTaskRate(ERate.zero);
   };
 
   const sortedColumns = sortTaskByRate(columns);

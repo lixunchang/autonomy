@@ -4,22 +4,44 @@ import { LikeOutlined } from '@ant-design/icons';
 
 import styles from './index.less';
 
-
 const AimList = (props) => {
-  const {
-    data = { title: '', desc: '', branchs: [], times: 0, currentTimes: 0 },
-    addBranchTimes,
-  } = props || {};
+  const { activeFile, addBranchTimes } = props || {};
+  const data =
+    typeof activeFile?.body === 'string' && activeFile?.body.length > 0
+      ? JSON.parse(activeFile.body)
+      : { branchs: [] };
+
   const { title, desc, branchs = [], times = 0, currentTimes = 0 } = data;
-  console.log('aimlist', times, currentTimes);
+  console.log('aimlist', data, branchs);
+
+  const handleTimesChagne = (index) => {
+    const newBranchs = [...branchs];
+    let dataCurrentTimes = data?.currentTimes;
+    if (index >= 0) {
+      if ((newBranchs[index]?.currentTimes || 0) < newBranchs[index]?.times) {
+        newBranchs[index].currentTimes += 1;
+        dataCurrentTimes = (data.currentTimes || 0) + 1;
+      }
+    } else {
+      if ((data?.currentTimes || 0) < data?.times) {
+        dataCurrentTimes = (data.currentTimes || 0) + 1;
+      }
+    }
+    addBranchTimes(activeFile.id, {
+      ...data,
+      currentTimes: dataCurrentTimes,
+      branchs: newBranchs,
+    });
+  };
 
   return (
     <div className={styles.AimList}>
       <Card
+        style={{ background: '#e6f7ff' }}
         actions={
           branchs.length < 1
             ? [
-                <span onClick={() => addBranchTimes(-1)}>
+                <span onClick={() => handleTimesChagne(-1)}>
                   <LikeOutlined key="times" style={{ marginRight: 4 }} />
                   {currentTimes}
                 </span>,
@@ -40,7 +62,7 @@ const AimList = (props) => {
             format={() => '总'}
           />
           <div className={styles.titleDes}>
-            <div className={styles.title}>{title}</div>
+            <div className={styles.title}>{activeFile.title}</div>
             <div className={styles.desc}>{desc}</div>
           </div>
         </div>
@@ -52,7 +74,7 @@ const AimList = (props) => {
             style={{ marginTop: 12 }}
             key={branch.id}
             actions={[
-              <span onClick={() => addBranchTimes(index)}>
+              <span onClick={() => handleTimesChagne(index)}>
                 <LikeOutlined key="times" style={{ marginRight: 4 }} />
                 {branch.currentTimes}
               </span>,

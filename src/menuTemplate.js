@@ -55,13 +55,13 @@ let template = [
           browserWindow.webContents.send('search-file');
         },
       },
-      // {
-      //   label: '导入',
-      //   accelerator: 'CmdOrCtrl+O',
-      //   click: (menuItem, browserWindow, event) => {
-      //     browserWindow.webContents.send('import-file');
-      //   },
-      // },
+      {
+        label: '导入',
+        accelerator: 'CmdOrCtrl+O',
+        click: (menuItem, browserWindow, event) => {
+          browserWindow.webContents.send('import-file');
+        },
+      },
     ],
   },
   {
@@ -191,7 +191,7 @@ let template = [
       {
         label: '学习更多',
         click: () => {
-          shell.openExternal('http://electron.atom.io');
+          shell.openExternal('https://lixingli.top');
         },
       },
     ],
@@ -199,12 +199,12 @@ let template = [
 ];
 
 if (process.platform === 'darwin') {
-  const name = app.getName();
+  const name = '自治领'; // app.getName();
   template.unshift({
     label: name,
     submenu: [
       {
-        label: `关于 ${name}`,
+        label: `关于${name}`,
         role: 'about',
       },
       {

@@ -7,8 +7,13 @@ import shortid from 'shortid';
 import { EAimType } from './initial';
 
 const EditAim = (props) => {
-  const { data, editId, onSubmit, onEditChange } = props || {};
-  const [title, setTitle] = useState(data.title || '');
+  const { activeFile, onSubmit } = props || {};
+  const data =
+    typeof activeFile?.body === 'string' && activeFile?.body.length > 0
+      ? JSON.parse(activeFile.body)
+      : { branchs: [] };
+  const [isEditing, setIsEditing] = useState(false);
+  // const [title, setTitle] = useState(activeFile.title || '');
   const [desc, setDesc] = useState(data.desc || '');
   const [times, setTimes] = useState(data.times || 0);
   const [startDate, setStartDate] = useState(
@@ -18,15 +23,14 @@ const EditAim = (props) => {
     data.branchs || [{ id: shortid.generate(), name: '' }]
   );
   useEffect(() => {
-    setTitle(data.title);
-    setDesc(data.desc);
-    setTimes(data.times);
-    setStartDate(data.startDate);
-    setBranchs(data.branchs);
-  }, [data.id]);
+    setDesc(data.desc || '');
+    setTimes(data.times || 0);
+    setStartDate(data.startDate || moment().format('YYYYMMDD'));
+    setBranchs(data.branchs || []);
+  }, [activeFile.id, activeFile.isLoaded]);
 
   const handleAddBranch = () => {
-    branchs.push({
+    branchs?.push({
       id: shortid.generate(),
       name: '',
       desc: '',
@@ -40,15 +44,14 @@ const EditAim = (props) => {
   };
 
   const handleSubmit = () => {
-    onSubmit({
+    onSubmit(activeFile.id, {
       ...data,
-      createTime: moment().valueOf(),
-      title,
       desc,
       times,
       startDate,
       branchs,
     });
+    setIsEditing(false);
   };
   const handleBranchChange = (key, e, index) => {
     let newBranchs = [...branchs];
@@ -57,50 +60,68 @@ const EditAim = (props) => {
   };
   const setBranchTimes = (num, index) => {
     let newBranchs = [...branchs];
-    setTimes(times - newBranchs[index].times + num);
+    console.log(
+      'xxxtimes',
+      times,
+      newBranchs[index],
+      newBranchs[index].times,
+      num,
+      times - newBranchs[index].times + num
+    );
+    setTimes(times - (newBranchs[index].times || 0) + num);
     newBranchs[index].times = num;
     setBranchs(newBranchs);
   };
-  console.log('editAim', data.id);
-  const isEditing = data.id === editId;
+  console.log(
+    'editAim',
+    activeFile,
+    data,
+    startDate,
+    data.startDate || moment().format('YYYYMMDD')
+  );
+  // const isEditing = data.id === editId;
   return (
     <div className={styles.EditAim}>
       <div className={styles.formItem}>
         <span className={styles.label}>目标名称：</span>
-        {isEditing ? (
+        {/* {isEditing ? (
           <Input
             onChange={(e) => setTitle(e.target.value)}
             value={title}
             style={{ width: '60%' }}
-            placeholder="请输入"
+            placeholder="请输入目标名称"
           />
-        ) : (
-          <div className={styles.aimTitle}>
-            {title}
-            <span
-              className={styles.edit}
-              onClick={() => onEditChange(EAimType.start, data.id)}
-            >
-              编辑
-            </span>
-          </div>
-        )}
+        ) : ( */}
+        <div className={styles.aimTitle}>
+          <span>{activeFile.title}</span>
+          <Button
+            disabled={isEditing}
+            type="text"
+            onClick={() => setIsEditing(true)}
+          >
+            编辑
+          </Button>
+        </div>
+        {/* )} */}
       </div>
-      <div className={styles.formItem}>
-        <span className={styles.label}>描述：</span>
-        {isEditing ? (
-          <Input.TextArea
-            rows={2}
-            onChange={(e) => setDesc(e.target.value)}
-            value={desc}
-            style={{ width: '60%' }}
-            placeholder="请输入"
-          />
-        ) : (
-          <div style={{ width: '60%', wordWrap: 'break-word' }}>{desc}</div>
-        )}
-      </div>
-      {branchs.map((branch, index) => {
+      {(isEditing || desc?.length > 0) && (
+        <div className={styles.formItem}>
+          <span className={styles.label}>描述：</span>
+          {isEditing ? (
+            <Input.TextArea
+              rows={2}
+              onChange={(e) => setDesc(e.target.value)}
+              value={desc}
+              style={{ width: '60%' }}
+              placeholder="请输入目标描述"
+            />
+          ) : (
+            <div style={{ width: '60%', wordWrap: 'break-word' }}>{desc}</div>
+          )}
+        </div>
+      )}
+
+      {branchs?.map((branch, index) => {
         if (!branch) return null;
         if (!isEditing && !branch.name) return null;
         return (
@@ -112,7 +133,7 @@ const EditAim = (props) => {
                   <Input
                     value={branch.name}
                     onChange={(e) => handleBranchChange('name', e, index)}
-                    placeholder="请输入"
+                    placeholder="请输入分支名"
                   />
                   <div className={styles.branchTimes}>
                     <InputNumber
@@ -132,20 +153,22 @@ const EditAim = (props) => {
                 </div>
               )}
             </div>
-            <div className={styles.formItem}>
-              <span className={styles.label}></span>
-              {isEditing ? (
-                <Input.TextArea
-                  value={branch.desc}
-                  onChange={(e) => handleBranchChange('desc', e, index)}
-                  rows={2}
-                  style={{ width: '60%' }}
-                  placeholder="请输入"
-                />
-              ) : (
-                <div style={{ width: '60%' }}>{branch.desc}</div>
-              )}
-            </div>
+            {(isEditing || branch?.desc?.length > 0) && (
+              <div className={styles.formItem}>
+                <span className={styles.label}></span>
+                {isEditing ? (
+                  <Input.TextArea
+                    value={branch.desc}
+                    onChange={(e) => handleBranchChange('desc', e, index)}
+                    rows={2}
+                    style={{ width: '60%' }}
+                    placeholder="请输入分支描述"
+                  />
+                ) : (
+                  <div style={{ width: '60%' }}>{branch.desc}</div>
+                )}
+              </div>
+            )}
           </div>
         );
       })}
@@ -180,10 +203,10 @@ const EditAim = (props) => {
             )}
           </div>
           <div className={styles.times}>
-            <span className={styles.label}>预期投入：</span>
+            <span className={styles.label}>总投入：</span>
             {isEditing ? (
               <InputNumber
-                disabled={branchs.length > 0}
+                disabled={branchs?.length > 0}
                 style={{ flex: 1, marginRight: 4 }}
                 min={0}
                 value={times}

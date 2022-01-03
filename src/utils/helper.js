@@ -1,3 +1,8 @@
+const Store = window.require('electron-store');
+const settingStore = new Store({ name: 'settings' });
+// const fileStore = new Store({ name: 'Files Data' });
+const { remote } = window.require('electron');
+
 export const getParentNode = (node, parentClassName) => {
   let current = node;
   while (current !== null) {
@@ -23,4 +28,15 @@ export const getChildNode = (children = [], childClassName) => {
   }
 };
 
+// fileStore.delete('files');
+export const getSaveLocation = () => {
+  return (
+    settingStore.get('savedFileLocatiion') ||
+    `${remote.app.getPath('documents')}/Autonomy/`
+  );
+};
 
+export const getAutoSync = () =>
+  ['accessKey', 'secretKey', 'bucket', 'enableAutoSync'].every(
+    (key) => !!settingStore.get(key)
+  );

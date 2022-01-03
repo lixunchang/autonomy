@@ -5,6 +5,8 @@ import {
   MailOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
+import { getSaveLocation } from '../utils/helper';
+import styles from './index.less';
 
 const { remote, ipcRenderer } = window.require('electron');
 const Store = window.require('electron-store');
@@ -14,9 +16,7 @@ const { SubMenu } = Menu;
 const { Search } = Input;
 
 const Setting = () => {
-  const savedLocation =
-    settingStore.get('savedFileLocatiion') ||
-    `${remote.app.getPath('documents')}/cloud-note/`;
+  const savedLocation = getSaveLocation();
   const [path, setPath] = useState(savedLocation || '');
   const [activeKey, setAcitveKey] = useState('path');
   const [accessKey, setAccessKey] = useState(
@@ -61,91 +61,139 @@ const Setting = () => {
   };
 
   return (
-    <div style={{ paddingTop: 26, display: 'flex' }}>
-      <Menu
-        mode="inline"
-        defaultOpenKeys={['sub1']}
-        selectedKeys={[activeKey]}
-        onClick={({ key }) => setAcitveKey(key)}
-        style={{ width: 126, height: '100%' }}
+    <div className={styles.Setting}>
+      <div
+        style={{
+          width: 220,
+          height: '100%',
+          background: '#f0f0f0',
+        }}
       >
-        <SubMenu key="sub1" icon={<MailOutlined />} title="主题">
-          <Menu.Item key="side">侧边栏</Menu.Item>
-          <Menu.Item key="editor">编辑器</Menu.Item>
-        </SubMenu>
-        <SubMenu key="sub2" icon={<AppstoreOutlined />} title="功能">
-          <Menu.Item key="function">功能选择</Menu.Item>
-          <Menu.Item key="path">保存路径</Menu.Item>
-        </SubMenu>
-        <SubMenu key="sub4" icon={<SettingOutlined />} title="第三方">
-          <Menu.Item key="qiniu">七牛云</Menu.Item>
-          <Menu.Item key="support">赞助</Menu.Item>
-        </SubMenu>
-      </Menu>
-      <div style={{ marginLeft: 16 }}>
-        <h2>设置</h2>
-        {activeKey === 'path' && (
-          <div>
-            <h3>选择文件保存位置</h3>
-            <Search
-              value={path}
-              placeholder="新的地址"
-              enterButton="选择新的地址"
-              onSearch={handleSelectFolder}
-              size="default"
-            />
-            <Button
-              onClick={onSavePath}
-              type="primary"
-              style={{ marginTop: 12 }}
-            >
-              保存
-            </Button>
-          </div>
-        )}
-        {activeKey === 'qiniu' && (
-          <div>
-            <h3>填写七牛云accessKey和secretKey</h3>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <sapn style={{ width: 120 }}>accessKey:</sapn>
-              <Input
-                value={accessKey}
-                placeholder="七牛云accessKey"
+        <div className={styles.dragArea} />
+        <Menu
+          mode="inline"
+          defaultOpenKeys={['sub1', 'sub2', 'sub3']}
+          selectedKeys={[activeKey]}
+          onClick={({ key }) => setAcitveKey(key)}
+          style={{
+            width: 220,
+            height: '100%',
+            paddingTop: 10,
+            background: '#f0f0f0',
+          }}
+        >
+          <SubMenu key="sub1" icon={<MailOutlined />} title="主题">
+            <Menu.Item key="side">侧边栏</Menu.Item>
+            <Menu.Item key="editor">编辑器</Menu.Item>
+          </SubMenu>
+          <SubMenu key="sub2" icon={<AppstoreOutlined />} title="功能">
+            <Menu.Item key="function">功能选择</Menu.Item>
+            <Menu.Item key="path">保存路径</Menu.Item>
+          </SubMenu>
+          <SubMenu key="sub3" icon={<SettingOutlined />} title="第三方">
+            <Menu.Item key="qiniu">七牛云</Menu.Item>
+            <Menu.Item key="support">赞助</Menu.Item>
+          </SubMenu>
+        </Menu>
+      </div>
+      <div style={{ flex: 1 }}>
+        <h3 className={styles.dragArea}>设置</h3>
+        <div style={{ margin: '0 26px' }}>
+          {activeKey === 'path' && (
+            <div>
+              <h5>选择文件保存位置</h5>
+              <Search
+                value={path}
+                placeholder="新的地址"
+                enterButton="选择新的地址"
+                onSearch={handleSelectFolder}
                 size="default"
-                onChange={(e) => setAccessKey(e.target.value)}
               />
+              <Button
+                onClick={onSavePath}
+                type="primary"
+                style={{ marginTop: 12 }}
+              >
+                保存
+              </Button>
             </div>
-            <div
-              style={{ display: 'flex', alignItems: 'center', marginTop: 14 }}
-            >
-              <span style={{ width: 120 }}>secretKey:</span>
-              <Input
-                value={secretKey}
-                placeholder="七牛云secretKey"
-                size="default"
-                onChange={(e) => setSecretKey(e.target.value)}
-              />
+          )}
+          {activeKey === 'qiniu' && (
+            <div>
+              <h5>填写七牛云accessKey和secretKey</h5>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <sapn
+                  style={{
+                    width: 124,
+                    color: '#999',
+                    textAlign: 'right',
+                    marginRight: 8,
+                  }}
+                >
+                  accessKey :
+                </sapn>
+                <Input
+                  value={accessKey}
+                  placeholder="七牛云accessKey"
+                  size="default"
+                  onChange={(e) => setAccessKey(e.target.value)}
+                />
+              </div>
+              <div
+                style={{ display: 'flex', alignItems: 'center', marginTop: 14 }}
+              >
+                <span
+                  style={{
+                    width: 124,
+                    color: '#999',
+                    textAlign: 'right',
+                    marginRight: 8,
+                  }}
+                >
+                  secretKey :
+                </span>
+                <Input
+                  value={secretKey}
+                  placeholder="七牛云secretKey"
+                  size="default"
+                  onChange={(e) => setSecretKey(e.target.value)}
+                />
+              </div>
+              <div
+                style={{ display: 'flex', alignItems: 'center', marginTop: 14 }}
+              >
+                <span
+                  style={{
+                    width: 124,
+                    color: '#999',
+                    textAlign: 'right',
+                    marginRight: 8,
+                  }}
+                >
+                  Bucket名称 :
+                </span>
+                <Input
+                  value={bucket}
+                  placeholder="七牛云bucket"
+                  size="default"
+                  onChange={(e) => setBucket(e.target.value)}
+                />
+              </div>
+              <Button
+                onClick={onSaveQiniuKeys}
+                type="primary"
+                style={{ marginTop: 12 }}
+              >
+                保存
+              </Button>
             </div>
-            <div
-              style={{ display: 'flex', alignItems: 'center', marginTop: 14 }}
-            >
-              <span style={{ width: 120 }}>Bucket名称:</span>
-              <Input
-                value={bucket}
-                placeholder="七牛云bucket"
-                size="default"
-                onChange={(e) => setBucket(e.target.value)}
-              />
-            </div>
-            <Button
-              onClick={onSaveQiniuKeys}
-              type="primary"
-              style={{ marginTop: 12 }}
-            >
-              保存
-            </Button>
-          </div>
-        )}
+          )}
+          {activeKey !== 'path' && activeKey !== 'qiniu' && (
+            <span style={{ color: 'orangered', marginTop: 26 }}>
+              ## 功能开发中...
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

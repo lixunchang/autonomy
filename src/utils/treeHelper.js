@@ -1,4 +1,3 @@
-import { isDevelop } from './helper';
 import antdIcons from './antdIcons';
 import { getSaveLocation } from './helper';
 
@@ -134,10 +133,10 @@ export const deepClone = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const savedLocation = getSaveLocation();
-
+const isDevelop = false;
 export const initAllFiles = (files = [], defaultFiles = []) => {
   return defaultFiles
-    .filter((item) => isDevelop() || item.status !== 'develop')
+    .filter((item) => isDevelop || item.status !== 'develop')
     .map((item) => {
       const [file] = files.filter((ite) => ite.id === item.id);
       return {

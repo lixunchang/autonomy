@@ -5,13 +5,14 @@ import {
   MailOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { getSaveLocation, isDevelop } from '../utils/helper';
+import { getSaveLocation } from '../utils/helper';
 import styles from './index.less';
 
 const { remote, ipcRenderer } = window.require('electron');
 const Store = window.require('electron-store');
+const isDevelop = false;
 const settingStore = new Store({
-  name: isDevelop() ? 'Settings_dev' : 'Settings',
+  name: isDevelop ? 'Settings_dev' : 'Settings',
 });
 
 const { SubMenu } = Menu;

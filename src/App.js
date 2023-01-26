@@ -25,14 +25,14 @@ import shortid from 'shortid';
 import fileHelper from './utils/fileHelper';
 import useIpcRenderer from './hooks/useIpcRenderer';
 import Draggable from 'react-draggable';
-import { getSaveLocation, getAutoSync, isDevelop } from './utils/helper';
+import { getSaveLocation, getAutoSync } from './utils/helper';
 import Music from './music';
 // Node API
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
 const Store = window.require('electron-store');
-
-const fileStore = new Store({ name: isDevelop() ? 'Dev Data' : 'Files Data' });
+const isDevelop = false;
+const fileStore = new Store({ name: isDevelop ? 'Dev Data' : 'Files Data' });
 // fileStore.set('files', defaultFiles); //重置操作
 
 const savedLocation = getSaveLocation();

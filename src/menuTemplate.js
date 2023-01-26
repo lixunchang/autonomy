@@ -1,9 +1,9 @@
 const { app, shell, ipcMain } = require('electron');
 const Store = require('electron-store');
-const { isDevelop } = require('./utils/helper');
 
+const isDevelop = false;
 const settingsStore = new Store({
-  name: isDevelop() ? 'Settings_dev' : 'Settings',
+  name: isDevelop ? 'Settings_dev' : 'Settings',
 });
 
 const qiniuIsConfiged = ['accessKey', 'secretKey', 'bucket'].every(

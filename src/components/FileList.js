@@ -139,7 +139,7 @@ const FileList = ({
           background: '#6E6E6E',
           color: 'white',
         }}
-        defaultExpandAll
+        defaultExpandAll={false}
         // onSelect={(_, { isLeaf, id, path, isLoaded }) => {}}
         selectedKeys={selectKey}
         selectable={true}

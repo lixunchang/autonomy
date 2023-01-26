@@ -4,7 +4,7 @@ import DecoupledDocumentEditor from '@ckeditor/ckeditor5-editor-decoupled/src/de
 import { builtinPlugins } from './config';
 // import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
+import './index.less';
 export default function CKEditor5 ({value, onChange}){
 
   return (

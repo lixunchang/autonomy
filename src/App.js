@@ -8,6 +8,7 @@ import Todo from './todo';
 import Aim from './aim';
 import {
   defaultFiles,
+  initAllFiles,
   importChildren,
   findItemById,
   editItemById,
@@ -24,13 +25,14 @@ import shortid from 'shortid';
 import fileHelper from './utils/fileHelper';
 import useIpcRenderer from './hooks/useIpcRenderer';
 import Draggable from 'react-draggable';
-import { getSaveLocation, getAutoSync } from './utils/helper';
+import { getSaveLocation, getAutoSync, isDevelop } from './utils/helper';
+import Music from './music';
 // Node API
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
 const Store = window.require('electron-store');
 
-const fileStore = new Store({ name: 'Files Data' });
+const fileStore = new Store({ name: isDevelop() ? 'Dev Data' : 'Files Data' });
 // fileStore.set('files', defaultFiles); //重置操作
 
 const savedLocation = getSaveLocation();
@@ -38,6 +40,7 @@ const savedLocation = getSaveLocation();
 const defaultSiderWidth = 260;
 const miniSiderWidth = 190;
 const maxSiderWidth = 360;
+
 /**
  * state分析
  * - 文件列表 【】
@@ -47,7 +50,9 @@ const maxSiderWidth = 360;
  * - 当前选中的文件
  */
 function App() {
-  const [files, setFiles] = useState(fileStore.get('files') || defaultFiles);
+  const [files, setFiles] = useState(
+    initAllFiles(fileStore.get('files'), defaultFiles)
+  );
   const [activeFileId, setActiveFileId] = useState('');
   const [openedFileIds, setOpenedFileIds] = useState([]);
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
@@ -114,7 +119,7 @@ function App() {
           });
         } else {
           fileHelper.readFile(path).then((val) => {
-            console.log('readFile-222', path, val);
+            // console.log('readFile-222', path, val);
             const newFiles = editItemById(files, id, {
               body: val,
               isLoaded: true,
@@ -224,7 +229,7 @@ function App() {
   };
 
   const fileChange = (id, value) => {
-    console.log('fileChange', id, value);
+    // console.log('fileChange', id, value);
     if (typeof value !== 'string') {
       value = JSON.stringify(value);
     }
@@ -238,10 +243,11 @@ function App() {
   };
 
   const saveEditFile = () => {
-    console.log('我要开始执行save了');
+    if (!activeFile) return;
+    // console.log('我要开始执行save了');
     const { path, body, title } = activeFile;
     // if (activeFile.type === 'note') {
-    console.log('保存文件，我执行了', path, body);
+    // console.log('保存文件，我执行了', path, body);
     return fileHelper.writeFile(path, body).then(() => {
       setUnsavedFileIds(unsavedFileIds.filter((id) => id !== activeFileId));
       if (getAutoSync()) {
@@ -303,11 +309,11 @@ function App() {
   };
 
   const activeFileDownloaded = (_, data) => {
-    console.log('activeFileDownloaded++++', data);
+    // // console.log('activeFileDownloaded++++', data);
     const curFile = findItemById(files, data.id);
-    console.log('activeFileDownloaded++++', curFile.path);
+    // // console.log('activeFileDownloaded++++', curFile.path);
     fileHelper.readFile(curFile.path).then((value) => {
-      console.log('readFile++++++', value);
+      // // console.log('readFile++++++', value);
       let newData;
       if (data.status === 'downloaded-success') {
         newData = {
@@ -322,7 +328,7 @@ function App() {
           isLoaded: true,
         };
       }
-      console.log('activeFileDownloaded', newData);
+      // // console.log('activeFileDownloaded', newData);
       const newFiles = editItemById(files, data.id, newData);
       setFiles(newFiles);
       saveFile2Store(newFiles);
@@ -339,7 +345,7 @@ function App() {
     'file-downloaded': activeFileDownloaded,
     'save-edit-file': saveEditFile,
   });
-  console.log('activeFileId', activeFile, files);
+  // // console.log('activeFileId', activeFile, files);
   return (
     <div className={styles.App}>
       <div style={{ height: '100%', display: 'flex' }}>
@@ -356,7 +362,7 @@ function App() {
           <FileSearch
             title=""
             onFileSearch={(val) => {
-              console.log(val);
+              // console.log(val);
             }}
           />
           <FileList
@@ -410,6 +416,7 @@ function App() {
                   fontWeight: 600,
                   margin: 0,
                   backgroundColor: '#fafbfc',
+                  position: 'relative',
                 }}
               >
                 {unsavedFileIds.includes(activeFileId) && (
@@ -423,6 +430,8 @@ function App() {
                 <Note activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === 'aim' ? (
                 <Aim activeFile={activeFile} onChange={fileChange} />
+              ) : activeFile.type === 'music' ? (
+                <Music activeFile={activeFile} onChange={fileChange} />
               ) : (
                 <div className={styles.empty}>
                   <h3 style={{ color: 'red' }}>

@@ -9,7 +9,7 @@ import { Input, Rate, Dropdown, Button, Menu } from 'antd';
 import { ITodo } from './initial';
 
 const switchColumnTask = (todoData, source, destination) => {
-  console.log('******', source.index);
+  // console.log('******', source.index);
   const { columns } = todoData;
   let task;
   let targetColumnIndex;
@@ -26,7 +26,7 @@ const switchColumnTask = (todoData, source, destination) => {
   if ((targetColumnIndex || targetColumnIndex === 0) && task) {
     newColumns[targetColumnIndex].tasks.splice(destination.index, 0, task);
   }
-  console.log('xxxnewColumns', newColumns);
+  // console.log('xxxnewColumns', newColumns);
   return { ...todoData, columns: newColumns };
 };
 
@@ -135,7 +135,7 @@ const TodoList = (props) => {
     setInputTaskDesc('');
     setTaskRate(ERate.zero);
   };
-  console.log('todo==', todoData, columns);
+  // console.log('todo==', todoData, columns);
   const sortedColumns = sortTaskByRate(columns);
   return (
     <DragDropContext onDragEnd={handleDragEnd}>

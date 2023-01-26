@@ -13,7 +13,7 @@ const Aim = ({ activeFile, onChange }) => {
   // const [allAims, setAllAims] = useState(initAims);
   // const { currentId = allAims.data[0].id, editId, data = [] } = allAims;
   // const [currentAim] = data.filter((item) => item.id === currentId);
-  // console.log('currentAim', initAims, currentAim);
+  // // console.log('currentAim', initAims, currentAim);
   // const changeCurrentAim = (aim) => {
   //   const newDatas = data.filter((item) => item.id !== currentId);
   //   newDatas.push({ ...aim, modifyTime: moment().valueOf() });

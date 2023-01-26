@@ -29,7 +29,7 @@ const defaultTodo = {
 };
 
 const Todo = (props) => {
-  console.log('todo===', props);
+  // console.log('todo===', props);
   const { activeFile, onChange } = props;
   // const newId = shortid.generate();
   // const initTodos = initTodo(newTodo(moment(), newId), newId);

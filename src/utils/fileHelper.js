@@ -14,7 +14,7 @@ const fileHelper = {
     return fsPs.writeFile(path, content, { encoding: 'utf-8' });
   },
   renameFile: (path, newPath) => {
-    console.log(path, newPath);
+    // console.log(path, newPath);
     return fsPs.rename(path, newPath);
   },
   deleteFile: (path) => {
@@ -25,7 +25,7 @@ const fileHelper = {
   },
   mkAppDirSync: (path) => {
     const saveLoaction = getSaveLocation();
-    if(!fs.existsSync(saveLoaction)){
+    if (!fs.existsSync(saveLoaction)) {
       fs.mkdirSync(saveLoaction);
     }
     const targetLocation = `${saveLoaction}${path}`;

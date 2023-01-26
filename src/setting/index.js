@@ -5,12 +5,14 @@ import {
   MailOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { getSaveLocation } from '../utils/helper';
+import { getSaveLocation, isDevelop } from '../utils/helper';
 import styles from './index.less';
 
 const { remote, ipcRenderer } = window.require('electron');
 const Store = window.require('electron-store');
-const settingStore = new Store({ name: 'settings' });
+const settingStore = new Store({
+  name: isDevelop() ? 'Settings_dev' : 'Settings',
+});
 
 const { SubMenu } = Menu;
 const { Search } = Input;
@@ -43,7 +45,7 @@ const Setting = () => {
 
   const onSavePath = () => {
     if (path) {
-      settingStore.set('savedFileLocatiion', path);
+      settingStore.set('savedFileLocation', path);
       remote.getCurrentWindow().close();
     }
   };

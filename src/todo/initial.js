@@ -27,7 +27,7 @@ export const ESort = {
 };
 
 export const newTodo = (momentFn, id) => {
-  console.log('momentFn', momentFn, id);
+  // console.log('momentFn', momentFn, id);
   const curTime = momentFn.valueOf();
   return {
     id,

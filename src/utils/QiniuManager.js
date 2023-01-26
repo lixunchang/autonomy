@@ -107,10 +107,10 @@ class QiniuManager {
         throw respErr;
       }
       if (respInfo.statusCode === 200) {
-        console.log(respBody);
+        // console.log(respBody);
         resolve(respBody);
       } else {
-        console.log(respInfo.statusCode, respBody);
+        // console.log(respInfo.statusCode, respBody);
         reject({
           statusCode: respInfo.statusCode,
           body: respBody,

@@ -8,6 +8,7 @@ import Crash from './crash';
 import reportWebVitals from './reportWebVitals';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom'; // 只能用hash路由
 import fileHelper from './utils/fileHelper';
+import Iframe from './music/Iframe';
 
 fileHelper.mkAppDirSync('aim');
 fileHelper.mkAppDirSync('note');
@@ -24,6 +25,9 @@ ReactDOM.render(
       </Route>
       <Route path="/crash">
         <Crash />
+      </Route>
+      <Route path="/iframe">
+        <Iframe />
       </Route>
     </Switch>
   </Router>,

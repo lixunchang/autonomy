@@ -60,25 +60,25 @@ const EditAim = (props) => {
   };
   const setBranchTimes = (num, index) => {
     let newBranchs = [...branchs];
-    console.log(
-      'xxxtimes',
-      times,
-      newBranchs[index],
-      newBranchs[index].times,
-      num,
-      times - newBranchs[index].times + num
-    );
+    // console.log(
+    //   'xxxtimes',
+    //   times,
+    //   newBranchs[index],
+    //   newBranchs[index].times,
+    //   num,
+    //   times - newBranchs[index].times + num
+    // );
     setTimes(times - (newBranchs[index].times || 0) + num);
     newBranchs[index].times = num;
     setBranchs(newBranchs);
   };
-  console.log(
-    'editAim',
-    activeFile,
-    data,
-    startDate,
-    data.startDate || moment().format('YYYYMMDD')
-  );
+  // console.log(
+  //   'editAim',
+  //   activeFile,
+  //   data,
+  //   startDate,
+  //   data.startDate || moment().format('YYYYMMDD')
+  // );
   // const isEditing = data.id === editId;
   return (
     <div className={styles.EditAim}>

@@ -12,7 +12,7 @@ const AimList = (props) => {
       : { branchs: [] };
 
   const { title, desc, branchs = [], times = 0, currentTimes = 0 } = data;
-  console.log('aimlist', data, branchs);
+  // console.log('aimlist', data, branchs);
 
   const handleTimesChagne = (index) => {
     const newBranchs = [...branchs];

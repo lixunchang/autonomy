@@ -14,7 +14,7 @@ class AppWindow extends BrowserWindow {
         nodeIntegration: true, // 是否集成 Nodejs
         enableRemoteModule: true,
         webSecurity: false,
-        // contextIsolation: false,
+        contextIsolation: false,
       },
       show: false,
       backgroundColor: '#efefef',

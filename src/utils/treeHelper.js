@@ -1,3 +1,4 @@
+import { isDevelop } from './helper';
 import antdIcons from './antdIcons';
 import { getSaveLocation } from './helper';
 
@@ -42,7 +43,7 @@ export const findItemsByIds = (arr, ids, result = []) => {
  */
 export const getChildrenFilePath = (arr, result = []) => {
   // result.push(
-  arr.map((item) => {
+  arr.forEach((item) => {
     if (item.children) {
       return getChildrenFilePath(item.children, result);
     }
@@ -133,8 +134,32 @@ export const deepClone = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const savedLocation = getSaveLocation();
+
+export const initAllFiles = (files = [], defaultFiles = []) => {
+  return defaultFiles
+    .filter((item) => isDevelop() || item.status !== 'develop')
+    .map((item) => {
+      const [file] = files.filter((ite) => ite.id === item.id);
+      return {
+        ...item,
+        ...file,
+        isLeaf: item.isLeaf,
+      };
+    });
+};
+
 export const defaultFiles = [
   {
+    sort: 0,
+    id: 'note',
+    title: '笔记本',
+    key: 'note',
+    type: 'note',
+    icon: 'WalletFilled',
+    children: [],
+  },
+  {
+    sort: 1,
     id: 'todo',
     title: '清单',
     key: 'todo',
@@ -188,64 +213,7 @@ export const defaultFiles = [
     ],
   },
   {
-    id: 'note',
-    title: '笔记本',
-    key: 'note',
-    type: 'note',
-    icon: 'WalletFilled',
-    children: [
-      // {
-      //   id: '00011',
-      //   title: '自媒体文集',
-      //   key: '0-1-3',
-      //   type: 'note',
-      //   icon: 'FolderOutlined',
-      //   children: [
-      //     {
-      //       id: '000111',
-      //       title: '飞往北京不可得',
-      //       type: 'note',
-      //       body: '## 飞往北京不可得',
-      //       createAt: 13344445,
-      //       key: '0-1-3-0',
-      //       icon: 'ProfileOutlined',
-      //       isLeaf: true,
-      //     },
-      //     {
-      //       id: '000113',
-      //       title: '什么情况下你请我',
-      //       key: '0-3-3-1',
-      //       type: 'note',
-      //       body: '## 什么情况下你请我',
-      //       createAt: 13344445,
-      //       icon: 'ProfileOutlined',
-      //       isLeaf: true,
-      //     },
-      //   ],
-      // },
-      // {
-      //   id: '00012',
-      //   title: '古都的秋',
-      //   key: '0-1-0',
-      //   type: 'note',
-      //   body: '## 古都的秋',
-      //   createAt: 13344445,
-      //   icon: 'ProfileOutlined',
-      //   isLeaf: true,
-      // },
-      // {
-      //   id: '00014',
-      //   title: '桨声灯影里的秦淮河',
-      //   key: '0-1-1',
-      //   type: 'note',
-      //   body: '## 桨声灯影里的秦淮河',
-      //   createAt: 13344445,
-      //   icon: 'ProfileOutlined',
-      //   isLeaf: true,
-      // },
-    ],
-  },
-  {
+    sort: 2,
     id: 'aim',
     title: '打卡记录',
     key: 'aim',
@@ -254,25 +222,29 @@ export const defaultFiles = [
     children: [
       // {
       //   id: '011',
-      //   title: 'leaf 0-0',
+      //   title: '测试',
       //   key: '011',
       //   type: 'aim',
       //   icon: 'FolderOutlined',
       //   isLeaf: false,
       // },
-      // {
-      //   id: '012',
-      //   title: 'leaf 0-1',
-      //   key: '012',
-      //   type: 'aim',
-      //   icon: 'ProfileOutlined',
-      //   isLeaf: true,
-      // },
     ],
   },
   {
+    sort: 3,
+    id: 'photo',
+    title: '自拍壁纸',
+    status: 'develop',
+    key: 'photo',
+    type: 'photo',
+    icon: 'ThunderboltFilled',
+    isLeaf: false,
+  },
+  {
+    sort: 4,
     id: 'amount',
     title: '记账本',
+    status: 'develop',
     key: 'amount',
     type: 'amount',
     icon: 'DollarCircleFilled',
@@ -285,18 +257,22 @@ export const defaultFiles = [
       //   icon: 'AccountBookOutlined',
       //   isLeaf: true,
       // },
-      // {
-      //   id: '010445',
-      //   title: 'leaf 1-1',
-      //   key: '0-4-1',
-      //   type: 'amount',
-      //   icon: 'AccountBookOutlined',
-      //   isLeaf: true,
-      // },
     ],
   },
   {
+    sort: 5,
+    id: 'music',
+    status: 'develop',
+    title: '音乐圈',
+    key: 'music',
+    type: 'music',
+    icon: 'ThunderboltFilled',
+    isLeaf: true,
+  },
+  {
+    sort: 6,
     id: 'import',
+    status: 'develop',
     title: '导入',
     key: 'import',
     type: 'import',
@@ -304,22 +280,17 @@ export const defaultFiles = [
     isLeaf: true,
   },
   {
-    id: 'photo',
-    title: '自拍壁纸',
-    key: 'photo',
-    type: 'photo',
-    icon: 'ThunderboltFilled',
-    isLeaf: false,
-  },
-  {
+    sort: 7,
     id: 'crash',
     title: '回收站',
+    status: 'develop',
     key: 'crash',
     type: 'crash',
     icon: 'DeleteFilled',
     isLeaf: true,
   },
   {
+    sort: 8,
     id: 'setting',
     title: '设置',
     key: 'setting',

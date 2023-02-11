@@ -10,8 +10,8 @@ const SmallRate =({value=0,count=4, style})=>{
   }
 
   return <div className={styles.SmallRate} style={style}>
-    {data.map(it=>{
-      return <div style={{width: it*3}} className={`${styles.line} ${it<=value?styles.active:''}`}/>
+    {data.map((it, i)=>{
+      return <div key={it+''+i} style={{width: it*3}} className={`${styles.line} ${it<=value?styles.active:''}`}/>
     })}
   </div>
 }

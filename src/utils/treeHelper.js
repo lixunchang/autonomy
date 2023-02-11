@@ -67,10 +67,11 @@ export const editItemById = (arr, id, data) => {
 };
 export const importChildren = (arr, id, data) => {
   for (let i = 0; i < arr.length; i++) {
+    if (!arr[i].children) return;
     if (arr[i].id === id) {
       arr[i].children = arr[i].children.concat(data);
       break;
-    } else if (arr[i].children) {
+    } else {
       importChildren(arr[i].children, id, data);
     }
   }
@@ -79,6 +80,7 @@ export const importChildren = (arr, id, data) => {
 //  递归多次 return;
 export const deleteItemById = (arr, id) => {
   for (let i = 0; i < arr.length; i++) {
+    arr = arr.filter((item) => item.id !== id);
     if (arr[i].children) {
       let len = arr[i].children.length;
       arr[i].children = arr[i].children.filter((item) => item.id !== id);
@@ -150,6 +152,15 @@ export const initAllFiles = (files = [], defaultFiles = []) => {
 export const defaultFiles = [
   {
     sort: 0,
+    id: 'autonomy',
+    title: '自治领',
+    key: 'autonomy',
+    type: 'note',
+    icon: 'WalletFilled',
+    children: [],
+  },
+  {
+    sort: 1,
     id: 'note',
     title: '笔记本',
     key: 'note',
@@ -158,7 +169,7 @@ export const defaultFiles = [
     children: [],
   },
   {
-    sort: 1,
+    sort: 2,
     id: 'todo',
     title: '清单',
     key: 'todo',
@@ -212,9 +223,9 @@ export const defaultFiles = [
     ],
   },
   {
-    sort: 2,
+    sort: 3,
     id: 'aim',
-    title: '打卡记录',
+    title: '打卡',
     key: 'aim',
     type: 'aim',
     icon: 'CarryOutFilled',
@@ -229,16 +240,16 @@ export const defaultFiles = [
       // },
     ],
   },
-  {
-    sort: 3,
-    id: 'photo',
-    title: '自拍壁纸',
-    status: 'develop',
-    key: 'photo',
-    type: 'photo',
-    icon: 'ThunderboltFilled',
-    isLeaf: false,
-  },
+  // {
+  //   sort: 3,
+  //   id: 'photo',
+  //   title: '自拍壁纸',
+  //   status: 'develop',
+  //   key: 'photo',
+  //   type: 'photo',
+  //   icon: 'ThunderboltFilled',
+  //   isLeaf: false,
+  // },
   {
     sort: 4,
     id: 'amount',
@@ -262,22 +273,22 @@ export const defaultFiles = [
     sort: 5,
     id: 'music',
     status: 'develop',
-    title: '音乐圈',
+    title: '天禅乐',
     key: 'music',
     type: 'music',
-    icon: 'ThunderboltFilled',
+    icon: 'CustomerServiceOutlined',
     isLeaf: true,
   },
-  {
-    sort: 6,
-    id: 'import',
-    status: 'develop',
-    title: '导入',
-    key: 'import',
-    type: 'import',
-    icon: 'ThunderboltFilled',
-    isLeaf: true,
-  },
+  // {
+  //   sort: 6,
+  //   id: 'import',
+  //   status: 'develop',
+  //   title: '导入',
+  //   key: 'import',
+  //   type: 'import',
+  //   icon: 'ThunderboltFilled',
+  //   isLeaf: true,
+  // },
   {
     sort: 7,
     id: 'crash',
@@ -299,6 +310,19 @@ export const defaultFiles = [
   },
 ];
 
+export const defaultKeys = [
+  'autonomy',
+  'note',
+  'aim',
+  'todo',
+  'amount',
+  'music',
+  'crash',
+  'setting',
+];
+export const noInportKeys = ['setting', 'crash'];
+export const noDeleteKeys = ['autonomy', 'setting', 'crash'];
+
 export const getIconByFileType = (type, isLeaf) => {
   if (!isLeaf) {
     return 'FolderOutlined';
@@ -307,13 +331,12 @@ export const getIconByFileType = (type, isLeaf) => {
     case 'todo':
       return 'CheckCircleOutlined';
     case 'note':
-      return 'ProfileOutlined';
+      return 'FileMarkdownOutlined';
     case 'aim':
-      return 'ProfileOutline';
+      return 'ProfileOutlined';
     case 'amount':
       return 'AccountBookOutlined';
     default:
-      break;
+      return 'ProfileOutlined';
   }
-  return 'ProfileOutline';
 };

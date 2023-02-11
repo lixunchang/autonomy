@@ -81,7 +81,6 @@ const Setting = () => {
           style={{
             width: 220,
             height: '100%',
-            paddingTop: 10,
             background: '#f0f0f0',
           }}
         >
@@ -100,7 +99,7 @@ const Setting = () => {
         </Menu>
       </div>
       <div style={{ flex: 1 }}>
-        <h3 className={styles.dragArea}>设置</h3>
+        <h3 className={styles.dragArea2}>设置</h3>
         <div style={{ margin: '0 26px' }}>
           {activeKey === 'path' && (
             <div>

@@ -41,7 +41,7 @@ const FileSearch = ({ title, onFileSearch }) => {
     <div className={styles.FileSearch}>
       {!inputActive ? (
         <div className={styles.noInputActive}>
-          <span className={styles.title}>我的文档</span>
+          <span className={styles.title}>我的自治领</span>
           <Button
             style={{ width: 24 }}
             type="text"
@@ -52,7 +52,7 @@ const FileSearch = ({ title, onFileSearch }) => {
       ) : (
         <div className={styles.inputActive}>
           <Input
-            placeholder="搜索我的文档"
+            placeholder="搜索"
             ref={node}
             value={value}
             onChange={(e) => setValue(e.target.value)}

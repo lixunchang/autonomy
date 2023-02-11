@@ -15,7 +15,9 @@
 
 .taskList {
   height: calc(100% - 34px);
+  overflow-y: auto;
   transition: background-color 0.2s ease;
+  &::-webkit-scrollbar { width: 0 !important }
 }
 
 .Task {

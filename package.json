@@ -1,6 +1,6 @@
 {
   "name": "autonomy",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "main.js",
   "private": true,
   "description": "自治领",
@@ -8,6 +8,7 @@
     "name": "格心派",
     "email": "783263503@qq.com"
   },
+  "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
     "@babel/core": "^7.20.12",
@@ -42,9 +43,6 @@
     "@octokit/core": "^4.2.0",
     "@octokit/rest": "^16.43.2",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
-    "@remirror/pm": "^2.0.3",
-    "@remirror/react": "^2.0.25",
-    "@tinymce/tinymce-react": "^4.3.0",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
     "@typescript-eslint/parser": "^4.0.0",
     "antd": "^4.24.7",
@@ -132,7 +130,6 @@
     "unsplash-js": "^6.3.0",
     "url-loader": "4.1.1",
     "use-prosemirror": "^1.3.0",
-    "vditor": "^3.9.0",
     "vega": "^5.22.1",
     "vega-embed": "^6.21.0",
     "vega-lite": "^4.17.0",
@@ -175,9 +172,9 @@
   },
   "homepage": "./",
   "build": {
-    "appId": "top.lixingli",
+    "appId": "io.github.gexinpai",
     "productName": "自治领",
-    "copyright": "Copyright © 2022 ${author}",
+    "copyright": "Copyright © 2023 GeXinPai",
     "directories": {
       "buildResources": "public"
     },
@@ -192,16 +189,13 @@
       "./src/utils/QiniuManager.js"
     ],
     "extends": null,
-    "electronDownload": {
-      "mirror": "https://npm.taobao.org/mirrors/electron/"
-    },
     "mac": {
       "icon": "public/favicon.icns",
       "category": "public.app-category.productivity",
       "artifactName": "${productName}-${version}-${arch}.${ext}"
     },
     "dmg": {
-      "background": "public/appdmg.jpg",
+      "background": "public/appdmg.png",
       "icon": "public/favicon.icns",
       "iconSize": 100,
       "contents": [
@@ -232,7 +226,7 @@
     "concurrently": "^5.3.0",
     "cross-env": "^7.0.3",
     "electron": "^11.5.0",
-    "electron-builder": "^22.14.13",
+    "electron-builder": "^23.0.0",
     "less": "^4.1.3",
     "less-loader": "^7.3.0",
     "nodemon": "^2.0.20",
@@ -294,5 +288,9 @@
     "presets": [
       "react-app"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gexinpai/autonomy.git"
   }
 }

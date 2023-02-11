@@ -95,8 +95,8 @@ const TodoList = (props) => {
       count={4}
       tooltips={[
         '不紧急不重要',
-        '不紧急很重要',
         '很紧急不重要',
+        '不紧急很重要',
         '很紧急很重要',
       ]}
       style={{ fontSize: 14 }}

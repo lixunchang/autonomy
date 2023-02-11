@@ -13,6 +13,8 @@ import {
   CheckCircleOutlined,
   WalletFilled,
   QuestionCircleOutlined,
+  FileMarkdownOutlined,
+  CustomerServiceOutlined,
 } from '@ant-design/icons';
 
 const antdIcons = {
@@ -21,6 +23,7 @@ const antdIcons = {
   CalendarOutlined: <CalendarOutlined />,
   AccountBookOutlined: <AccountBookOutlined />,
   ProfileOutlined: <ProfileOutlined />,
+  FileMarkdownOutlined: <FileMarkdownOutlined />,
   DollarCircleFilled: <DollarCircleFilled />,
   ThunderboltFilled: <ThunderboltFilled />,
   SettingFilled: <SettingFilled />,
@@ -30,6 +33,7 @@ const antdIcons = {
   CheckCircleOutlined: <CheckCircleOutlined />,
   WalletFilled: <WalletFilled />,
   QuestionCircleOutlined: <QuestionCircleOutlined />,
+  CustomerServiceOutlined: <CustomerServiceOutlined />,
 };
 
 export default antdIcons;

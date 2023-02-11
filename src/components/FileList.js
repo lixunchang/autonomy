@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Tree } from 'antd';
 import { getChildNode } from '../utils/helper';
-import { switchFileIcons } from '../utils/treeHelper';
+import { noDeleteKeys, noInportKeys, switchFileIcons } from '../utils/treeHelper';
 import styles from './FileList.less';
 import useContextMenu from '../hooks/useContextMenu';
 import useIpcRenderer from '../hooks/useIpcRenderer';
@@ -9,12 +9,12 @@ import useIpcRenderer from '../hooks/useIpcRenderer';
 const { ipcRenderer } = window.require('electron');
 
 const { DirectoryTree } = Tree;
-
 const FileList = ({
   activeId,
   files,
   newFile,
   onFileClick,
+  expanded,
   createNewFile,
   onFileDelete,
   onFileRename,
@@ -23,6 +23,7 @@ const FileList = ({
   const [editStatus, setEditStatus] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [selectKey, setSelectKey] = useState([]);
+  const { expandedKeys, setExpandedKeys } = expanded;
   const handleSaveInput = (path, type, isLeaf) => {
     onFileRename(editStatus, path, inputValue, type, isLeaf);
     if (isLeaf) {
@@ -34,15 +35,40 @@ const FileList = ({
   const clickItem = useContextMenu(
     [
       {
-        label: '新建文件',
+        label: '新建笔记',
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
             const childNode = getChildNode(current.childNodes, 'file-item');
-            const { id, type } = childNode.dataset;
-            createNewFile(id, type, true);
+            const { id } = childNode.dataset;
+            createNewFile(id, 'note', true);
           }
         },
+      },
+      {
+        label: '新建代办',
+        click: () => {
+          const { current = { childNodes: [] } } = clickItem;
+          if (current !== null) {
+            const childNode = getChildNode(current.childNodes, 'file-item');
+            const { id } = childNode.dataset;
+            createNewFile(id, 'todo', true);
+          }
+        },
+      },
+      {
+        label: '新建打卡记录',
+        click: () => {
+          const { current = { childNodes: [] } } = clickItem;
+          if (current !== null) {
+            const childNode = getChildNode(current.childNodes, 'file-item');
+            const { id } = childNode.dataset;
+            createNewFile(id, 'aim', true);
+          }
+        },
+      },
+      {
+        type: 'separator',
       },
       {
         label: '新建文件夹',
@@ -70,12 +96,18 @@ const FileList = ({
         },
       },
       {
-        label: '导入',
+        type: 'separator',
+      },
+      {
+        label: '导入笔记',
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
             const childNode = getChildNode(current.childNodes, 'file-item');
-            const { id, type } = childNode.dataset;
+            const { id, type, isleaf } = childNode.dataset;
+            if (!isleaf || noInportKeys.includes(id)) {
+              return;
+            }
             onImportFiles(id, type);
           }
         },
@@ -93,8 +125,12 @@ const FileList = ({
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
             const { dataset } = getChildNode(current.childNodes, 'file-item');
-            console.log('移至回收站', dataset);
-            onFileDelete(dataset.id, dataset.path, dataset.isleaf);
+            const { id, path, isleaf } = dataset;
+            if (noDeleteKeys.includes(id)) {
+              return;
+            }
+            setEditStatus('');
+            onFileDelete(id, path, isleaf);
           }
         },
       },
@@ -126,12 +162,14 @@ const FileList = ({
         break;
     }
   };
+
   useIpcRenderer({
     'create-new-todo': () => createNewFile('todo', 'todo', true),
     'create-new-note': () => createNewFile('note', 'note', true),
     'create-new-aim': () => createNewFile('aim', 'aim', true),
     'create-new-account': () => createNewFile('account', 'account', true),
   });
+  // console.log('file', files);
   return (
     <div className={styles.FileList}>
       <DirectoryTree
@@ -140,27 +178,26 @@ const FileList = ({
           color: 'white',
         }}
         defaultExpandAll={false}
-        // onSelect={(_, { isLeaf, id, path, isLoaded }) => {}}
+        expandedKeys={expandedKeys}
         selectedKeys={selectKey}
         selectable={true}
         onSelect={(key, { node }) => {
           if (editStatus) return;
-          console.log('xxxonselect', node);
           const { isLeaf, id, path, isLoaded, type } = node;
           setSelectKey(key);
           onItemClick(isLeaf, id, path, isLoaded, type);
         }}
-        // onExpand={onExpand}
+        onExpand={(keys) => setExpandedKeys(keys)}
         treeData={switchFileIcons(files)}
         titleRender={({ key, title, id, type, isLeaf, isLoaded, path }) => {
           return (
             <div
               key={key}
-              className={
+              className={`${styles.treeItem} ${
                 type !== 'crash' && type !== 'import' ? 'file-item' : ''
-              }
+              }`}
               // data-isloaded={isLoaded}
-              data-isleaf={isLeaf} // 小写
+              data-isleaf={isLeaf} //
               data-title={title}
               data-type={type}
               data-path={path}
@@ -171,23 +208,14 @@ const FileList = ({
                   autoFocus
                   placeholder="请输入"
                   value={inputValue}
-                  // onBlur={() => setEditStatus('')}
-                  onPressEnter={() => handleSaveInput(path, type, isLeaf)}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  style={{
-                    width: '86%',
-                    height: 23,
-                    padding: '0 4px',
-                    background: '#5e5e5e',
-                    borderColor: '#9e9e9e',
-                    color: '#fff',
-                    caretColor: '#fff',
+                  onBlur={() => handleSaveInput(path, type, isLeaf)}
+                  onPressEnter={() => {
+                    handleSaveInput(path, type, isLeaf);
                   }}
+                  onChange={(e) => setInputValue(e.target.value)}
                 />
               ) : (
-                <span style={!title ? { color: 'orangered' } : {}}>
-                  {title || '未命名'}
-                </span>
+                <span>{title || '未命名'}</span>
               )}
             </div>
           );

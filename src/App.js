@@ -19,6 +19,7 @@ import {
   getIconByFileType,
   deleteExtraAttr,
   deepClone,
+  defaultKeys,
 } from './utils/treeHelper';
 import emptyImg from '../public/empty.png';
 import shortid from 'shortid';
@@ -33,7 +34,7 @@ const { join, basename, extname, dirname } = window.require('path');
 const Store = window.require('electron-store');
 const isDevelop = false;
 const fileStore = new Store({ name: isDevelop ? 'Dev Data' : 'Files Data' });
-// fileStore.set('files', defaultFiles); //重置操作
+// fileStore.set('files', defaultFiles); //重置操作 22.14.13
 
 const savedLocation = getSaveLocation();
 
@@ -58,6 +59,7 @@ function App() {
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
   const [newFile, setNewFile] = useState(null);
   const [siderWidth, setSiderWidth] = useState(defaultSiderWidth);
+  const [expandedKeys, setExpandedKeys] = useState([files?.[0].key]);
 
   const activeFile = findItemById(files, activeFileId);
   // const openedFiles = findItemsByIds(files, openedFileIds);
@@ -140,6 +142,15 @@ function App() {
     }
   };
   const deleteFile = (id, path, isLeaf = false) => {
+    //删除默认文件夹
+    if (defaultKeys.includes(id)) {
+      const newFiles = deleteItemById(files, id);
+      saveFile2Store(newFiles);
+      setFiles(newFiles);
+      closeOpenedFile(id);
+      clearUnsavedFile(id);
+      return;
+    }
     if (isLeaf && isLeaf !== 'false') {
       fileHelper.deleteFile(path).then(() => {
         const newFiles = deleteItemById(files, id);
@@ -162,8 +173,8 @@ function App() {
       });
     }
   };
-  const createNewFile = (fatherId, type, isLeaf) => {
-    const newId = shortid.generate();
+  const createNewFile = (fatherId, type, isLeaf, nId) => {
+    const newId = nId || shortid.generate();
     const newPath = join(
       `${savedLocation}${type}/`,
       `${newId}${type === 'note' ? '.md' : '.json'}`
@@ -203,6 +214,7 @@ function App() {
       setNewFile(newFile);
       setFiles(newFiles);
     }
+    setExpandedKeys([...expandedKeys, fatherId]);
   };
   const renameFile = (id, path, title, type, isLeaf = false) => {
     if (isLeaf) {
@@ -369,6 +381,7 @@ function App() {
             activeId={activeFileId}
             files={deepClone(files)}
             newFile={newFile}
+            expanded={{ expandedKeys, setExpandedKeys }}
             // openedFiles={openedFiles}
             onImportFiles={onImportFiles}
             closeOpenedFile={closeOpenedFile}
@@ -422,7 +435,7 @@ function App() {
                 {unsavedFileIds.includes(activeFileId) && (
                   <span className={styles.unsaveIcon} />
                 )}
-                {activeFile.title}
+                {activeFile.title || '未命名'}
               </h1>
               {activeFile.type === 'todo' ? (
                 <Todo activeFile={activeFile} onChange={fileChange} />

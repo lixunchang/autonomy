@@ -13,6 +13,8 @@ import Iframe from './music/Iframe';
 fileHelper.mkAppDirSync('aim');
 fileHelper.mkAppDirSync('note');
 fileHelper.mkAppDirSync('todo');
+fileHelper.mkAppDirSync('crash');
+fileHelper.mkAppDirSync('image');
 
 ReactDOM.render(
   <Router>

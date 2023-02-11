@@ -3,8 +3,13 @@
   display: flex;
   height: 100%;
   .dragArea {
-    width: 100%;
-    height: 26px;
+    height: 38px;
+    margin-left: 68px;
+    cursor: move;
+    -webkit-app-region: drag;
+  }
+  .dragArea2 {
+    height: 38px;
     cursor: move;
     -webkit-app-region: drag;
   }
@@ -53,11 +58,10 @@
     }
   }
   h3 {
-    height: 60px !important;
     color: #333;
     font-weight: 600;
-    padding: 16px 26px;
-    margin: 0;
+    padding: 6px 26px;
+    margin-bottom: 12;
   }
   h5 {
     color: #666;

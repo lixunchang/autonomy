@@ -7,6 +7,7 @@ import SmallRate from './SmallRate';
 const Task = ({ task, index }) => {
   return (
     <Draggable
+      key = {task.id}
       draggableId={task.id}
       index={index}
       // isDragDisabled={isDragDisabled}
@@ -15,6 +16,7 @@ const Task = ({ task, index }) => {
         //snapshot.isDragging
         return (
           <div
+            key={task.id}
             className={styles.Task}
             ref={provided.innerRef}
             {...provided.draggableProps}

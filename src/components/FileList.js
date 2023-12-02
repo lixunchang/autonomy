@@ -187,7 +187,7 @@ const FileList = ({
           setSelectKey(key);
           onItemClick(isLeaf, id, path, isLoaded, type);
         }}
-        onExpand={(keys) => setExpandedKeys(keys)}
+        onExpand={(keys) => {console.log('onExpand', keys);setExpandedKeys(keys)}}
         treeData={switchFileIcons(files)}
         titleRender={({ key, title, id, type, isLeaf, isLoaded, path }) => {
           return (

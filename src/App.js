@@ -14,7 +14,6 @@ import {
   editItemById,
   createItemByFatherId,
   deleteItemById,
-  findItemsByIds,
   getChildrenFilePath,
   getIconByFileType,
   deleteExtraAttr,
@@ -28,6 +27,7 @@ import useIpcRenderer from './hooks/useIpcRenderer';
 import Draggable from 'react-draggable';
 import { getSaveLocation, getAutoSync } from './utils/helper';
 import Music from './music';
+import { message } from 'antd';
 // Node API
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
@@ -214,7 +214,7 @@ function App() {
       setNewFile(newFile);
       setFiles(newFiles);
     }
-    setExpandedKeys([...expandedKeys, fatherId]);
+    setExpandedKeys((keys) => [...keys, fatherId]);
   };
   const renameFile = (id, path, title, type, isLeaf = false) => {
     if (isLeaf) {
@@ -240,15 +240,17 @@ function App() {
     }
   };
 
-  const fileChange = (id, value) => {
-    // console.log('fileChange', id, value);
+  const fileChange = (id, value, autoSave = false) => {
+    console.log('fileChange', id, value);
     if (typeof value !== 'string') {
       value = JSON.stringify(value);
     }
     if (value !== activeFile.body) {
       const newFiles = editItemById(files, id, { body: value });
       setFiles(newFiles);
-      if (!unsavedFileIds.includes(id)) {
+      if (autoSave) {
+        saveEditFile();
+      } else if (!unsavedFileIds.includes(id)) {
         setUnsavedFileIds([...unsavedFileIds, id]);
       }
     }
@@ -260,6 +262,10 @@ function App() {
     const { path, body, title } = activeFile;
     // if (activeFile.type === 'note') {
     // console.log('保存文件，我执行了', path, body);
+    if (body === undefined) {
+      message.error('保存异常：内容未定义');
+      return;
+    }
     return fileHelper.writeFile(path, body).then(() => {
       setUnsavedFileIds(unsavedFileIds.filter((id) => id !== activeFileId));
       if (getAutoSync()) {

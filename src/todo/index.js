@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import moment from 'moment';
 import styles from './index.less';
 import { IColumn, ITask, EStatus, ERate, ERepeat } from './initial';
 import shortid from 'shortid';
 import { DragDropContext } from 'react-beautiful-dnd';
 import Column from '../components/Column';
-import { Input, Rate, Dropdown, Button, Menu } from 'antd';
+import { Input, Rate, Form, Button, Menu } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import { ITodo } from './initial';
+import AddModal from './components/AddDrawer';
+import useContextMenu from '../hooks/useContextMenu';
+import { PlusCircleOutlined } from '@ant-design/icons';
+
+const emptyString = ['undefined', 'null', ''];
 
 const switchColumnTask = (todoData, source, destination) => {
   // console.log('******', source.index);
@@ -41,11 +47,25 @@ const deleteColumnTask = (todoData, source) => ({
     };
   }),
 });
+const getTaskText = (task = {}) => {
+  return [
+    task.content,
+    task.desc,
+    task.items.map((item) => item.title).join('-'),
+    task.tags.join('-'),
+  ].join('-');
+};
 
-const sortTaskByRate = (columns) =>
+const sortTaskByRate = (columns, searchFilter) =>
   columns.map((column) => {
-    column.tasks.sort((a, b) => b.rate - a.rate);
-    return column;
+    return {
+      ...column,
+      tasks: column.tasks
+        .filter((task) =>
+          getTaskText(task).includes(searchFilter[column.id] || '')
+        )
+        .sort((a, b) => b.rate - a.rate),
+    };
   });
 
 const defalutColumns = [
@@ -66,23 +86,96 @@ const defalutColumns = [
   },
 ];
 
-const TodoList = (props) => {
+const TodoList = React.memo((props) => {
   const { activeFile, onChange } = props;
-  const columns = (typeof activeFile?.body === 'string' &&
-    activeFile?.body?.length > 0 &&
-    JSON.parse(activeFile.body)) ||
-    activeFile?.body || [...defalutColumns];
+  const columns =
+    activeFile?.body?.length > 0 && !emptyString.includes(activeFile.body)
+      ? typeof activeFile?.body === 'string'
+        ? JSON.parse(activeFile.body)
+        : activeFile?.body
+      : [...defalutColumns];
   const todoData = { ...activeFile, columns };
-  const [taskRate, setTaskRate] = useState(ERate.zero);
-  const [inputTask, setInputTask] = useState('');
-  const [inputTaskDesc, setInputTaskDesc] = useState('');
+  // const [taskRate, setTaskRate] = useState(ERate.zero);
+  // const [inputTask, setInputTask] = useState('');
+  // const [inputTaskDesc, setInputTaskDesc] = useState('');
   const [taskRepeat, setTaskRepeat] = useState(ERepeat.once);
+  const [open, setOpen] = useState(false);
+  const [form] = Form.useForm();
+  const [modalColumnId, setModalColumnId] = useState();
+  const [searchFilter, setSearchFilter] = useState({});
+
+  console.log('sortedColumns111', columns);
+  const clickItem = useContextMenu(
+    [
+      {
+        label: '编辑',
+        click: () => {
+          const { current } = clickItem;
+          if (current !== null) {
+            const task = JSON.parse(current.dataset.task);
+            console.log('task==', task);
+            setOpen(true);
+            setModalColumnId(current.dataset.columnid);
+            form.setFieldsValue({
+              id: task.id,
+              title: task.content,
+              desc: task.desc,
+              rate: task.rate,
+              items: task.items,
+              tags: task.tags,
+            });
+          }
+        },
+      },
+      {
+        label: '移至回收站',
+        click: () => {
+          const { current } = clickItem;
+          if (current !== null) {
+            const task = JSON.parse(current.dataset.task);
+            // console.log(
+            //   'xxx===>',
+            //   columns.map((column) => {
+            //     if (column.id === current.dataset.columnid) {
+            //       return {
+            //         ...column,
+            //         tasks: column.tasks.filter((item) => item.id !== task.id),
+            //       };
+            //     }
+            //     return column;
+            //   })
+            // );
+            handleDeleteTask(current.dataset.columnid, task.id);
+          }
+        },
+      },
+    ],
+    'context_menu_task',
+    [columns]
+  );
+
+  const handleDeleteTask = (columnId, taskId) => {
+    onChange(
+      todoData.id,
+      columns.map((column) => {
+        debugger;
+        if (column.id === columnId) {
+          return {
+            ...column,
+            tasks: column.tasks.filter((item) => item.id !== taskId),
+          };
+        }
+        return column;
+      }),
+      true
+    );
+  };
 
   const handleDragEnd = (result) => {
     const { source, destination } = result;
     if (!destination) {
-      const { id, columns } = deleteColumnTask({ ...todoData }, source);
-      onChange(id, columns);
+      // const { id, columns } = deleteColumnTask({ ...todoData }, source);
+      // onChange(id, columns);
       return;
     }
     if (
@@ -92,94 +185,164 @@ const TodoList = (props) => {
       return;
     }
     const { id, columns } = switchColumnTask(todoData, source, destination);
-    onChange(id, columns);
+    onChange(id, columns, true);
   };
-  const rate = (
-    <Rate
-      allowClear={false}
-      value={taskRate}
-      defaultValue={ERate.zero}
-      count={4}
-      tooltips={[
-        '不紧急不重要',
-        '不紧急很重要',
-        '很紧急不重要',
-        '很紧急很重要',
-      ]}
-      style={{ fontSize: 14, color: 'orangered' }}
-      onChange={setTaskRate}
-    />
-  );
-  const handleAddTask = () => {
-    if (!inputTask) {
+  const handleTaskEdit = (column, task) => {
+    setOpen(true);
+    setModalColumnId(column.id);
+    form.setFieldsValue({ ...task, title: task.content });
+  };
+  // const rate = (
+  //   <Rate
+  //     allowClear={false}
+  //     value={taskRate}
+  //     defaultValue={ERate.zero}
+  //     count={4}
+  //     tooltips={[
+  //       '不紧急不重要',
+  //       '不紧急很重要',
+  //       '很紧急不重要',
+  //       '很紧急很重要',
+  //     ]}
+  //     style={{ fontSize: 14, color: 'orangered' }}
+  //     onChange={setTaskRate}
+  //   />
+  // );
+  const handleAddTodo = (values) => {
+    const { id, title, desc, rate, items = [], tags = [] } = values;
+    if (!title) {
       return;
     }
     const newTodo = {
-      id: shortid.generate(),
+      id: id || shortid.generate(),
       status: EStatus.todo,
-      content: inputTask,
-      desc: inputTaskDesc,
-      rate: taskRate,
+      content: title,
+      desc: desc,
+      rate: rate,
       repeat: taskRepeat,
+      items,
+      tags,
     };
-    const [todo, ...rest] = columns;
-    // onChange({
-    //   ...todoData,
-    //   columns: [{ ...todo, tasks: [newTodo, ...todo.tasks] }, ...rest],
-    // });
-    onChange(todoData.id, [
-      { ...todo, tasks: [newTodo, ...todo.tasks] },
-      ...rest,
-    ]);
-    setInputTask('');
-    setInputTaskDesc('');
-    setTaskRate(ERate.zero);
+    onChange(
+      todoData.id,
+      columns.map((column) => {
+        if (column.id === modalColumnId) {
+          return {
+            ...column,
+            tasks: id
+              ? column.tasks.map((task) => {
+                  if (task.id === id) {
+                    return {
+                      ...task,
+                      ...newTodo,
+                    };
+                  }
+                  return task;
+                })
+              : [newTodo, ...column.tasks],
+          };
+        }
+        return column;
+      }),
+      true
+    );
+    // setInputTask('');
+    // setInputTaskDesc('');
+    // setTaskRate(ERate.zero);
+  };
+
+  const handleCheckLittleTask = (
+    columnItem,
+    taskItem,
+    little,
+    checked,
+    index
+  ) => {
+    onChange(
+      todoData.id,
+      columns.map((column) => {
+        if (column.id === columnItem.id) {
+          return {
+            ...column,
+            tasks: column.tasks.map((task) => {
+              if (task.id === taskItem.id) {
+                return {
+                  ...task,
+                  items: task.items.map((item) => {
+                    if (item.title === little.title) {
+                      return {
+                        ...item,
+                        checked,
+                      };
+                    }
+                    return item;
+                  }),
+                };
+              }
+              return task;
+            }),
+          };
+        }
+        return column;
+      }),
+      true
+    );
   };
   // console.log('todo==', todoData, columns);
-  const sortedColumns = sortTaskByRate(columns);
+  const sortedColumns = sortTaskByRate(columns, searchFilter);
+  console.log('sortedColumns', sortedColumns, columns, searchFilter);
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       {/* <div className={styles.title}>象限法则日程</div> */}
       <div className={styles.Todo}>
-        <Input.Group compact style={{ width: '80%', margin: '10px auto 16px' }}>
-          <Input
-            size="middle"
-            placeholder="添加代办事项标题"
-            style={{
-              width: '50%',
-            }}
-            value={inputTask}
-            onPressEnter={handleAddTask}
-            onChange={(e) => setInputTask(e.target.value)}
-          />
-          <Input.Search
-            className={styles.inputSearch}
-            enterButton={
-              <Button
-                type="primary"
-                style={{ width: 80, background: '#6E6E6E' }}
-              >
-                添加
-              </Button>
-            }
-            style={{
-              width: '50%',
-            }}
-            size="middle"
-            suffix={rate}
-            value={inputTaskDesc}
-            onChange={(e) => setInputTaskDesc(e.target.value)}
-            onSearch={handleAddTask}
-          />
-        </Input.Group>
         <div className={styles.columns}>
-          {sortedColumns.map((column) => {
-            return <Column key={column.id} column={column} />;
+          {sortedColumns.map((column, index) => {
+            return (
+              <Column
+                key={column.id}
+                column={column}
+                onEditTask={handleTaskEdit}
+                onCheckLittleTask={handleCheckLittleTask}
+                actions={
+                  <>
+                    <Input
+                      placeholder={''}
+                      bordered={false}
+                      suffix={<SearchOutlined />}
+                      className={styles.search}
+                      onChange={(e) =>
+                        setSearchFilter({
+                          ...searchFilter,
+                          [column.id]: e.target.value,
+                        })
+                      }
+                    />
+                    <PlusCircleOutlined
+                      className={styles.add}
+                      onClick={() => {
+                        setOpen(true);
+                        setModalColumnId(column.id);
+                      }}
+                    />
+                  </>
+                }
+              />
+            );
           })}
         </div>
+        {open && (
+          <AddModal
+            form={form}
+            open={open}
+            closeModal={() => {
+              setOpen(false);
+            }}
+            handleAddTodo={handleAddTodo}
+          />
+        )}
       </div>
     </DragDropContext>
   );
-};
+});
 
 export default TodoList;

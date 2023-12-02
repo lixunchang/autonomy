@@ -1,7 +1,7 @@
 const Store = window.require('electron-store');
 const { remote } = window.require('electron');
 
-const isDevelop = false;
+const isDevelop = true;
 const settingStore = new Store({
   name: isDevelop ? 'Settings_dev' : 'Settings',
 });

@@ -4,7 +4,7 @@ import { getParentNode } from '../utils/helper';
 const { remote } = window.require('electron');
 const { Menu, MenuItem } = remote;
 
-const useContextMenu = (menus, targetClass) => {
+const useContextMenu = (menus, targetClass, deps = []) => {
   const clickElement = useRef(null);
   useEffect(() => {
     const menu = new Menu();
@@ -26,7 +26,7 @@ const useContextMenu = (menus, targetClass) => {
     return () => {
       window.removeEventListener('contextmenu', handleContextMenu);
     };
-  }, []);
+  }, [...deps]);
   return clickElement;
 };
 

@@ -3,10 +3,13 @@ import { Droppable } from 'react-beautiful-dnd';
 import styles from './Column.less';
 import Task from './Task';
 
-const Column = ({ column }) => {
+const Column = ({ column, actions, onEditTask, onCheckLittleTask }) => {
   return (
     <div className={styles.Column}>
-      <div className={styles.title}>{column.name || column.title}</div>
+      <div className={styles.title}>
+        <span className={styles.title_word}>{column.name || column.title}</span>
+        {actions}
+      </div>
       <Droppable
         // direction="horizontal"
         droppableId={column.id}
@@ -22,7 +25,21 @@ const Column = ({ column }) => {
               {...provided.droppableProps}
             >
               {column.tasks.map((task, index) => {
-                return <Task key={task.id} task={task} index={index} />;
+                return (
+                  <Task
+                    columnId={column.id}
+                    key={task.id}
+                    task={task}
+                    index={index}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      onEditTask(column, task);
+                    }}
+                    onCheckLittleTask={(item, checked, index) =>
+                      onCheckLittleTask(column, task, item, checked, index)
+                    }
+                  />
+                );
               })}
               {provided.placeholder}
             </div>

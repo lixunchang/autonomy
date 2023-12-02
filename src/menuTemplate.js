@@ -35,13 +35,13 @@ let template = [
           browserWindow.webContents.send('create-new-aim');
         },
       },
-      {
-        label: '新建账单',
-        accelerator: 'CmdOrCtrl+N+C',
-        click: (menuItem, browserWindow, event) => {
-          browserWindow.webContents.send('create-new-account');
-        },
-      },
+      // {
+      //   label: '新建账单',
+      //   accelerator: 'CmdOrCtrl+N+C',
+      //   click: (menuItem, browserWindow, event) => {
+      //     browserWindow.webContents.send('create-new-account');
+      //   },
+      // },
       {
         type: 'separator',
       },

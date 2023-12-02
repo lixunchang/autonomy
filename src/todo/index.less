@@ -31,10 +31,28 @@
   }
 
   .columns {
-    height: calc(100% - 75px);
+    height: calc(100% - 5px);
     display: flex;
     justify-content: space-around;
     min-height: 300px;
     padding: 0 8px;
+    .add{
+      color: #b2b2b2;
+      &:hover{
+        color: #2b2b2b;
+      }
+    }
+  }
+
+  .search{
+    flex: 1;
+    :global{
+      .ant-input-suffix{
+        color: #b2b2b2;
+      }
+      .ant-input{
+        text-align: right;
+      }
+    }
   }
 }

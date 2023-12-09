@@ -1,7 +1,7 @@
 import React from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import DecoupledDocumentEditor from '@ckeditor/ckeditor5-editor-decoupled/src/decouplededitor.js';
-import { builtinPlugins } from './config';
+import { builtinPlugins, defaultConfig } from './config';
 // import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import './index.less';
@@ -12,7 +12,7 @@ export default function CKEditor5 ({value, onChange}){
           editor={ DecoupledDocumentEditor }
           data={ value || "正在加载..." }
           config={{
-            toolbar: false,
+            ...defaultConfig,
             plugins: builtinPlugins
           }}
           onChange={ ( event, editor ) => {

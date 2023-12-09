@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Tree } from 'antd';
 import { getChildNode } from '../utils/helper';
-import { noDeleteKeys, noInportKeys, switchFileIcons } from '../utils/treeHelper';
+import {
+  noDeleteKeys,
+  noInportKeys,
+  switchFileIcons,
+} from '../utils/treeHelper';
 import styles from './FileList.less';
 import useContextMenu from '../hooks/useContextMenu';
 import useIpcRenderer from '../hooks/useIpcRenderer';
@@ -22,7 +26,7 @@ const FileList = ({
 }) => {
   const [editStatus, setEditStatus] = useState('');
   const [inputValue, setInputValue] = useState('');
-  const [selectKey, setSelectKey] = useState([]);
+  const [selectKey, setSelectKey] = useState([activeId]);
   const { expandedKeys, setExpandedKeys } = expanded;
   const handleSaveInput = (path, type, isLeaf) => {
     onFileRename(editStatus, path, inputValue, type, isLeaf);
@@ -187,7 +191,10 @@ const FileList = ({
           setSelectKey(key);
           onItemClick(isLeaf, id, path, isLoaded, type);
         }}
-        onExpand={(keys) => {console.log('onExpand', keys);setExpandedKeys(keys)}}
+        onExpand={(keys) => {
+          console.log('onExpand', keys);
+          setExpandedKeys(keys);
+        }}
         treeData={switchFileIcons(files)}
         titleRender={({ key, title, id, type, isLeaf, isLoaded, path }) => {
           return (
@@ -215,7 +222,7 @@ const FileList = ({
                   onChange={(e) => setInputValue(e.target.value)}
                 />
               ) : (
-                <span>{title || '未命名'}</span>
+                <span>{title || ''}</span>
               )}
             </div>
           );

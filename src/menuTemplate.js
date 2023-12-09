@@ -1,7 +1,7 @@
 const { app, shell, ipcMain } = require('electron');
 const Store = require('electron-store');
 
-const isDevelop = false;
+const isDevelop = true;
 const settingsStore = new Store({
   name: isDevelop ? 'Settings_dev' : 'Settings',
 });

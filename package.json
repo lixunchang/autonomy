@@ -1,6 +1,6 @@
 {
   "name": "autonomy",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "main.js",
   "private": true,
   "description": "自治领",
@@ -20,6 +20,7 @@
     "@ckeditor/ckeditor5-code-block": "^36.0.0",
     "@ckeditor/ckeditor5-dev-translations": "^32.1.2",
     "@ckeditor/ckeditor5-dev-utils": "^32.1.2",
+    "@ckeditor/ckeditor5-dev-webpack-plugin": "^31.1.13",
     "@ckeditor/ckeditor5-editor-decoupled": "^36.0.0",
     "@ckeditor/ckeditor5-essentials": "^36.0.0",
     "@ckeditor/ckeditor5-font": "^36.0.0",
@@ -175,7 +176,7 @@
   "build": {
     "appId": "io.github.gexinpai",
     "productName": "自治领",
-    "copyright": "Copyright © 2023 GeXinPai",
+    "copyright": "Copyright © 2023 xiaoyaoyou",
     "directories": {
       "buildResources": "public"
     },

@@ -135,7 +135,7 @@ export const deepClone = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const savedLocation = getSaveLocation();
-const isDevelop = false;
+const isDevelop = true;
 export const initAllFiles = (files = [], defaultFiles = []) => {
   return defaultFiles
     .filter((item) => isDevelop || item.status !== 'develop')
@@ -150,19 +150,20 @@ export const initAllFiles = (files = [], defaultFiles = []) => {
 };
 
 export const defaultFiles = [
-  {
-    sort: 0,
-    id: 'autonomy',
-    title: '自治领',
-    key: 'autonomy',
-    type: 'note',
-    icon: 'WalletFilled',
-    children: [],
-  },
+  // {
+  //   sort: 0,
+  //   id: 'autonomy',
+  //   title: '自治领',
+  //   key: 'autonomy',
+  //   type: 'note',
+  //   icon: 'WalletFilled',
+  //   children: [],
+  // },
   {
     sort: 1,
     id: 'note',
-    title: '笔记本',
+    title: '笔记',
+    status: 'develop',
     key: 'note',
     type: 'note',
     icon: 'WalletFilled',
@@ -172,6 +173,7 @@ export const defaultFiles = [
     sort: 2,
     id: 'todo',
     title: '清单',
+    status: 'develop',
     key: 'todo',
     type: 'todo',
     icon: 'CheckCircleFilled',
@@ -226,6 +228,7 @@ export const defaultFiles = [
     sort: 3,
     id: 'aim',
     title: '打卡',
+    status: 'develop',
     key: 'aim',
     type: 'aim',
     icon: 'CarryOutFilled',

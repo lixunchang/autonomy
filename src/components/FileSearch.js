@@ -41,7 +41,7 @@ const FileSearch = ({ title, onFileSearch }) => {
     <div className={styles.FileSearch}>
       {!inputActive ? (
         <div className={styles.noInputActive}>
-          <span className={styles.title}>我的自治领</span>
+          <span className={styles.title}>自治领</span>
           <Button
             style={{ width: 24 }}
             type="text"

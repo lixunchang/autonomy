@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './App.less';
 import moment from 'moment';
 import FileSearch from './components/FileSearch';
@@ -32,7 +32,7 @@ import { message } from 'antd';
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
 const Store = window.require('electron-store');
-const isDevelop = false;
+const isDevelop = true;
 const fileStore = new Store({ name: isDevelop ? 'Dev Data' : 'Files Data' });
 // fileStore.set('files', defaultFiles); //重置操作 22.14.13
 
@@ -54,17 +54,37 @@ function App() {
   const [files, setFiles] = useState(
     initAllFiles(fileStore.get('files'), defaultFiles)
   );
-  const [activeFileId, setActiveFileId] = useState('');
+  // console.log('remote.app.getPath', remote.app.getPath('userData'));
+  const [activeFileId, setActiveFileId] = useState(
+    fileStore.get('activeFileId')
+  );
   const [openedFileIds, setOpenedFileIds] = useState([]);
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
   const [newFile, setNewFile] = useState(null);
   const [siderWidth, setSiderWidth] = useState(defaultSiderWidth);
-  const [expandedKeys, setExpandedKeys] = useState([files?.[0].key]);
+  const [expandedKeys, setExpandedKeys] = useState(
+    fileStore.get('expandedKeys')
+  );
+
+  useEffect(() => {
+    if (fileStore) {
+      fileStore.set('expandedKeys', expandedKeys);
+    }
+  }, [expandedKeys]);
 
   const activeFile = findItemById(files, activeFileId);
+  useEffect(() => {
+    if (activeFile && !activeFile.isLoaded) {
+      openClickedFile(activeFileId, activeFile.isLoaded, activeFile.path);
+    }
+  }, []);
   // const openedFiles = findItemsByIds(files, openedFileIds);
   // const unsavedFiles = findItemsByIds(files, unsavedFileIds);
-
+  useEffect(() => {
+    if (fileStore) {
+      fileStore.set('activeFileId', activeFileId);
+    }
+  }, [activeFileId]);
   const saveFile2Store = (data) => {
     const newData = deleteExtraAttr(deepClone(data));
     fileStore.set('files', newData);
@@ -263,8 +283,8 @@ function App() {
     // if (activeFile.type === 'note') {
     // console.log('保存文件，我执行了', path, body);
     if (body === undefined) {
-      message.error('保存异常：内容未定义');
-      return;
+      // message.error('保存异常：内容未定义');
+      return Promise.resolve(false);
     }
     return fileHelper.writeFile(path, body).then(() => {
       setUnsavedFileIds(unsavedFileIds.filter((id) => id !== activeFileId));
@@ -363,7 +383,7 @@ function App() {
     'file-downloaded': activeFileDownloaded,
     'save-edit-file': saveEditFile,
   });
-  // // console.log('activeFileId', activeFile, files);
+  console.log('activeFileId', activeFile, files);
   return (
     <div className={styles.App}>
       <div style={{ height: '100%', display: 'flex' }}>
@@ -441,7 +461,7 @@ function App() {
                 {unsavedFileIds.includes(activeFileId) && (
                   <span className={styles.unsaveIcon} />
                 )}
-                {activeFile.title || '未命名'}
+                {activeFile.title || ''}
               </h1>
               {activeFile.type === 'todo' ? (
                 <Todo activeFile={activeFile} onChange={fileChange} />

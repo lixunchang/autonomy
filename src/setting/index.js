@@ -10,7 +10,7 @@ import styles from './index.less';
 
 const { remote, ipcRenderer } = window.require('electron');
 const Store = window.require('electron-store');
-const isDevelop = false;
+const isDevelop = true;
 const settingStore = new Store({
   name: isDevelop ? 'Settings_dev' : 'Settings',
 });

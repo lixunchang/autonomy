@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Tree } from 'antd';
-import { getChildNode } from '../utils/helper';
+import { getChildNode } from '../utils/helper.js';
 import {
   noDeleteKeys,
   noInportKeys,

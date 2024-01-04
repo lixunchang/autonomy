@@ -1,4 +1,4 @@
-import { getSaveLocation } from './helper';
+import { getSaveLocation } from './helper.js';
 
 const fs = window.require('fs');
 const fsPs = fs.promises;

@@ -1,5 +1,5 @@
 import antdIcons from './antdIcons';
-import { getSaveLocation } from './helper';
+import { getSaveLocation } from './helper.js';
 
 export const findItemById = (arr, id) => {
   for (let i in arr) {

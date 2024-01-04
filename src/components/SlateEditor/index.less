@@ -1,0 +1,26 @@
+.slate_editor{
+  height: calc(100% - 48px);
+  outline: none;
+  padding: 12px;
+  overflow: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  blockquote{
+    color: #999999;
+    padding: 6px 10px;
+    border-left: 6px solid #e2e2e2;
+  }
+}
+.toolbar{
+  padding: 8px 12px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid #e2e2e2 !important;
+  :global{
+    .anticon{
+      &:hover{
+        color: #333333 !important;
+      }
+    }
+  }
+}

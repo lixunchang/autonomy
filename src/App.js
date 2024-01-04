@@ -25,7 +25,7 @@ import shortid from 'shortid';
 import fileHelper from './utils/fileHelper';
 import useIpcRenderer from './hooks/useIpcRenderer';
 import Draggable from 'react-draggable';
-import { getSaveLocation, getAutoSync } from './utils/helper';
+import { getSaveLocation, getAutoSync } from './utils/helper.js';
 import Music from './music';
 import { message } from 'antd';
 // Node API

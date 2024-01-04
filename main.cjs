@@ -1,9 +1,9 @@
 const { app, Menu, ipcMain, dialog } = require('electron');
 const isDev = require('electron-is-dev');
-const menuTemplate = require('./src/menuTemplate');
-const AppWindow = require('./src/AppWindow');
+const menuTemplate = require('./src/menuTemplate.cjs');
+const AppWindow = require('./src/AppWindow.cjs');
 const Store = require('electron-store');
-const QiniuManager = require('./src/utils/QiniuManager');
+const QiniuManager = require('./src/utils/QiniuManager.cjs');
 const path = require('path');
 const url = require('url');
 

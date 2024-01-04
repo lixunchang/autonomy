@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { getParentNode } from '../utils/helper';
+import { getParentNode } from '../utils/helper.js';
 // import nodejs modules
 const { remote } = window.require('electron');
 const { Menu, MenuItem } = remote;

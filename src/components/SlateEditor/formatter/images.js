@@ -60,7 +60,7 @@ const withImages = (editor) => {
   return editor;
 };
 
-export const Image = ({ attributes, children, element }) => {
+export const Image = ({ attributes, children, element, style }) => {
   const editor = useSlateStatic();
   const path = ReactEditor.findPath(editor, element);
 
@@ -78,7 +78,7 @@ export const Image = ({ attributes, children, element }) => {
         <img
           alt=""
           src={element.url}
-          // src={'file:///Users/jacklee/Pictures/learn-english.jpeg'}
+          style={style}
           className={css`
             display: block;
             max-width: 100%;

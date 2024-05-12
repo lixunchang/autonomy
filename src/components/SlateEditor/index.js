@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   Transforms,
   createEditor,
@@ -16,10 +16,32 @@ import styles from './index.less';
 import formatter, { formatChildren } from './formatter';
 import { BlockButton, MarkButton } from './components/Button';
 import { toggleMark } from './formatter/utils';
-import { HOTKEYS, SHORTCUTS } from './constant';
+import { DEFAULT_NOTE, HOTKEYS, SHORTCUTS } from './constant';
 import ToolIcon from '../Icon';
 import ColorPicker from './components/ColorPicker';
 import InsertImage from './components/InsertImage';
+
+const parseValue = (value) => {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    if (value.startsWith('[{') && value.endsWith('}]')) {
+      return JSON.parse(value);
+    }
+    return [
+      {
+        type: 'paragraph',
+        children: [
+          {
+            text: value,
+          },
+        ],
+      },
+    ];
+  }
+  return DEFAULT_NOTE;
+};
 
 const initialValue = [
   {
@@ -30,50 +52,55 @@ const initialValue = [
       },
     ],
   },
-  // {
-  //   type: 'block-quote',
-  //   children: [{ text: 'A wise quote.', color: 'red' }],
-  // },
-  // {
-  //   type: 'image',
-  //   url: 'https://source.unsplash.com/kFrdX5IeQzI',
-  //   children: [{ text: '' }],
-  // },
-  // {
-  //   type: 'paragraph',
-  //   children: [
-  //     {
-  //       text: 'Order when you start a line with "## " you get a level-two heading, like this:',
-  //     },
-  //   ],
-  // },
-  // {
-  //   type: 'heading-two',
-  //   children: [{ text: 'Try it out!' }],
-  // },
-  // {
-  //   type: 'image',
-  //   url: 'https://source.unsplash.com/zOwZKwZOZq8',
-  //   children: [{ text: '' }],
-  // },
-  // {
-  //   type: 'paragraph',
-  //   textAlign: 'right',
-  //   children: [
-  //     {
-  //       text: 'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
-  //     },
-  //   ],
-  // },
 ];
+//   // {
+//   //   type: 'block-quote',
+//   //   children: [{ text: 'A wise quote.', color: 'red' }],
+//   // },
+//   // {
+//   //   type: 'image',
+//   //   url: 'https://source.unsplash.com/kFrdX5IeQzI',
+//   //   children: [{ text: '' }],
+//   // },
+//   // {
+//   //   type: 'paragraph',
+//   //   children: [
+//   //     {
+//   //       text: 'Order when you start a line with "## " you get a level-two heading, like this:',
+//   //     },
+//   //   ],
+//   // },
+//   // {
+//   //   type: 'heading-two',
+//   //   children: [{ text: 'Try it out!' }],
+//   // },
+//   // {
+//   //   type: 'image',
+//   //   url: 'https://source.unsplash.com/zOwZKwZOZq8',
+//   //   children: [{ text: '' }],
+//   // },
+//   // {
+//   //   type: 'paragraph',
+//   //   textAlign: 'right',
+//   //   children: [
+//   //     {
+//   //       text: 'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
+//   //     },
+//   //   ],
+//   // },
+// ];
 
-const SlateEditor = ({ id, value, onChange, isLoaded }) => {
+const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
   const renderElement = useCallback(formatter, []);
   const renderLeaf = useCallback(formatChildren, []);
   const editor = useMemo(
     () => withShortcuts(withImages(withReact(withHistory(createEditor())))),
     []
   );
+
+  // useEffect(() => {
+  //   // editor.children = value;
+  // }, [editor, value]);
 
   const handleSaveSelection = () => {
     editor.savedSelection = editor.selection;
@@ -119,11 +146,10 @@ const SlateEditor = ({ id, value, onChange, isLoaded }) => {
   console.log('SlateEditor', id, value);
   return (
     <Slate
-      key={id}
+      key={id + '-' + page}
       editor={editor}
-      initialValue={
-        typeof value === 'string' ? JSON.parse(value) : value || initialValue
-      }
+      initialValue={parseValue(value)}
+      // value={parseValue(value)}
       onChange={(value) => {
         console.log('values==', value);
         const isAstChange = editor.operations.some(
@@ -131,9 +157,9 @@ const SlateEditor = ({ id, value, onChange, isLoaded }) => {
         );
         if (isAstChange) {
           // Save the value to Local Storage.
-          const content = JSON.stringify(value);
+          // const content = JSON.stringify(value);
           // localStorage.setItem('content', content);
-          onChange(content);
+          onChange(value);
         }
       }}
     >
@@ -208,7 +234,11 @@ const SlateEditor = ({ id, value, onChange, isLoaded }) => {
             }
           }
         }}
-        placeholder="Write some markdown..."
+        placeholder={
+          <span style={{ display: 'inline-block', marginTop: 12 }}>
+            请输入markdown...
+          </span>
+        }
         spellCheck
         autoFocus
         onBlur={handleSaveSelection}

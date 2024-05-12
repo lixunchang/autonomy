@@ -28,7 +28,11 @@ const FileList = ({
   const [inputValue, setInputValue] = useState('');
   const [selectKey, setSelectKey] = useState([activeId]);
   const { expandedKeys, setExpandedKeys } = expanded;
+
   const handleSaveInput = (path, type, isLeaf) => {
+    if (!inputValue) {
+      return;
+    }
     onFileRename(editStatus, path, inputValue, type, isLeaf);
     if (isLeaf) {
       setSelectKey([editStatus]);
@@ -101,6 +105,24 @@ const FileList = ({
       },
       {
         type: 'separator',
+      },
+      {
+        label: '导入PDF',
+        click: () => {
+          const { current = { childNodes: [] } } = clickItem;
+          if (current !== null) {
+            const childNode = getChildNode(current.childNodes, 'file-item');
+            const { id, type, isleaf } = childNode.dataset;
+            console.log('导入pdf', type, id, isleaf);
+            if (!isleaf || noInportKeys.includes(id)) {
+              return;
+            }
+            onImportFiles(id, type, {
+              extension: ['pdf'],
+              title: '选择导入PDF',
+            });
+          }
+        },
       },
       {
         label: '导入笔记',

@@ -8,11 +8,11 @@ import {
 import { getSaveLocation } from '../utils/helper';
 import styles from './index.less';
 
+const isDev = window.require('electron-is-dev');
 const { remote, ipcRenderer } = window.require('electron');
 const Store = window.require('electron-store');
-const isDevelop = true;
 const settingStore = new Store({
-  name: isDevelop ? 'Settings_dev' : 'Settings',
+  name: isDev ? 'Settings_dev' : 'Settings',
 });
 
 const { SubMenu } = Menu;
@@ -56,9 +56,9 @@ const Setting = () => {
   };
 
   const onSaveQiniuKeys = () => {
-    settingStore.set('accessKey', accessKey);
-    settingStore.set('secretKey', secretKey);
-    settingStore.set('bucket', bucket);
+    settingStore.set('accessKey', accessKey || '');
+    settingStore.set('secretKey', secretKey || '');
+    settingStore.set('bucket', bucket || '');
     uploadMenuStatus();
     remote.getCurrentWindow().close();
   };

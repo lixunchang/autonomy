@@ -167,6 +167,7 @@ const TodoList = React.memo((props) => {
         }
         return column;
       }),
+      {},
       true
     );
   };
@@ -185,7 +186,7 @@ const TodoList = React.memo((props) => {
       return;
     }
     const { id, columns } = switchColumnTask(todoData, source, destination);
-    onChange(id, columns, true);
+    onChange(id, columns, {}, true);
   };
   const handleTaskEdit = (column, task) => {
     setOpen(true);

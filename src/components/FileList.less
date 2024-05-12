@@ -1,7 +1,12 @@
 .FileList {
+  height: calc(100% - 72px);
   background: #6e6e6e;
-  color: white;
+  color: #fff;
   text-align: left;
+  overflow: auto;
+  &::-webkit-scrollbar{
+    display: none;
+  }
 
   :global {
     .ant-tree-indent-unit{

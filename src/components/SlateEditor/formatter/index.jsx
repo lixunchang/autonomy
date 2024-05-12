@@ -3,8 +3,9 @@ import { Image } from './images';
 
 export default function formatter(props) {
   const { attributes, children, element } = props;
-  const { type, children:ccc, url, ...styles} = element;
-  console.log('element-type', element)
+  const { type, children:ccc, url, style, ...rest} = element;
+  const styles = {...style, ...rest};
+  console.log('element-type', element, styles)
   switch (element.type) {
     /**
      * 图片

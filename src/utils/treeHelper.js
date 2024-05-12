@@ -1,6 +1,7 @@
 import antdIcons from './antdIcons';
 import { getSaveLocation } from './helper.js';
 
+const isDev = window.require('electron-is-dev');
 export const findItemById = (arr, id) => {
   for (let i in arr) {
     let item = arr[i];
@@ -12,6 +13,19 @@ export const findItemById = (arr, id) => {
       if (value) return value;
     }
   }
+};
+
+export const deepTree = (tree = [], action, parent, childKey = 'children') => {
+  if (typeof action !== 'function') {
+    return tree;
+  }
+  return tree.map((item, index) => {
+    const newItem = action(item, index, parent) || item;
+    if (newItem[childKey]) {
+      newItem[childKey] = deepTree(newItem[childKey], action, item, childKey);
+    }
+    return newItem;
+  });
 };
 
 /**
@@ -118,7 +132,7 @@ export const switchFileIcons = (arr) => {
   }
   return [...arr];
 };
-export const deleteExtraAttr = (arr) => {
+export const deleteExtraAttr = (arr = []) => {
   for (let i = 0; i < arr.length; i++) {
     if (typeof arr[i].icon === 'string') {
       delete arr[i].isLoaded;
@@ -131,14 +145,14 @@ export const deleteExtraAttr = (arr) => {
   return [...arr];
 };
 
-export const deepClone = (obj) => {
+export const deepClone = (obj = []) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const savedLocation = getSaveLocation();
-const isDevelop = true;
+
 export const initAllFiles = (files = [], defaultFiles = []) => {
   return defaultFiles
-    .filter((item) => isDevelop || item.status !== 'develop')
+    .filter((item) => isDev || item.status !== 'develop')
     .map((item) => {
       const [file] = files.filter((ite) => ite.id === item.id);
       return {
@@ -150,20 +164,19 @@ export const initAllFiles = (files = [], defaultFiles = []) => {
 };
 
 export const defaultFiles = [
-  // {
-  //   sort: 0,
-  //   id: 'autonomy',
-  //   title: '自治领',
-  //   key: 'autonomy',
-  //   type: 'note',
-  //   icon: 'WalletFilled',
-  //   children: [],
-  // },
+  {
+    sort: 0,
+    id: 'autonomy',
+    title: '自治领',
+    key: 'autonomy',
+    type: 'note',
+    icon: 'WalletFilled',
+    children: [],
+  },
   {
     sort: 1,
     id: 'note',
     title: '笔记',
-    status: 'develop',
     key: 'note',
     type: 'note',
     icon: 'WalletFilled',
@@ -173,7 +186,6 @@ export const defaultFiles = [
     sort: 2,
     id: 'todo',
     title: '清单',
-    status: 'develop',
     key: 'todo',
     type: 'todo',
     icon: 'CheckCircleFilled',
@@ -228,7 +240,6 @@ export const defaultFiles = [
     sort: 3,
     id: 'aim',
     title: '打卡',
-    status: 'develop',
     key: 'aim',
     type: 'aim',
     icon: 'CarryOutFilled',

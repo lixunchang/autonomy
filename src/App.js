@@ -6,6 +6,8 @@ import FileList from './components/FileList';
 import Note from './note';
 import Todo from './todo';
 import Aim from './aim';
+import { ConfigProvider } from 'antd';
+// import zhCN from 'antd/locale/zh_CN';
 import {
   defaultFiles,
   initAllFiles,
@@ -19,6 +21,7 @@ import {
   deleteExtraAttr,
   deepClone,
   defaultKeys,
+  deepTree,
 } from './utils/treeHelper';
 import emptyImg from '../public/empty.png';
 import shortid from 'shortid';
@@ -27,13 +30,20 @@ import useIpcRenderer from './hooks/useIpcRenderer';
 import Draggable from 'react-draggable';
 import { getSaveLocation, getAutoSync } from './utils/helper.js';
 import Music from './music';
-import { message } from 'antd';
+import { DEFAULT_NOTE } from './components/SlateEditor/constant.js';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import Book from './book/index.jsx';
+
 // Node API
+const isDev = require('electron-is-dev');
+const pdfjsLib = require('pdfjs-dist');
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+const fs = require('fs');
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
 const Store = window.require('electron-store');
-const isDevelop = true;
-const fileStore = new Store({ name: isDevelop ? 'Dev Data' : 'Files Data' });
+
+const fileStore = new Store({ name: isDev ? 'Dev Data' : 'Files Data' });
 // fileStore.set('files', defaultFiles); //重置操作 22.14.13
 
 const savedLocation = getSaveLocation();
@@ -63,12 +73,12 @@ function App() {
   const [newFile, setNewFile] = useState(null);
   const [siderWidth, setSiderWidth] = useState(defaultSiderWidth);
   const [expandedKeys, setExpandedKeys] = useState(
-    fileStore.get('expandedKeys')
+    fileStore.get('expandedKeys') || []
   );
 
   useEffect(() => {
     if (fileStore) {
-      fileStore.set('expandedKeys', expandedKeys);
+      fileStore.set('expandedKeys', expandedKeys || []);
     }
   }, [expandedKeys]);
 
@@ -81,13 +91,14 @@ function App() {
   // const openedFiles = findItemsByIds(files, openedFileIds);
   // const unsavedFiles = findItemsByIds(files, unsavedFileIds);
   useEffect(() => {
-    if (fileStore) {
+    if (fileStore && activeFileId) {
       fileStore.set('activeFileId', activeFileId);
     }
   }, [activeFileId]);
+
   const saveFile2Store = (data) => {
     const newData = deleteExtraAttr(deepClone(data));
-    fileStore.set('files', newData);
+    newData && fileStore.set('files', newData);
   };
 
   const clearUnsavedFile = (id) => {
@@ -197,9 +208,11 @@ function App() {
     const newId = nId || shortid.generate();
     const newPath = join(
       `${savedLocation}${type}/`,
-      `${newId}${type === 'note' ? '.md' : '.json'}`
+      `${newId}.json` //${type === 'note' ? '.md' : '.json'}
     );
-    const defalutBody = type === 'note' ? '##### 请输入markdown' : '';
+
+    const defalutBody = type === 'note' ? JSON.stringify(DEFAULT_NOTE) : '';
+
     const folder = isLeaf
       ? {
           path: newPath,
@@ -260,18 +273,27 @@ function App() {
     }
   };
 
-  const fileChange = (id, value, autoSave = false) => {
+  const fileChange = (id, value, info, autoSave = false) => {
     console.log('fileChange', id, value);
     if (typeof value !== 'string') {
       value = JSON.stringify(value);
     }
-    if (value !== activeFile.body) {
-      const newFiles = editItemById(files, id, { body: value });
+    if (
+      value !== activeFile.body ||
+      JSON.stringify(info || {}) !== JSON.stringify(activeFile.info)
+    ) {
+      const newFiles = editItemById(files, id, {
+        body: value,
+        ...(info || {}),
+      });
       setFiles(newFiles);
       if (autoSave) {
         saveEditFile();
       } else if (!unsavedFileIds.includes(id)) {
         setUnsavedFileIds([...unsavedFileIds, id]);
+      }
+      if (info) {
+        saveFile2Store(newFiles);
       }
     }
   };
@@ -282,7 +304,7 @@ function App() {
     const { path, body, title } = activeFile;
     // if (activeFile.type === 'note') {
     // console.log('保存文件，我执行了', path, body);
-    if (body === undefined) {
+    if (!body) {
       // message.error('保存异常：内容未定义');
       return Promise.resolve(false);
     }
@@ -298,11 +320,12 @@ function App() {
     // }
   };
 
-  const onImportFiles = (id, type) => {
+  const onImportFiles = (id, type, dialogCfg) => {
+    const { extension = ['md'], title = '选择导入MD文档' } = dialogCfg;
     remote.dialog
       .showOpenDialog({
-        title: '选择导入MD文档',
-        filters: [{ name: 'Markdown Files', extension: ['md'] }],
+        title,
+        filters: [{ name: 'Markdown Files', extension }],
         properties: ['openFile', 'multiSelections'],
       })
       .then(({ filePaths }) => {
@@ -310,12 +333,18 @@ function App() {
           // TODO 过滤已经添加过的文件
           const children = filePaths.map((path) => {
             const newId = shortid.generate();
+            const isBook = path.endsWith('.pdf');
             return {
               id: newId,
-              title: basename(path, extname(path)),
-              path,
               key: newId,
-              type,
+              ...(isBook
+                ? {
+                    type: 'book',
+                    pdf: path,
+                    path: join(`${savedLocation}${type}/`, `${newId}.json`),
+                  }
+                : { type, path }),
+              title: basename(path, extname(path)),
               icon: getIconByFileType(type, true),
               createAt: moment().valueOf(),
               isLeaf: true,
@@ -323,7 +352,16 @@ function App() {
               updatedAt: 0,
             };
           });
-          const newFiles = importChildren(files, id, children);
+          // const newFiles = importChildren(files, id, children);
+          const newFiles = deepTree(files, (item) => {
+            if (item.id === id) {
+              return {
+                ...item,
+                children: [...item.children, ...children],
+              };
+            }
+          });
+          console.log('new-files', files, id, children, newFiles);
           saveFile2Store(newFiles);
           setFiles(newFiles);
           if (children.length > 0) {
@@ -467,6 +505,8 @@ function App() {
                 <Todo activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === 'note' ? (
                 <Note activeFile={activeFile} onChange={fileChange} />
+              ) : activeFile.type === 'book' ? (
+                <Book activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === 'aim' ? (
                 <Aim activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === 'music' ? (

@@ -21,3 +21,14 @@ export const HOTKEYS = {
 export const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify'];
 
 export const LIST_TYPES = ['numbered-list', 'bulleted-list'];
+
+export const DEFAULT_NOTE = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '',
+      },
+    ],
+  },
+];

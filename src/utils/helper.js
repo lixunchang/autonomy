@@ -1,9 +1,9 @@
 const Store = window.require('electron-store');
 const { remote } = window.require('electron');
+const isDev = window.require('electron-is-dev');
 
-const isDevelop = true;
 const settingStore = new Store({
-  name: isDevelop ? 'Settings_dev' : 'Settings',
+  name: isDev ? 'Settings_dev' : 'Settings',
 });
 
 export const getParentNode = (node, parentClassName) => {
@@ -33,7 +33,7 @@ export const getChildNode = (children = [], childClassName) => {
 
 // fileStore.delete('files');
 export const getSaveLocation = () => {
-  const savePath = isDevelop ? 'Autonomy_dev' : 'Autonomy';
+  const savePath = isDev ? 'Autonomy_dev' : 'Autonomy';
   return (
     settingStore.get('savedFileLocation') ||
     `${remote.app.getPath('documents')}/${savePath}/`

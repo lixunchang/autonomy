@@ -85,6 +85,7 @@
     "mini-css-extract-plugin": "0.11.3",
     "moment": "^2.29.4",
     "optimize-css-assets-webpack-plugin": "5.0.4",
+    "pdfjs-dist": "^2.4.456",
     "plist": "^3.0.6",
     "pnp-webpack-plugin": "1.6.4",
     "popper.js": "^1.16.1",
@@ -145,7 +146,7 @@
   },
   "scripts": {
     "ele": "electron .",
-    "onlyEle": "nodemon --watch main.cjs --watch src/menuTemplate.js --exec \"electron .\"",
+    "onlyEle": "nodemon --watch main.cjs --watch src/menuTemplate.cjs --exec \"electron .\"",
     "dev": "concurrently \"wait-on http://localhost:3000 && electron .\" \"cross-env BROWSER=none npm start\"",
     "start": "node scripts/start.cjs",
     "build": "node scripts/build.cjs",
@@ -188,9 +189,9 @@
       "settings/**/*",
       "package.json",
       "main.cjs",
-      "./src/menuTemplate.js",
-      "./src/AppWindow.js",
-      "./src/utils/QiniuManager.js"
+      "./src/menuTemplate.cjs",
+      "./src/AppWindow.cjs",
+      "./src/utils/QiniuManager.cjs"
     ],
     "extends": null,
     "mac": {
@@ -241,7 +242,7 @@
       "<rootDir>/src"
     ],
     "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}",
+      "src/**/*.{js,cjs,jsx,ts,tsx}",
       "!src/**/*.d.ts"
     ],
     "setupFiles": [
@@ -251,8 +252,8 @@
       "<rootDir>/src/setupTests.js"
     ],
     "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
+      "<rootDir>/src/**/__tests__/**/*.{js,cjs,jsx,ts,tsx}",
+      "<rootDir>/src/**/*.{spec,test}.{js,cjs,jsx,ts,tsx}"
     ],
     "testEnvironment": "jsdom",
     "testRunner": "/Users/jacklee/Project/Study/cloud-note/node_modules/jest-circus/runner.js",

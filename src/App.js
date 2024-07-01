@@ -6,7 +6,7 @@ import FileList from './components/FileList';
 import Note from './note';
 import Todo from './todo';
 import Aim from './aim';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Dropdown } from 'antd';
 // import zhCN from 'antd/locale/zh_CN';
 import {
   defaultFiles,
@@ -51,6 +51,15 @@ const savedLocation = getSaveLocation();
 const defaultSiderWidth = 260;
 const miniSiderWidth = 190;
 const maxSiderWidth = 360;
+
+
+const reportTypes = [
+  {key:'day',label:'日报',},
+  {key:'week',label:'周报',},
+  {key:'month',label:'月报',},
+  {key:'',label:'季报',},
+  {key:'year',label:'年报',},
+]
 
 /**
  * state分析
@@ -416,6 +425,10 @@ function App() {
     setSiderWidth(dragWidth);
   };
 
+  const onMenuClick=(e)=>{
+    console.log('menu=>', e)
+  }
+
   useIpcRenderer({
     'active-file-uploaded': activeFileUploaded,
     'file-downloaded': activeFileDownloaded,
@@ -500,6 +513,13 @@ function App() {
                   <span className={styles.unsaveIcon} />
                 )}
                 {activeFile.title || ''}
+                <Dropdown 
+                  menu={{ 
+                    items: reportTypes,
+                    onClick: onMenuClick
+                  }}>
+                  <span className={styles.report_text}>生成报告</span>
+                </Dropdown>
               </h1>
               {activeFile.type === 'todo' ? (
                 <Todo activeFile={activeFile} onChange={fileChange} />

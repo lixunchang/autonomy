@@ -33,6 +33,8 @@ import Music from './music';
 import { DEFAULT_NOTE } from './components/SlateEditor/constant.js';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import Book from './book/index.jsx';
+import Report from './todo/components/Report';
+
 
 // Node API
 const isDev = require('electron-is-dev');
@@ -81,6 +83,7 @@ function App() {
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
   const [newFile, setNewFile] = useState(null);
   const [siderWidth, setSiderWidth] = useState(defaultSiderWidth);
+  const [reportType, setReportOpen] = useState('none');
   const [expandedKeys, setExpandedKeys] = useState(
     fileStore.get('expandedKeys') || []
   );
@@ -283,7 +286,6 @@ function App() {
   };
 
   const fileChange = (id, value, info, autoSave = false) => {
-    console.log('fileChange', id, value);
     if (typeof value !== 'string') {
       value = JSON.stringify(value);
     }
@@ -296,18 +298,19 @@ function App() {
         ...(info || {}),
       });
       setFiles(newFiles);
+      if (info) {
+        saveFile2Store(newFiles);
+      }
       if (autoSave) {
         saveEditFile();
       } else if (!unsavedFileIds.includes(id)) {
         setUnsavedFileIds([...unsavedFileIds, id]);
       }
-      if (info) {
-        saveFile2Store(newFiles);
-      }
     }
   };
 
   const saveEditFile = () => {
+    const activeFile = findItemById(files, activeFileId);
     if (!activeFile) return;
     // console.log('我要开始执行save了');
     const { path, body, title } = activeFile;
@@ -425,8 +428,8 @@ function App() {
     setSiderWidth(dragWidth);
   };
 
-  const onMenuClick=(e)=>{
-    console.log('menu=>', e)
+  const submitWeekReport=()=>{
+    console.log('activeFile==>', activeFile)
   }
 
   useIpcRenderer({
@@ -513,16 +516,19 @@ function App() {
                   <span className={styles.unsaveIcon} />
                 )}
                 {activeFile.title || ''}
-                <Dropdown 
+                {/* <Dropdown 
                   menu={{ 
                     items: reportTypes,
                     onClick: onMenuClick
-                  }}>
-                  <span className={styles.report_text}>生成报告</span>
-                </Dropdown>
+                  }}> */}
+                  {
+                    activeFile.type === 'todo'&&
+                    <span className={styles.report_text} onClick={()=>setReportOpen('week')}>生成周报</span>
+                  }
+                {/* </Dropdown> */}
               </h1>
               {activeFile.type === 'todo' ? (
-                <Todo activeFile={activeFile} onChange={fileChange} />
+                <Todo activeFile={activeFile} onChange={fileChange}/>
               ) : activeFile.type === 'note' ? (
                 <Note activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === 'book' ? (
@@ -541,6 +547,13 @@ function App() {
             </>
           )}
         </div>
+        {
+          reportType !== 'none' &&(
+            <Report type={reportType} activeFile={activeFile} closeReport={()=>{
+              setReportOpen('none')
+            }}/>
+          )
+        }
       </div>
     </div>
   );

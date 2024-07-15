@@ -16,13 +16,30 @@
   // border: 1px solid #e2e2e2;
   transition: background-color 0.2s ease;
   .content {
-    width: calc(100% - 12px);
+    width: calc(100% - 20px);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     padding-left: 4px;
     line-height: 25px;
     font-weight: bold;
+  }
+
+  .collapseIcon{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #e2e2e2;
+    cursor: pointer;
+    &:hover{
+      color: #1890ff;
+    }
+    :global{
+      .anticon{
+        font-size: 12px;
+        margin-left: 5px;
+      }
+    }
   }
 
   .important_line{

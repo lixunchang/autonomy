@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './Task.less';
 import { Draggable } from 'react-beautiful-dnd';
 import { Checkbox, Tag, Card } from 'antd';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import SmallRate from './SmallRate';
 
 const Task = ({ columnId, task, index, onCheckLittleTask, ...restProps }) => {
   console.log('task.items==>', task);
+  const [collapse, setCollapse] = useState(true);
+  const progress = task?.items?.length>0? task?.items?.filter(ite=>ite.checked).length + '/' + task?.items?.length: '';
+  const handleCollapse=(e)=>{
+    e.stopPropagation();
+    setCollapse(!collapse)
+  }
   return (
     <Draggable
       key={task.id}
@@ -46,34 +53,45 @@ const Task = ({ columnId, task, index, onCheckLittleTask, ...restProps }) => {
                 <span className={styles.divider} style={{ left: '75%' }} /> */}
                 <SmallRate count={4} value={task.rate || 0} />
                 <div className={styles.content}>{task.content}</div>
+                <span className={styles.collapseIcon} onClick={handleCollapse}>
+                  {progress}
+                  {
+                    collapse ? <DownOutlined className="icon"/>: <UpOutlined className="icon"/>
+                  }
+                </span>
               </div>
-              <div className={styles.tips}>{task.desc}</div>
-              <div>
-                {task?.items?.map((item, index) => {
-                  return (
-                    <div key={item.title} className={styles.smallTitle}>
-                      <Checkbox
-                        size="small"
-                        style={{ marginRight: 6 }}
-                        checked={item.checked}
-                        onChange={({ target }) =>
-                          onCheckLittleTask(item, target.checked, index)
-                        }
-                      ></Checkbox>
-                      {item.title}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className={styles.tags}>
-                {task?.tags?.map((tag) => {
-                  return (
-                    <Tag key={tag} size="small" onChange={() => {}}>
-                      {tag}
-                    </Tag>
-                  );
-                })}
-              </div>
+              {
+                !collapse&&
+                <>
+                  <div className={styles.tips}>{task.desc}</div>
+                  <div>
+                    {task?.items?.map((item, index) => {
+                      return (
+                        <div key={item.title} className={styles.smallTitle}>
+                          <Checkbox
+                            size="small"
+                            style={{ marginRight: 6 }}
+                            checked={item.checked}
+                            onChange={({ target }) =>
+                              onCheckLittleTask(item, target.checked, index)
+                            }
+                          ></Checkbox>
+                          {item.title}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className={styles.tags}>
+                    {task?.tags?.map((tag) => {
+                      return (
+                        <Tag key={tag} size="small" onChange={() => {}}>
+                          {tag}
+                        </Tag>
+                      );
+                    })}
+                  </div>
+                </>
+              }
             </div>
           </Card>
         );

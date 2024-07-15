@@ -15,7 +15,7 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 const emptyString = ['undefined', 'null', ''];
 
 const switchColumnTask = (todoData, source, destination) => {
-  // console.log('******', source.index);
+  console.log('******', source, destination);
   const { columns } = todoData;
   let task;
   let targetColumnIndex;
@@ -30,6 +30,12 @@ const switchColumnTask = (todoData, source, destination) => {
     return column;
   });
   if ((targetColumnIndex || targetColumnIndex === 0) && task) {
+    if(destination.droppableId === 'column-inprogress'){
+      task.inprogressTime = Date.now();
+    }
+    if(destination.droppableId === 'column-done'){
+      task.finishTime = Date.now();
+    }
     newColumns[targetColumnIndex].tasks.splice(destination.index, 0, task);
   }
   // console.log('xxxnewColumns', newColumns);
@@ -103,6 +109,7 @@ const TodoList = React.memo((props) => {
   const [form] = Form.useForm();
   const [modalColumnId, setModalColumnId] = useState();
   const [searchFilter, setSearchFilter] = useState({});
+  const [sortType, setSortType] = useState('normal');
 
   console.log('sortedColumns111', columns);
   const clickItem = useContextMenu(
@@ -223,6 +230,7 @@ const TodoList = React.memo((props) => {
       repeat: taskRepeat,
       items,
       tags,
+      createTime: Date.now()
     };
     onChange(
       todoData.id,
@@ -236,6 +244,7 @@ const TodoList = React.memo((props) => {
                     return {
                       ...task,
                       ...newTodo,
+                      createTime: task.createTime || Date.now()
                     };
                   }
                   return task;
@@ -245,6 +254,7 @@ const TodoList = React.memo((props) => {
         }
         return column;
       }),
+      {},
       true
     );
     // setInputTask('');
@@ -274,6 +284,7 @@ const TodoList = React.memo((props) => {
                       return {
                         ...item,
                         checked,
+                        finishTime: checked? Date.now(): 0
                       };
                     }
                     return item;
@@ -286,11 +297,12 @@ const TodoList = React.memo((props) => {
         }
         return column;
       }),
+      {},
       true
     );
   };
   // console.log('todo==', todoData, columns);
-  const sortedColumns = sortTaskByRate(columns, searchFilter);
+  const sortedColumns = sortType === 'rate'?sortTaskByRate(columns, searchFilter): columns;
   console.log('sortedColumns', sortedColumns, columns, searchFilter);
   return (
     <DragDropContext onDragEnd={handleDragEnd}>

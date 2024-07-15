@@ -9,6 +9,14 @@ import reportWebVitals from './reportWebVitals';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom'; // 只能用hash路由
 import fileHelper from './utils/fileHelper';
 import Iframe from './music/Iframe';
+import moment from 'moment';
+
+
+moment.locale('zh-cn',{
+  week : {
+      dow : 1, 
+   }
+}); 
 
 fileHelper.mkAppDirSync('aim');
 fileHelper.mkAppDirSync('note');

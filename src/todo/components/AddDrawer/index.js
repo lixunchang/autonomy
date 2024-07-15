@@ -18,7 +18,7 @@ const formItemLayoutWithOutLabel = {
   },
 };
 
-const AddModal = ({ form, handleAddTodo, open, closeModal }) => {
+const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
   const [rateText, setRateText] = useState(
     RateTask[form.getFieldValue('rate') - 1] || ''
   );
@@ -147,7 +147,7 @@ const AddModal = ({ form, handleAddTodo, open, closeModal }) => {
                 <Form.Item>
                   <Button
                     type="dashed"
-                    onClick={() => add()}
+                    onClick={() => add({createTime: Date.now()})}
                     className={styles.addTask}
                     icon={<PlusOutlined />}
                   >
@@ -196,7 +196,7 @@ const AddModal = ({ form, handleAddTodo, open, closeModal }) => {
           </Form.Item>
         </Form>
 
-        <Form.Item>
+        {/* <Form.Item> */}
           <Button
             type="primary"
             htmlType="submit"
@@ -205,7 +205,7 @@ const AddModal = ({ form, handleAddTodo, open, closeModal }) => {
           >
             保存
           </Button>
-        </Form.Item>
+        {/* </Form.Item> */}
         {/* <Input.Group compact style={{ width: '80%', margin: '10px auto 16px' }}>
           <Input
             size="middle"
@@ -242,4 +242,4 @@ const AddModal = ({ form, handleAddTodo, open, closeModal }) => {
   );
 };
 
-export default AddModal;
+export default AddDrawer;

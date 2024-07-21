@@ -1,7 +1,7 @@
 .slate_editor{
-  height: calc(100% - 70px);
+  height: calc(100% - 32px);
   outline: none;
-  padding: 12px;
+  padding: 12px 26px;
   overflow: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -10,6 +10,11 @@
     color: #999999;
     padding: 6px 10px;
     border-left: 6px solid #e2e2e2;
+  }
+  :global{
+    p{
+      margin-bottom: 2px;
+    }
   }
 }
 .toolbar{

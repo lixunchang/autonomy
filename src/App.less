@@ -3,6 +3,27 @@
 .App {
   height: 100%;
 
+  .siderBar{
+    transition: all 0.3s linear;
+    &:hover{
+      .actions{
+        display: inline-flex;
+      }
+    }
+  }
+
+  .sider_hide{
+    max-width: 0px;
+    min-width: 0px !important;
+    width: 0px !important;
+    .handle{
+      transform: none !important;
+    }
+  }
+  .sider_show{
+    max-width: 360px;
+  }
+
   .dragArea {
     margin-left: 68px;
     height: 26px;
@@ -41,6 +62,29 @@
     left: 259px;
     cursor: col-resize;
     z-index: 1000;
+    transition: all 0.3s linear;
+    .actions{
+      display: none;
+      color: #fff;
+      background-color: #6e6e6e;
+      border: 1px solid #6e6e6e;
+      position: absolute;
+      top: 43%;
+      height: 32px;
+      width: 10px;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      border-radius: 0 16px 16px 0;
+      top: 43%;
+      transition: all 0.3s linear;
+      :global{
+        .anticon{
+          cursor: pointer;
+        }
+      }
+    }
+    
   }
 }
 

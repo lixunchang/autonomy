@@ -54,16 +54,13 @@ export const findItemsByIds = (arr, ids, result = []) => {
  * @param {*} ids
  * @param {*} result
  */
-export const getChildrenFilePath = (arr, result = []) => {
-  // result.push(
+export const getChildrenFilePath = (arr=[], result = []) => {
   arr.forEach((item) => {
     if (item.children) {
       return getChildrenFilePath(item.children, result);
     }
     result.push(item.path);
-    // return item.path;
   });
-  // );
 
   return result;
 };

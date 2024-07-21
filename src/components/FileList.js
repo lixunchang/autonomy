@@ -20,6 +20,7 @@ const FileList = ({
   onFileClick,
   expanded,
   createNewFile,
+  onDropEnd,
   onFileDelete,
   onFileRename,
   onImportFiles,
@@ -170,6 +171,16 @@ const FileList = ({
     }
   }, [newFile]);
 
+  const allowDrop=({ dropNode, dropPosition })=>{
+
+    if(dropPosition === 0){
+      return !dropNode.isLeaf
+    }
+
+    console.log('allowDrop', dropNode, dropPosition)
+    return true;
+  }
+
   const onItemClick = (isLeaf, id, path, isLoaded, type) => {
     if (!isLeaf) {
       return;
@@ -203,6 +214,11 @@ const FileList = ({
           background: '#6E6E6E',
           color: 'white',
         }}
+        draggable={{
+          icon: false
+        }}
+        allowDrop={allowDrop}
+        onDrop={onDropEnd}
         defaultExpandAll={false}
         expandedKeys={expandedKeys}
         selectedKeys={selectKey}
@@ -214,7 +230,6 @@ const FileList = ({
           onItemClick(isLeaf, id, path, isLoaded, type);
         }}
         onExpand={(keys) => {
-          console.log('onExpand', keys);
           setExpandedKeys(keys);
         }}
         treeData={switchFileIcons(files)}

@@ -28,7 +28,7 @@ const Task = ({ columnId, task, index, onCheckLittleTask, ...restProps }) => {
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            bodyStyle={{ padding: '12px 14px' }}
+            bodyStyle={{ padding: '8px 8px 8px 12px' }}
           >
             <div
               key={task.id}
@@ -53,18 +53,21 @@ const Task = ({ columnId, task, index, onCheckLittleTask, ...restProps }) => {
                 <span className={styles.divider} style={{ left: '75%' }} /> */}
                 <SmallRate count={4} value={task.rate || 0} />
                 <div className={styles.content}>{task.content}</div>
-                <span className={styles.collapseIcon} onClick={handleCollapse}>
+                {
+                  task?.items?.length>0&&
+                  <span className={styles.collapseIcon} onClick={handleCollapse}>
                   {progress}
                   {
                     collapse ? <DownOutlined className="icon"/>: <UpOutlined className="icon"/>
                   }
                 </span>
+                }
               </div>
               {
                 !collapse&&
                 <>
-                  <div className={styles.tips}>{task.desc}</div>
-                  <div>
+                  {/* <div className={styles.tips}>{task.desc}</div> */}
+                  <div style={{marginTop: 8}}>
                     {task?.items?.map((item, index) => {
                       return (
                         <div key={item.title} className={styles.smallTitle}>
@@ -76,7 +79,7 @@ const Task = ({ columnId, task, index, onCheckLittleTask, ...restProps }) => {
                               onCheckLittleTask(item, target.checked, index)
                             }
                           ></Checkbox>
-                          {item.title}
+                          <div>{item.title}</div>
                         </div>
                       );
                     })}

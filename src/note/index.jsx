@@ -24,7 +24,7 @@ const Note = ({ activeFile, onChange }) => {
     <div className={styles.Note}>
       {
         body&&
-        <Editor id={id} value={body} onChange={handleContentChange} isLoaded={isLoaded}/>
+        <Editor key={id} id={id} value={body} onChange={handleContentChange} isLoaded={isLoaded}/>
       }
     </div>
   );

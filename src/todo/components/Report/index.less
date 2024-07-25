@@ -1,6 +1,40 @@
+.report_drawer{
+
+  :global{
+    .ant-drawer-body{
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACFJREFUeNpiZGBg4GegAsBlCD8TqSYNQg2Mo6FEBAAIMACdPABtrSW/IQAAAABJRU5ErkJggg==");
+      background-repeat: repeat;
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.04);
+      min-height: 100vh;
+      margin: 0;
+    }
+  }
+}
+
+
 .report_content{
-  h2{
-    border-bottom: 4px solid #e2e2e2;
+  .section{
+    padding: 24px;
+    background-color: #e2e2e26b;
+    border-radius: 10px;
+  }
+  .section_item{
+    margin-bottom: 18px;
+    .title{
+      font-size: 14px;
+      font-weight: bold;
+    }
+  }
+  h3{
     margin-top: 18px;
+    border-left: 4px solid #6e6e6e;
+    padding-left: 8px;
+  }
+  .empty_text{
+    text-align: center;
+    min-height: 120px;
+    line-height: 120px;
   }
 }

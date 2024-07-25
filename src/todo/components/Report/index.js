@@ -74,6 +74,7 @@ const Report = ({ type = 'week', activeFile, closeReport }) => {
       onOk={closeReport} 
       onCancel={closeReport}
       onClose={closeReport}
+      className={styles.report_drawer}
       bodyStyle={{ paddingTop: 12, paddingBottom: 12 }}
       extra={
         <>
@@ -86,59 +87,65 @@ const Report = ({ type = 'week', activeFile, closeReport }) => {
         {
           newFinish.length + newInprogress.length + newTodo.length > 0 ?
           <>
-            <h2>本周期已完成任务</h2>
-            {
-              newFinish.length>0?newFinish.map(item=>{
-                return (
-                  <div>
-                    <h3>{item.content}</h3>
-                    <ol>
-                      {
-                        item.items.map((ite, i)=>{
-                          return <li>{ite.title}</li>
-                        })
-                      }
-                    </ol>
-                  </div>
-                )
-              }):<>暂无数据</>
-            }
-            <h2>本周期进行中任务</h2>
-            {
-              newInprogress.length>0?newInprogress.map(item=>{
-                return (
-                  <div>
-                    <h3>{item.content}</h3>
-                    <ol>
-                      {
-                        item.items.map((ite, i)=>{
-                          return <li>{ite.title}</li>
-                        })
-                      }
-                    </ol>
-                  </div>
-                )
-              }):<>暂无数据</>
-            }
-            <h2>本周期新增任务</h2>
-            {
-              newTodo.length>0?newTodo.map(item=>{
-                return (
-                  <div>
-                    <h3>{item.content}</h3>
-                    <ol>
-                      {
-                        item.items.map((ite, i)=>{
-                          return <li>{ite.title}</li>
-                        })
-                      }
-                    </ol>
-                  </div>
-                )
-              }):<>暂无数据</>
-            }
+            <h3>已完成</h3>
+            <div className={styles.section}>
+              {
+                newFinish.length>0?newFinish.map((item)=>{
+                  return (
+                    <div className={styles.section_item} key={item.id}>
+                      <div className={styles.title}>{item.content}</div>
+                      <ol>
+                        {
+                          item.items.map((ite, i)=>{
+                            return <li key={i}>{ite.title}</li>
+                          })
+                        }
+                      </ol>
+                    </div>
+                  )
+                }):<div className={styles.empty_text}>暂无数据</div>
+              }
+            </div>
+            <h3>进行中</h3>
+            <div className={styles.section}>
+              {
+                newInprogress.length>0?newInprogress.map(item=>{
+                  return (
+                    <div className={styles.section_item} key={item.id}>
+                      <div className={styles.title}>{item.content}</div>
+                      <ol>
+                        {
+                          item.items.map((ite, i)=>{
+                            return <li key={i}>{ite.title}</li>
+                          })
+                        }
+                      </ol>
+                    </div>
+                  )
+                }):<div className={styles.empty_text}>暂无数据</div>
+              }
+            </div>
+            <h3>本期新增</h3>
+            <div className={styles.section}>
+              {
+                newTodo.length>0?newTodo.map(item=>{
+                  return (
+                    <div className={styles.section_item} key={item.id}>
+                      <div className={styles.title}>{item.content}</div>
+                      <ol>
+                        {
+                          item.items.map((ite, i)=>{
+                            return <li key={i}>{ite.title}</li>
+                          })
+                        }
+                      </ol>
+                    </div>
+                  )
+                }):<div className={styles.empty_text}>暂无数据</div>
+              }
+            </div>
           </>
-          :<>暂无数据</>
+          :<div className={styles.empty_text}>暂无数据</div>
         }
       </div>
     </Drawer>

@@ -491,7 +491,7 @@ function App() {
     'file-downloaded': activeFileDownloaded,
     'save-edit-file': saveEditFile,
   });
-  console.log('activeFileId', activeFile, files, JSON.stringify(files));
+  // console.log('activeFileId', activeFile, files, JSON.stringify(files));
   return (
     <div className={styles.App}>
       <div style={{ height: '100%', display: 'flex' }}>

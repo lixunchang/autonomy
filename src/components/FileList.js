@@ -259,7 +259,7 @@ const FileList = ({
                   onChange={(e) => setInputValue(e.target.value)}
                 />
               ) : (
-                <span>{title || ''}</span>
+                <span>{title || '未命名文件'}</span>
               )}
             </div>
           );

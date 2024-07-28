@@ -9,7 +9,7 @@ import {
 } from '../formatter/utils';
 import { TEXT_ALIGN_TYPES } from '../constant';
 
-const Button = React.forwardRef(
+export const Button = React.forwardRef(
   ({ className, active, reversed, ...props }, ref) => (
     <span
       {...props}

@@ -16,7 +16,6 @@ const withShortcuts = (editor) => {
 
   editor.insertText = (text) => {
     const { selection } = editor;
-
     if (text.endsWith(' ') && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection;
       const block = Editor.above(editor, {
@@ -42,8 +41,19 @@ const withShortcuts = (editor) => {
         Transforms.setNodes(editor, newProperties, {
           match: (n) => SlateElement.isElement(n) && Editor.isBlock(editor, n),
         });
-
-        if (type === 'list-item') {
+        if (type === 'numbered-list-item') {
+          const list = {
+            type: 'numbered-list',
+            children: [],
+          };
+          Transforms.wrapNodes(editor, list, {
+            match: (n) =>
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              n.type === 'numbered-list-item',
+          });
+        }else if (type === 'bulleted-list-item') {
+ 
           const list = {
             type: 'bulleted-list',
             children: [],
@@ -52,9 +62,21 @@ const withShortcuts = (editor) => {
             match: (n) =>
               !Editor.isEditor(n) &&
               SlateElement.isElement(n) &&
-              n.type === 'list-item',
+              n.type === 'bulleted-list-item',
           });
         }
+        // else if (type === 'block-code-line'){
+        //   const list = {
+        //     type: 'block-code',
+        //     children: [],
+        //   };
+        //   Transforms.wrapNodes(editor, list, {
+        //     match: (n) =>
+        //       !Editor.isEditor(n) &&
+        //       SlateElement.isElement(n) &&
+        //       n.type === 'block-code-line',
+        //   });
+        // }
 
         return;
       }
@@ -86,12 +108,20 @@ const withShortcuts = (editor) => {
           };
           Transforms.setNodes(editor, newProperties);
 
-          if (block.type === 'list-item') {
+          if (block.type === 'bulleted-list-item') {
             Transforms.unwrapNodes(editor, {
               match: (n) =>
                 !Editor.isEditor(n) &&
                 SlateElement.isElement(n) &&
                 n.type === 'bulleted-list',
+              split: true,
+            });
+          }else if (block.type === 'numbered-list-item') {
+            Transforms.unwrapNodes(editor, {
+              match: (n) =>
+                !Editor.isEditor(n) &&
+                SlateElement.isElement(n) &&
+                n.type === 'numbered-list',
               split: true,
             });
           }

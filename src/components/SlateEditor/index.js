@@ -13,13 +13,26 @@ import withImages from './formatter/images';
 import Toolbar from './components/Toolbar';
 import isHotkey from 'is-hotkey';
 import styles from './index.less';
-import formatter, { formatChildren } from './formatter';
+import RenderElement, { formatChildren } from './formatter';
 import { BlockButton, MarkButton } from './components/Button';
 import { toggleMark } from './formatter/utils';
 import { DEFAULT_NOTE, HOTKEYS, SHORTCUTS } from './constant';
 import ToolIcon from '../Icon';
 import ColorPicker from './components/ColorPicker';
 import InsertImage from './components/InsertImage';
+import useDecorate from './hooks/useDecorate';
+import SetNodeToDecorations from './components/SetNodeToDecorations';
+import CodeBlockButton from './components/BlockCode/components/BlockCodeButton';
+import { prismThemeCss } from './components/BlockCode/highlight.js';
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-jsx'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-tsx'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-sql'
+import 'prismjs/components/prism-java'
 
 const parseValue = (value) => {
   if (Array.isArray(value)) {
@@ -43,16 +56,16 @@ const parseValue = (value) => {
   return DEFAULT_NOTE;
 };
 
-const initialValue = [
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: '请输入markdown...',
-      },
-    ],
-  },
-];
+// const initialValue = [
+//   {
+//     type: 'paragraph',
+//     children: [
+//       {
+//         text: '请输入markdown...',
+//       },
+//     ],
+//   },
+// ];
 //   // {
 //   //   type: 'block-quote',
 //   //   children: [{ text: 'A wise quote.', color: 'red' }],
@@ -91,7 +104,7 @@ const initialValue = [
 // ];
 
 const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
-  const renderElement = useCallback(formatter, []);
+  const renderElement = useCallback(RenderElement, []);
   const renderLeaf = useCallback(formatChildren, []);
   const editor = useMemo(
     () => withShortcuts(withImages(withReact(withHistory(createEditor())))),
@@ -101,6 +114,8 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
   // useEffect(() => {
   //   // editor.children = value;
   // }, [editor, value]);
+
+  const decorate = useDecorate(editor)
 
   const handleSaveSelection = () => {
     editor.savedSelection = editor.selection;
@@ -166,6 +181,9 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
       <Toolbar className={styles.toolbar}>
         <InsertImage />
         <ColorPicker />
+        {/* <MarkButton format="code" icon={<ToolIcon type="icon-editor-code" />} /> */}
+        <CodeBlockButton />
+        <ToolIcon type="icon-editor-fengexian" className={styles.fengexian}/>
         <MarkButton
           format="bold"
           icon={<ToolIcon type="icon-editor-fuhao-jiacu" />}
@@ -178,7 +196,11 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
           format="underline"
           icon={<ToolIcon type="icon-editor-underline" />}
         />
-        <MarkButton format="code" icon={<ToolIcon type="icon-editor-code" />} />
+        <MarkButton
+          format="middleline"
+          icon={<ToolIcon type="icon-editor-a-zhonghuaxian1" />}
+        />
+        <ToolIcon type="icon-editor-fengexian" className={styles.fengexian}/>
         <BlockButton
           format="heading-one"
           icon={<ToolIcon type="icon-editor-heading-h1" />}
@@ -186,6 +208,27 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         <BlockButton
           format="heading-two"
           icon={<ToolIcon type="icon-editor-heading-h2" />}
+        />
+        <BlockButton
+          format="heading-three"
+          icon={<ToolIcon type="icon-editor-heading-h3" />}
+        />
+        <BlockButton
+          format="heading-four"
+          icon={<ToolIcon type="icon-editor-heading-h4" />}
+        />
+        <BlockButton
+          format="heading-five"
+          icon={<ToolIcon type="icon-editor-heading-h5" />}
+        />
+         <BlockButton
+          format="heading-six"
+          icon={<ToolIcon type="icon-editor-heading-h6" />}
+        />
+        <ToolIcon type="icon-editor-fengexian" className={styles.fengexian}/>
+        <BlockButton
+          format="check-list"
+          icon={<ToolIcon type="icon-editor-checkbox-checked" />}
         />
         <BlockButton
           format="block-quote"
@@ -199,10 +242,7 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
           format="bulleted-list"
           icon={<ToolIcon type="icon-editor-format-list-bulleted" />}
         />
-        <BlockButton
-          format="left"
-          icon={<ToolIcon type="icon-editor-align-left" />}
-        />
+        <ToolIcon type="icon-editor-fengexian" className={styles.fengexian}/>
         <BlockButton
           format="center"
           icon={<ToolIcon type="icon-editor-align-center" />}
@@ -212,16 +252,26 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
           icon={<ToolIcon type="icon-editor-align-right" />}
         />
         <BlockButton
+          format="left"
+          icon={<ToolIcon type="icon-editor-align-left" />}
+        />
+        <BlockButton
           format="justify"
           icon={<ToolIcon type="icon-editor-align-justify" />}
         />
       </Toolbar>
+      <SetNodeToDecorations />
       <Editable
         className={styles.slate_editor}
+        decorate={decorate}
         onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         onKeyDown={(event) => {
+          if (isHotkey('tab', event)) {
+            event.preventDefault();
+            Editor.insertText(editor, '  ')
+          }
           if (isHotkey('mod+a', event)) {
             event.preventDefault();
             Transforms.select(editor, []);
@@ -243,6 +293,7 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         autoFocus
         onBlur={handleSaveSelection}
       />
+      <style>{prismThemeCss}</style>
     </Slate>
   );
 };

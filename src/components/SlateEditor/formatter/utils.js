@@ -1,5 +1,5 @@
 import { LIST_TYPES, TEXT_ALIGN_TYPES } from '../constant';
-import { Editor, Transforms, Element } from 'slate';
+import { Editor, Transforms, Element as SlateElement } from 'slate';
 
 export const isBlockActive = (editor, format, blockType = 'type') => {
   const { selection } = editor;
@@ -9,7 +9,7 @@ export const isBlockActive = (editor, format, blockType = 'type') => {
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: (n) =>
-        !Editor.isEditor(n) && Element.isElement(n) && n[blockType] === format,
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n[blockType] === format,
     })
   );
 
@@ -32,7 +32,7 @@ export const toggleBlock = (editor, format) => {
   Transforms.unwrapNodes(editor, {
     match: (n) =>
       !Editor.isEditor(n) &&
-      Element.isElement(n) &&
+    SlateElement.isElement(n) &&
       LIST_TYPES.includes(n.type) &&
       !TEXT_ALIGN_TYPES.includes(format),
     split: true,

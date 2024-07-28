@@ -1,10 +1,17 @@
+import { CodeBlockType, CodeLineType } from '../components/BlockCode';
+import CheckList from '../components/CheckList';
 import { Image } from './images';
+import { ReactEditor, useSlateStatic } from 'slate-react'
+import { Transforms } from 'slate'
+import { css } from '@emotion/css'
+import LanguageSelect from '../components/BlockCode/components/LanguageSelect';
 
 
-export default function formatter(props) {
+export default function RenderElement(props) {
   const { attributes, children, element } = props;
   const { type, children:ccc, url, style, ...rest} = element;
   const styles = {...style, ...rest};
+  const editor = useSlateStatic()
   console.log('element-type', element, styles)
   switch (element.type) {
     /**
@@ -12,6 +19,9 @@ export default function formatter(props) {
      */
     case 'image':
       return <Image style={styles} {...props} />;
+
+    case 'check-list':
+      return <CheckList style={styles} {...props}/>;
     /**
      * markdown 快捷
      */
@@ -32,30 +42,69 @@ export default function formatter(props) {
     case 'numbered-list':
       return <ol style={styles} {...attributes}>{children}</ol>;
     case 'list-item':
+    case 'bulleted-list-item':
+    case 'numbered-list-item':
       return <li style={styles} {...attributes}>{children}</li>;
     case 'block-quote':
       return <blockquote style={styles} {...attributes}>{children}</blockquote>;
+    // case 'code-line':
+    //     return <p style={styles} {...attributes}>{children}</p>;
+    // case 'code-block':
+    //       return <pre><code style={styles} {...attributes}>{children}</code></pre>;
+    case CodeLineType:
+      return (
+        <p {...attributes} style={{ ...styles, position: 'relative' }}>
+          {children}
+        </p>
+      )
+    case CodeBlockType: 
+      const setLanguage = (language) => {
+        const path = ReactEditor.findPath(editor, element)
+        Transforms.setNodes(editor, { language }, { at: path })
+      }
+      return (
+        <div
+          {...attributes}
+          className={css(`
+          font-family: monospace;
+          font-size: 16px;
+          line-height: 20px;
+          margin-block: 14px;
+          background: rgba(0, 20, 60, .03);
+          padding: 32px 16px;
+        `)}
+          style={{ position: 'relative' }}
+          spellCheck={false}
+        >
+          <LanguageSelect
+            value={element.language}
+            onChange={e => setLanguage(e.target.value)}
+          />
+          {children}
+        </div>
+      )
     default:
-      return <p style={styles} {...attributes}>{children}</p>;
+      const Tag = editor.isInline(element) ? 'span' : 'p'
+      return <Tag style={styles} {...attributes}>{children}</Tag>;
   }
 }
 
 export function formatChildren({ attributes, children, leaf }){
-  const {text, url, bold, code, italic, underline, ...styles} = leaf;
+  const {text, url, bold, code, italic, underline, middleline, ...styles} = leaf;
   if (bold) {
     children = <strong>{children}</strong>
   }
-
   if (code) {
     children = <code>{children}</code>
   }
-
   if (italic) {
     children = <em>{children}</em>
   }
-
   if (underline) {
     children = <u>{children}</u>
+  }
+  if(middleline){
+    children = <del>{children}</del>
   }
 
   return <span style={styles} {...attributes}>{children}</span>

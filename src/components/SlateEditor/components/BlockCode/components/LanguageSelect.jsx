@@ -6,6 +6,7 @@ const LanguageSelect = (props) => {
       data-test-id="language-select"
       contentEditable={false}
       className={css`
+        font-size: 12px;
         position: absolute;
         right: 5px;
         top: 5px;

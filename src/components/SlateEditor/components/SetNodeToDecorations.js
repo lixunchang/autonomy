@@ -41,6 +41,7 @@ const getChildNodeToDecorations = ([
   const text = block.children.map(line => SlateNode.string(line)).join('\n')
   const language = block.language
   const tokens = Prism.tokenize(text, Prism.languages[language])
+  console.log('lang-token', tokens, blockPath)
   const normalizedTokens = normalizeTokens(tokens) // make tokens flat and grouped by line
   const blockChildren = block.children
 
@@ -68,7 +69,7 @@ const getChildNodeToDecorations = ([
         token: true,
         ...Object.fromEntries(token.types.map(type => [type, true])),
       }
-
+      console.log('lang-range',  range)
       nodeToDecorations.get(element).push(range)
 
       start = end

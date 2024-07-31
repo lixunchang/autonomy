@@ -63,25 +63,25 @@ export default function RenderElement(props) {
         Transforms.setNodes(editor, { language }, { at: path })
       }
       return (
-        <div
-          {...attributes}
-          className={css(`
-          font-family: monospace;
-          font-size: 16px;
-          line-height: 20px;
-          margin-block: 14px;
-          background: rgba(0, 20, 60, .03);
-          padding: 32px 16px;
-        `)}
-          style={{ position: 'relative' }}
-          spellCheck={false}
-        >
-          <LanguageSelect
-            value={element.language}
-            onChange={e => setLanguage(e.target.value)}
-          />
-          {children}
-        </div>
+          <div
+            {...attributes}
+            className={css(`
+            font-family: monospace;
+            font-size: 16px;
+            line-height: 20px;
+            margin-block: 14px;
+            background: rgba(0, 20, 60, .03);
+            padding: 24px 16px 16px;
+          `)}
+            style={{ position: 'relative' }}
+            spellCheck={false}
+          >
+            <LanguageSelect
+              value={element.language}
+              onChange={e => setLanguage(e.target.value)}
+            />
+            {children}
+          </div>
       )
     default:
       const Tag = editor.isInline(element) ? 'span' : 'p'
@@ -89,8 +89,8 @@ export default function RenderElement(props) {
   }
 }
 
-export function formatChildren({ attributes, children, leaf }){
-  const {text, url, bold, code, italic, underline, middleline, ...styles} = leaf;
+export function RenderLeaf({ attributes, children, leaf }){
+  const {text, url, bold, code, italic, underline, middleline, ...rest} = leaf;
   if (bold) {
     children = <strong>{children}</strong>
   }
@@ -106,6 +106,5 @@ export function formatChildren({ attributes, children, leaf }){
   if(middleline){
     children = <del>{children}</del>
   }
-
-  return <span style={styles} {...attributes}>{children}</span>
+  return <span style={rest} className={Object.keys(rest).join(' ')} {...attributes}>{children}</span>
 }

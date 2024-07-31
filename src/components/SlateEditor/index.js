@@ -13,7 +13,7 @@ import withImages from './formatter/images';
 import Toolbar from './components/Toolbar';
 import isHotkey from 'is-hotkey';
 import styles from './index.less';
-import RenderElement, { formatChildren } from './formatter';
+import RenderElement, { RenderLeaf } from './formatter';
 import { BlockButton, MarkButton } from './components/Button';
 import { toggleMark } from './formatter/utils';
 import { DEFAULT_NOTE, HOTKEYS, SHORTCUTS } from './constant';
@@ -105,7 +105,7 @@ const parseValue = (value) => {
 
 const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
   const renderElement = useCallback(RenderElement, []);
-  const renderLeaf = useCallback(formatChildren, []);
+  const renderLeaf = useCallback(RenderLeaf, []);
   const editor = useMemo(
     () => withShortcuts(withImages(withReact(withHistory(createEditor())))),
     []
@@ -285,9 +285,9 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
           }
         }}
         placeholder={
-          <span style={{ display: 'inline-block', marginTop: 12 }}>
+          <p style={{ marginTop: 12 }}>
             请输入markdown...
-          </span>
+          </p>
         }
         spellCheck
         autoFocus

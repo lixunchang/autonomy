@@ -3,7 +3,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import styles from './Column.less';
 import Task from './Task';
 
-const Column = ({ column, actions, onEditTask, onCheckLittleTask }) => {
+const Column = ({ column, actions, onEditTask, handleTaskChange, onCheckLittleTask }) => {
   return (
     <div className={styles.Column}>
       <div className={styles.title}>
@@ -34,6 +34,9 @@ const Column = ({ column, actions, onEditTask, onCheckLittleTask }) => {
                     onDoubleClick={(e) => {
                       e.stopPropagation();
                       onEditTask(column, task);
+                    }}
+                    onCollapseChange={(collapse)=>{
+                      handleTaskChange(column, {...task, collapse})
                     }}
                     onCheckLittleTask={(item, checked, index) =>
                       onCheckLittleTask(column, task, item, checked, index)

@@ -5,13 +5,14 @@ import { Checkbox, Tag, Card } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import SmallRate from './SmallRate';
 
-const Task = ({ columnId, task, index, onCheckLittleTask, ...restProps }) => {
+const Task = ({ columnId, task, index, onCollapseChange, onCheckLittleTask, ...restProps }) => {
   console.log('task.items==>', task);
-  const [collapse, setCollapse] = useState(true);
+  // const [collapse, setCollapse] = useState(task.collapse||true);
   const progress = task?.items?.length>0? task?.items?.filter(ite=>ite.checked).length + '/' + task?.items?.length: '';
   const handleCollapse=(e)=>{
     e.stopPropagation();
-    setCollapse(!collapse)
+    // setCollapse(!collapse)
+    onCollapseChange(!task.collapse)
   }
   return (
     <Draggable
@@ -58,13 +59,13 @@ const Task = ({ columnId, task, index, onCheckLittleTask, ...restProps }) => {
                   <span className={styles.collapseIcon} onClick={handleCollapse}>
                   {progress}
                   {
-                    collapse ? <DownOutlined className="icon"/>: <UpOutlined className="icon"/>
+                    task.collapse ? <DownOutlined className="icon"/>: <UpOutlined className="icon"/>
                   }
                 </span>
                 }
               </div>
               {
-                !collapse&&
+                !task.collapse&&
                 <>
                   {/* <div className={styles.tips}>{task.desc}</div> */}
                   <div style={{marginTop: 8}}>

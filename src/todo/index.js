@@ -200,6 +200,7 @@ const TodoList = React.memo((props) => {
     setModalColumnId(column.id);
     form.setFieldsValue({ ...task, title: task.content });
   };
+
   // const rate = (
   //   <Rate
   //     allowClear={false}
@@ -261,7 +262,30 @@ const TodoList = React.memo((props) => {
     // setInputTaskDesc('');
     // setTaskRate(ERate.zero);
   };
-
+  const handleTaskChange = (columnItem, newTask,)=>{
+    onChange(
+      todoData.id,
+      columns.map((column) => {
+        if (column.id === columnItem.id) {
+          return {
+            ...column,
+            tasks: column.tasks.map((task) => {
+              if (task.id === newTask.id) {
+                return {
+                  ...task,
+                  ...newTask
+                }
+              }
+              return task;
+            }),
+          };
+        }
+        return column;
+      }),
+      {},
+      true
+    );
+  }
   const handleCheckLittleTask = (
     columnItem,
     taskItem,
@@ -315,6 +339,7 @@ const TodoList = React.memo((props) => {
                 key={column.id}
                 column={column}
                 onEditTask={handleTaskEdit}
+                handleTaskChange={handleTaskChange}
                 onCheckLittleTask={handleCheckLittleTask}
                 actions={
                   <>

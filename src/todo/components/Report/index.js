@@ -79,7 +79,7 @@ const Report = ({ type = 'week', activeFile, closeReport }) => {
       extra={
         <>
           <Button onClick={()=>setBackCount(backCount+1)}>上一周期</Button>
-          <Button style={{marginLeft: 12}} disabled={backCount === 0} onClick={()=>setBackCount(backCount-1)}>上一周期</Button>
+          <Button style={{marginLeft: 12}} disabled={backCount === 0} onClick={()=>setBackCount(backCount-1)}>下一周期</Button>
         </>
     }
     >

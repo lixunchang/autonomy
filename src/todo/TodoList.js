@@ -94,10 +94,10 @@ const TodoList = (props) => {
       defaultValue={ERate.zero}
       count={4}
       tooltips={[
-        '不紧急不重要',
-        '很紧急不重要',
-        '不紧急很重要',
-        '很紧急很重要',
+        '（低）不紧急且不重要',
+        '（中）不重要但紧急',
+        '（高）重要不紧急',
+        '（急）重要且紧急',
       ]}
       style={{ fontSize: 14 }}
       onChange={setTaskRate}

@@ -9,7 +9,7 @@ const SmallRate =({value=0,count=4, style})=>{
   //   data.push(i);
   // }
 
-  return <div className={styles.SmallRate} style={style}>
+  return <div className={`${styles.SmallRate} ${styles['star_'+value]}`} style={style}>
     {Array.from(new Array(value)).map((_, it)=>{
       return <div key={it} className={`${styles.line} ${styles.active}`}/>
     })}

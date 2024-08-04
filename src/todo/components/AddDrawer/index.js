@@ -5,10 +5,10 @@ import styles from './index.less';
 import DynamicTags from '../../../components/DynamicTags';
 
 export const RateTask = [
-  '不紧急、不重要',
-  '不紧急、很重要',
-  '很紧急、不重要',
-  '很紧急、很重要',
+  '（低）不紧急且不重要',
+  '（中）不重要但紧急',
+  '（高）重要不紧急',
+  '（急）重要且紧急',
 ];
 
 const formItemLayoutWithOutLabel = {

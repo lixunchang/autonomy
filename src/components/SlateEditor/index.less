@@ -1,15 +1,17 @@
 .slate_editor{
   height: calc(100% - 32px);
   outline: none;
-  padding: 12px 26px;
+  padding: 12px 26px 200px;
   overflow: auto;
   &::-webkit-scrollbar {
     display: none;
   }
   blockquote{
     color: #999999;
-    padding: 6px 10px;
-    border-left: 6px solid #e2e2e2;
+    padding: 4px 10px;
+    border-left: 4px solid #e2e2e2;
+    margin: 0;
+    line-height: 18px;
   }
   code{
     word-break: break-word;
@@ -21,17 +23,34 @@
     padding: .065em .4em;
   }
   pre{
-    color: #333;
-    background: #f8f8f8;
+    font-family: monospace;
+    font-size: 16px;
+    line-height: 20px;
+    margin-block: 14px;
+    background: #ffffff80;
+    padding: 24px 16px 16px;
+    border: 1px solid #eee;
+    select{
+      font-size: 12px;
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      color: #b2b2b2;
+      border: none;
+      outline: none;
+      z-index: 1;
+      appearance: none;
+      direction: rtl;
+    }
     code{
       font-size: 12px;
-      padding: 15px 12px;
+      padding: 0;
       margin: 0;
       word-break: normal;
       display: block;
       overflow-x: auto;
       color: #333;
-      background: #f8f8f8;
+      background: transparent;
     }
   }
   del{

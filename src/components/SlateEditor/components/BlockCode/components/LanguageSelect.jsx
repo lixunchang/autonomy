@@ -5,13 +5,6 @@ const LanguageSelect = (props) => {
     <select
       data-test-id="language-select"
       contentEditable={false}
-      className={css`
-        font-size: 12px;
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        z-index: 1;
-      `}
       {...props}
     >
       <option value="css">CSS</option>

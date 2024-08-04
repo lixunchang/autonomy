@@ -8,7 +8,7 @@ const useDecorate = (editor) => {
   return useCallback(
     ([node, path]) => {
       if (SlateElement.isElement(node) && node.type === CodeLineType) {
-        const ranges = editor.nodeToDecorations.get(node) || []
+        const ranges = (editor.nodeToDecorations && editor.nodeToDecorations.get(node)) || []
         return ranges
       }
 

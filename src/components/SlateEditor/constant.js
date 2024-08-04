@@ -11,7 +11,7 @@ export const SHORTCUTS = {
   '#####': 'heading-five',
   '######': 'heading-six',
   '[]': 'check-list',
-  '```': 'block-code-line'
+  // '```': 'block-code-line'
 };
 
 export const HOTKEYS = {
@@ -19,6 +19,7 @@ export const HOTKEYS = {
   'mod+i': 'italic',
   'mod+u': 'underline',
   'mod+`': 'code',
+  'mod+Enter': 'newLine',
 };
 
 export const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify'];

@@ -18,7 +18,7 @@ const CheckList = ({ attributes, children, element }) => {
       className={css`
         display: flex;
         flex-direction: row;
-        padding-left: 40px;
+        padding-left: 24px;
         margin-bottom: 2px;
         align-items: center;
         overflow: hidden;

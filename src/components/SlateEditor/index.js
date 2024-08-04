@@ -5,6 +5,7 @@ import {
   Editor,
   Element as SlateElement,
   Node as SlateNode,
+  Text
 } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
@@ -15,7 +16,7 @@ import isHotkey from 'is-hotkey';
 import styles from './index.less';
 import RenderElement, { RenderLeaf } from './formatter';
 import { BlockButton, MarkButton } from './components/Button';
-import { toggleMark } from './formatter/utils';
+import { isBlockActive, toggleMark } from './formatter/utils';
 import { DEFAULT_NOTE, HOTKEYS, SHORTCUTS } from './constant';
 import ToolIcon from '../Icon';
 import ColorPicker from './components/ColorPicker';
@@ -33,6 +34,9 @@ import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
+import { CodeBlockType, CodeLineType, languageTypes, ParagraphType } from './components/BlockCode/index.jsx';
+
+const { clipboard } = require('electron')
 
 const parseValue = (value) => {
   if (Array.isArray(value)) {
@@ -115,11 +119,77 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
   //   // editor.children = value;
   // }, [editor, value]);
 
+  const handleEditableCopy=()=>{
+    // const selectedText = Editor.string(editor, editor.selection, {voids: true});
+    // SlateNode.texts(editor, editor.selection)
+    // console.log('selectedText====>22', editor, selectedText, editor.selection, editor.selection.anchor.path, editor.selection.focus.path);
+    // // 获取编辑器的值
+    // const value = editor.value;
+    
+    // // 如果没有选中的文本，直接返回空字符串
+    // if (value.isBlurred || editor.selection.isBlurred) {
+    //     return '';
+    // }
+
+    const { anchor, focus } = editor.selection;
+    let from = anchor.path;
+    let fromOffset = anchor.offset;
+    let to  = focus.path;
+    let toOffset = focus.offset;
+    if(from[0] > to[0]){
+      from = focus.path;
+      fromOffset = focus.offset;
+      to = anchor.path;
+      toOffset = anchor.offset;
+    }
+    const selectedText = Array.from(SlateNode.texts(editor, {from, to})).reduce((result, ite, index, list)=>{
+
+      const item = ite[0]
+      if(index === 0){
+        return item.text.slice(fromOffset)
+      }else if(index === list.length - 1){
+        console.log('item===', item)
+        return result + '\n' + item.text.slice(0, toOffset)
+      }
+      return result + '\n' + item.text;
+    },'')
+
+    // for (let number of SlateNode.texts(editor, {from, to})) {
+    //   console.log('----', number);
+    // }
+    // 获取选中的文本
+    // const selectedText2 = SlateNode.texts(editor, editor.selection).reduce((text, node) => {
+    //     console.log('=====>', node)
+    //     return text + node.text.split('\n').join('\n' + node.indent);
+    // }, '');
+
+    console.log('selectedText====>', editor, selectedText)
+    clipboard.writeText(selectedText)
+  }
+
   const decorate = useDecorate(editor)
 
   const handleSaveSelection = () => {
     editor.savedSelection = editor.selection;
   };
+
+  const handleEditablePaste =(e)=>{
+    console.log('paste=', e)
+  }
+
+  const handleEditableClick=(event)=>{
+    const lastNodeType = editor.children[editor.children.length - 1].type;
+    if(event.target.getAttribute('data-slate-editor')&&['code-block', 'image'].includes(lastNodeType)){
+      // // Editor.isNormalizing(editor)
+      Editor.insertNode(editor, {
+        type: 'paragraph',
+        children: [{ text: '' }],
+      })
+      if(['code-block'].includes(lastNodeType)){
+        Transforms.liftNodes(editor);
+      }
+    }
+  }
 
   const handleDOMBeforeInput = useCallback(
     (e) => {
@@ -166,10 +236,10 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
       initialValue={parseValue(value)}
       // value={parseValue(value)}
       onChange={(value) => {
-        console.log('values==', value);
         const isAstChange = editor.operations.some(
           (op) => 'set_selection' !== op.type
         );
+        console.log('values==', value, isAstChange);
         if (isAstChange) {
           // Save the value to Local Storage.
           // const content = JSON.stringify(value);
@@ -267,7 +337,11 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
+        onClick={handleEditableClick}
+        onCopy={handleEditableCopy}
+        onPaste={handleEditablePaste}
         onKeyDown={(event) => {
+          
           if (isHotkey('tab', event)) {
             event.preventDefault();
             Editor.insertText(editor, '  ')
@@ -275,6 +349,109 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
           if (isHotkey('mod+a', event)) {
             event.preventDefault();
             Transforms.select(editor, []);
+          }
+          console.log('event==>', event, event.metaKey&&event.code === 'Enter', event.ctrlKey && event.key ==='q')
+          if(event.ctrlKey&&event.key === '`'){
+            event.preventDefault();
+            if(isBlockActive(editor, 'code-block')){
+              Transforms.unwrapNodes(editor, {
+                match: (n) =>
+                  !Editor.isEditor(n) &&
+                  SlateElement.isElement(n) &&
+                  n.type === 'code-block',
+              });
+              Transforms.setNodes(
+                editor,
+                { type: ParagraphType }
+              )
+            }else{
+              Transforms.wrapNodes(
+                editor,
+                { type: CodeBlockType, language: 'html', children: [] },
+                {
+                  match: n => SlateElement.isElement(n) && n.type === ParagraphType,
+                  split: true,
+                }
+              )
+              Transforms.setNodes(
+                editor,
+                { type: CodeLineType, children: [{text: ""}] },
+                { match: n => SlateElement.isElement(n) && n.type === ParagraphType }
+              )
+            }
+            return;
+          }
+          if(event.metaKey && event.key ==='Enter'){
+            event.preventDefault();
+            // let nextsilbingNode;
+            // for(let node of Editor.levels(
+            //   editor,
+            //   {
+            //     match:n=>!Editor.isEditor(n)&&n.type === 'code-block' ? true : false, 
+            //     reverse:true
+            //   }
+            // )){
+            //   nextsilbingNode = Editor.next(editor,{at:node[1]})
+            // }
+            // console.log('=====', nextsilbingNode);
+            // if(nextsilbingNode){
+            //   Transforms.select(editor, nextsilbingNode[1])
+            //   Transforms.collapse(editor, {fedge:'end'})
+            // }else{
+              // Transforms.collapse(editor, {fedge:'end'})
+              Editor.insertNode(editor, {
+                type: 'paragraph',
+                children: [{ text: '' }],
+              })
+              // 将光标移动到编辑器末尾
+              // Transforms.moveToEnd(editor);?
+              // Transforms.collapse(editor, {fedge:'end'})
+              Transforms.liftNodes(editor);
+              // 插入新块
+              // Transforms.insertNodes(editor, {
+              //   type: 'paragraph',
+              //   children: [{ text: '' }],
+              // });
+              // Transforms.setNodes(editor, {type:'paragraph'})
+            // }
+          }else if(event.key ==='Enter') {
+            // const textBeforeCursor = Editor.before(editor, editor.selection.anchor, { unit: 'block' });
+            // const start = Editor.start(editor, textBeforeCursor.path);
+            const range = { anchor: editor.selection.anchor, focus:{ ...editor.selection.focus, offset: 0} };
+            const beforeText = Editor.string(editor, range)
+            const codePrefix = beforeText.startsWith('```')? languageTypes[beforeText.replace('```','')||'html']: '';
+            // 获取当前选区中的块级节点
+            // const [ node ] = Editor.nodes(editor, {
+            //   match: (n) => Editor.isBlock(editor, n),
+            //   mode: 'all',
+            // });
+            // const [match] = Editor.nodes(editor, {
+            //   match: n => n.type === 'code-block',
+            // })
+            // Range.isCollapsed(range),
+            console.log('node===>', codePrefix, Editor.isStart(editor, editor.selection))
+            if(codePrefix){
+              event.preventDefault();
+              Transforms.insertText(editor, '', {at: range})
+              if(isBlockActive(editor, 'code-block')){
+                Transforms.liftNodes(editor);
+                Transforms.setNodes(editor, {type:'paragraph'})
+                return;
+              }
+              Transforms.wrapNodes(
+                editor,
+                { type: CodeBlockType, language: codePrefix, children: [] },
+                {
+                  match: n => SlateElement.isElement(n) && n.type === ParagraphType,
+                  split: true,
+                }
+              )
+              Transforms.setNodes(
+                editor,
+                { type: CodeLineType, children: [{text: ""}] },
+                { match: n => SlateElement.isElement(n) && n.type === ParagraphType }
+              )
+            }
           }
           for (const hotkey in HOTKEYS) {
             if (isHotkey(hotkey, event)) {
@@ -285,9 +462,9 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
           }
         }}
         placeholder={
-          <p style={{ marginTop: 12 }}>
-            请输入markdown...
-          </p>
+          <span style={{display: 'inline-block', marginTop: 12 }}>
+            写点什么...
+          </span>
         }
         spellCheck
         autoFocus

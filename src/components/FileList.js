@@ -108,7 +108,7 @@ const FileList = ({
         type: 'separator',
       },
       {
-        label: '导入PDF',
+        label: '导入PDF书籍',
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
@@ -120,7 +120,7 @@ const FileList = ({
             }
             onImportFiles(id, type, {
               extension: ['pdf'],
-              title: '选择导入PDF',
+              title: '选择导入PDF书籍',
             });
           }
         },

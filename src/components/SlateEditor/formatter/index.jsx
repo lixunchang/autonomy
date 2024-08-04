@@ -63,16 +63,11 @@ export default function RenderElement(props) {
         Transforms.setNodes(editor, { language }, { at: path })
       }
       return (
-          <div
+          <pre
             {...attributes}
             className={css(`
-            font-family: monospace;
-            font-size: 16px;
-            line-height: 20px;
-            margin-block: 14px;
-            background: rgba(0, 20, 60, .03);
-            padding: 24px 16px 16px;
-          `)}
+              
+            `)}
             style={{ position: 'relative' }}
             spellCheck={false}
           >
@@ -80,8 +75,8 @@ export default function RenderElement(props) {
               value={element.language}
               onChange={e => setLanguage(e.target.value)}
             />
-            {children}
-          </div>
+            <code>{children}</code>
+          </pre>
       )
     default:
       const Tag = editor.isInline(element) ? 'span' : 'p'

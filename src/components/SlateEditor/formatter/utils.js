@@ -16,6 +16,7 @@ export const isBlockActive = (editor, format, blockType = 'type') => {
   return !!match;
 };
 
+
 export const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor);
   return marks ? marks[format] === true : false;

@@ -6,6 +6,7 @@ import {
   getPdfPageImages,
 } from './pdf.js';
 
+const { join } = window.require('path');
 const fs = window.require('fs');
 const fsPs = fs.promises;
 // Node API
@@ -53,6 +54,32 @@ const fileHelper = {
       content = JSON.stringify(content);
     }
     return fsPs.writeFile(path, content, { encoding: 'utf-8' });
+  },
+  writeImage: (path, fileName, content)=>{
+    if (!fs.existsSync(path)) {
+      const saveLoaction = getSaveLocation();
+      const imgPath = join(saveLoaction, 'images/')
+      if(!fs.existsSync(imgPath)){
+        fs.mkdirSync(imgPath)
+      }
+      fs.mkdirSync(path);
+    }
+    return fsPs.writeFile(join(path, fileName), content.split(',')[1], {encoding: 'base64'})
+  },
+  copyFile: (from, path, fileName)=>{
+    if (!fs.existsSync(path)) {
+      const saveLoaction = getSaveLocation();
+      const imgPath = join(saveLoaction, 'images/')
+      if(!fs.existsSync(imgPath)){
+        fs.mkdirSync(imgPath)
+      }
+      fs.mkdirSync(path);
+    }
+    const newPath = join(path, fileName)
+    if(fs.existsSync(newPath)){
+      return;
+    }
+    return fsPs.copyFile(from, newPath)
   },
   renameFile: (path, newPath) => {
     // console.log(path, newPath);

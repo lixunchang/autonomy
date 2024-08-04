@@ -1,25 +1,39 @@
 import { Button } from "../../Button"
 import { useSlateStatic } from 'slate-react'
-import { Element as SlateElement, Transforms } from 'slate'
+import { Element as SlateElement, Transforms, Editor } from 'slate'
 import { CodeBlockType, CodeLineType, ParagraphType } from ".."
 import ToolIcon from '../../../../Icon';
+import { isBlockActive } from "../../../formatter/utils";
 
 const CodeBlockButton = () => {
   const editor = useSlateStatic()
   const handleClick = () => {
-    Transforms.wrapNodes(
-      editor,
-      { type: CodeBlockType, language: 'html', children: [] },
-      {
-        match: n => SlateElement.isElement(n) && n.type === ParagraphType,
-        split: true,
-      }
-    )
-    Transforms.setNodes(
-      editor,
-      { type: CodeLineType },
-      { match: n => SlateElement.isElement(n) && n.type === ParagraphType }
-    )
+    if(isBlockActive(editor, 'code-block')){
+      Transforms.unwrapNodes(editor, {
+        match: (n) =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          n.type === 'code-block',
+      });
+      Transforms.setNodes(
+        editor,
+        { type: ParagraphType }
+      )
+    }else{
+      Transforms.wrapNodes(
+        editor,
+        { type: CodeBlockType, language: 'html', children: [] },
+        {
+          match: n => SlateElement.isElement(n) && n.type === ParagraphType,
+          split: true,
+        }
+      )
+      Transforms.setNodes(
+        editor,
+        { type: CodeLineType },
+        { match: n => SlateElement.isElement(n) && n.type === ParagraphType }
+      )
+    }
   }
 
   return (

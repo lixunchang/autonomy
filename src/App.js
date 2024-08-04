@@ -394,23 +394,34 @@ function App() {
         filters: [{ name: 'Markdown Files', extension }],
         properties: ['openFile', 'multiSelections'],
       })
-      .then(({ filePaths }) => {
+      .then(async ({ filePaths }) => {
         if (Array.isArray(filePaths)) {
           // TODO 过滤已经添加过的文件
           const children = filePaths.map((path) => {
-            const newId = shortid.generate();
+            let newId = shortid.generate();
             const isBook = path.endsWith('.pdf');
+            const title = basename(path, extname(path));
+            let lastPath = path;
+
+            if(isBook){
+              newId = 'book_' + newId;
+              lastPath = join(`${savedLocation}pdf-books/`, title+extname(path))
+              fileHelper.copyFile(path, `${savedLocation}pdf-books/`, title+extname(path))
+            }else{
+              newId = 'import_' + newId
+            }
+            console.log('----1111---', newId, lastPath)
             return {
               id: newId,
               key: newId,
               ...(isBook
                 ? {
                     type: 'book',
-                    pdf: path,
+                    pdf: lastPath,
                     path: join(`${savedLocation}${type}/`, `${newId}.json`),
                   }
                 : { type, path }),
-              title: basename(path, extname(path)),
+              title,
               icon: getIconByFileType(type, true),
               createAt: moment().valueOf(),
               isLeaf: true,

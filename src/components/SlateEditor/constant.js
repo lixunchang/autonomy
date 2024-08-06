@@ -1,3 +1,11 @@
+import { getSaveLocation } from '../../utils/helper';
+
+const { join } = window.require('path');
+
+const savedLocation = getSaveLocation();
+export const imageCopyPrefix = join(savedLocation, "images/copy");
+export const imagePastePrefix = join(savedLocation, "images/paste");
+
 export const SHORTCUTS = {
   // '*': 'list-item',
   // '+': 'list-item',
@@ -13,6 +21,7 @@ export const SHORTCUTS = {
   '[]': 'check-list',
   // '```': 'block-code-line'
 };
+
 
 export const HOTKEYS = {
   'mod+b': 'bold',

@@ -3,13 +3,11 @@ import EditorIcon from '../../Icon';
 import imageExtensions from 'image-extensions';
 import { insertImage, isImageUrl } from '../formatter/images';
 import fileHelper from '../../../utils/fileHelper';
-import { getSaveLocation } from '../../../utils/helper';
+import { imageCopyPrefix } from '../constant';
 
 const { join } = window.require('path');
 const { remote } = window.require('electron');
 
-const savedLocation = getSaveLocation();
-const imageCopyPrefix = `${savedLocation}images/copy`;
 
 const InsertImage = () => {
   const editor = useSlateStatic();
@@ -42,7 +40,7 @@ const InsertImage = () => {
               return;
             }      
             const [fileName] = url.split('/').reverse();
-            console.log('iiiImage=====>bbbbbb', url, fileName)
+            console.log('iiiImage=====>bbbbbb', imageCopyPrefix, url, fileName)
             fileHelper.copyFile(url, imageCopyPrefix, fileName);
             insertImage(editor, 'file://' + join(imageCopyPrefix, fileName));
           })

@@ -11,14 +11,11 @@ import {
 import { css } from '@emotion/css';
 import Button from '../components/Button';
 import { DeleteOutlined } from '@ant-design/icons';
-import { getSaveLocation } from '../../../utils/helper';
 import moment from 'moment';
 import fileHelper from '../../../utils/fileHelper';
+import { imageCopyPrefix, imagePastePrefix } from '../constant';
 
 const { join } = window.require('path');
-const savedLocation = getSaveLocation();
-const imagePathPrefix = `${savedLocation}images/paste`;
-const imageCopyPrefix = `${savedLocation}images/copy`;
 
 // join(
 //   `${savedLocation}${'images'}/`,
@@ -61,8 +58,8 @@ const withImages = (editor) => {
             console.log('files==', file, reader, event);
             const fileName = moment().format('YYYYMMDDHHmmss.SSS')+'.png';
             // const imgPath = join(imagePathPrefix, moment().format('YYYYMMDDHHmmss.SSS')+'.png');
-            fileHelper.writeImage(imagePathPrefix, fileName, url).then(res=>{
-              insertImage(editor, 'file://'+join(imagePathPrefix, fileName));
+            fileHelper.writeImage(imagePastePrefix, fileName, url).then(res=>{
+              insertImage(editor, 'file://'+join(imagePastePrefix, fileName));
             })
             
           });

@@ -5,12 +5,14 @@ import {
   Editor,
   Element as SlateElement,
   Node as SlateNode,
-  Text
+  Text,
+  Node
 } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import withShortcuts from './formatter/shortcuts';
 import withImages from './formatter/images';
+import {withTables} from './formatter/tables/index';
 import Toolbar from './components/Toolbar';
 import isHotkey from 'is-hotkey';
 import styles from './index.less';
@@ -35,6 +37,8 @@ import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import { CodeBlockType, CodeLineType, languageTypes, ParagraphType } from './components/BlockCode/index.jsx';
+import { isCanEditInTable } from './utils/util.js';
+// import { TableOutlined } from '@ant-design/icons';
 
 const { clipboard } = require('electron')
 
@@ -111,7 +115,7 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
   const renderElement = useCallback(RenderElement, []);
   const renderLeaf = useCallback(RenderLeaf, []);
   const editor = useMemo(
-    () => withShortcuts(withImages(withReact(withHistory(createEditor())))),
+    () => withShortcuts(withTables(withImages(withReact(withHistory(createEditor()))))),
     []
   );
 
@@ -177,19 +181,25 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
     console.log('paste=', e)
   }
 
-  const handleEditableClick=(event)=>{
-    const lastNodeType = editor.children[editor.children.length - 1].type;
-    if(event.target.getAttribute('data-slate-editor')&&['code-block', 'image'].includes(lastNodeType)){
-      // // Editor.isNormalizing(editor)
-      Editor.insertNode(editor, {
-        type: 'paragraph',
-        children: [{ text: '' }],
-      })
-      if(['code-block'].includes(lastNodeType)){
-        Transforms.liftNodes(editor);
-      }
-    }
-  }
+  // const handleEditableClick=(event)=>{
+  //   const lastNodeType = editor.children[editor.children.length - 1].type;
+
+  //   console.log('==========>>>>>>', event, editor.selection, Editor.start(editor, editor.selection.path))
+  //   if(event.target.getAttribute('data-slate-editor')&&['code-block', 'image'].includes(lastNodeType)){
+  //     // // Editor.isNormalizing(editor)
+  //     console.log('==========>>>>>>', 'handleEditableClick', 
+  //       editor, editor.selection,
+  //       Editor.isEnd(editor, editor.selection.focus, editor.selection.focus.path)
+  //     )
+  //     Editor.insertNode(editor, {
+  //       type: 'paragraph',
+  //       children: [{ text: '' }],
+  //     })
+  //     if(['code-block'].includes(lastNodeType)){
+  //       Transforms.liftNodes(editor);
+  //     }
+  //   }
+  // }
 
   const handleDOMBeforeInput = useCallback(
     (e) => {
@@ -250,10 +260,13 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
     >
       <Toolbar className={styles.toolbar}>
         <InsertImage />
-        <ColorPicker />
-        {/* <MarkButton format="code" icon={<ToolIcon type="icon-editor-code" />} /> */}
+        <BlockButton
+          format="table"
+          icon={<ToolIcon type="icon-editor-biaoge" style={{color: '#aaa'}} />}
+        />
         <CodeBlockButton />
         <ToolIcon type="icon-editor-fengexian" className={styles.fengexian}/>
+        <ColorPicker />
         <MarkButton
           format="bold"
           icon={<ToolIcon type="icon-editor-fuhao-jiacu" />}
@@ -337,11 +350,22 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        onClick={handleEditableClick}
+        // onClick={handleEditableClick}
         onCopy={handleEditableCopy}
         onPaste={handleEditablePaste}
         onKeyDown={(event) => {
-          
+          const editorDom = ReactEditor.toDOMNode(editor, editor)
+          if (
+            !isCanEditInTable(editor) &&
+            !isHotkey(['delete', 'backspace'], event) &&
+            editorDom.getAttribute('contenteditable') === 'true'
+          ) {
+            // 非 delete backspace 按键时
+            editorDom.setAttribute('contenteditable', 'false')
+            Promise.resolve()
+              .then(() => editorDom.setAttribute('contenteditable', 'true'))
+              .catch(() => {})
+          }
           if (isHotkey('tab', event)) {
             event.preventDefault();
             Editor.insertText(editor, '  ')
@@ -399,6 +423,21 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
             //   Transforms.collapse(editor, {fedge:'end'})
             // }else{
               // Transforms.collapse(editor, {fedge:'end'})
+
+            //   function getDepth(editor, at = editor.selection) {
+            //     const { anchor } = at;
+            //     if (anchor.depth === 0) {
+            //         return 0;
+            //     }
+            //     let depth = 1;
+            //     let block = editor.value.document.getParent(anchor.path);
+            //     while (block && block.type !== editor.value.document.type) {
+            //         block = editor.value.document.getParent(block.parent.path);
+            //         depth += 1;
+            //     }
+            //     return depth;
+            // }
+
               Editor.insertNode(editor, {
                 type: 'paragraph',
                 children: [{ text: '' }],
@@ -406,7 +445,9 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
               // 将光标移动到编辑器末尾
               // Transforms.moveToEnd(editor);?
               // Transforms.collapse(editor, {fedge:'end'})
-              Transforms.liftNodes(editor);
+              if(Array.from(Node.levels(editor, editor.selection.focus.path)).length>3){
+                Transforms.liftNodes(editor);
+              }
               // 插入新块
               // Transforms.insertNodes(editor, {
               //   type: 'paragraph',

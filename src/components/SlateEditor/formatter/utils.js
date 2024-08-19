@@ -1,5 +1,6 @@
 import { LIST_TYPES, TEXT_ALIGN_TYPES } from '../constant';
 import { Editor, Transforms, Element as SlateElement } from 'slate';
+import { insertTable } from './tables';
 
 export const isBlockActive = (editor, format, blockType = 'type') => {
   const { selection } = editor;
@@ -16,6 +17,15 @@ export const isBlockActive = (editor, format, blockType = 'type') => {
   return !!match;
 };
 
+const isInTable = (editor) => {
+  const [tableNode] = Editor.nodes(editor, {
+    match: (n) =>
+      !Editor.isEditor(n) && Element.isElement(n) && n.type === "table",
+    mode: "highest",
+  });
+  return !!tableNode;
+};
+
 
 export const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor);
@@ -23,6 +33,11 @@ export const isMarkActive = (editor, format) => {
 };
 
 export const toggleBlock = (editor, format) => {
+  if(format === 'table'){
+    if(isInTable) return;
+    insertTable(editor);
+    return;
+  }
   const isActive = isBlockActive(
     editor,
     format,

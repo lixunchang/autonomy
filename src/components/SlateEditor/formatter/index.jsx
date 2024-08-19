@@ -5,7 +5,9 @@ import { ReactEditor, useSlateStatic } from 'slate-react'
 import { Transforms } from 'slate'
 import { css } from '@emotion/css'
 import LanguageSelect from '../components/BlockCode/components/LanguageSelect';
-
+import { RenderTable } from './tables/components/RenderTable';
+import { RenderTableRow } from './tables/components/RenderTableRow';
+import { RenderTableCell } from './tables/components/RenderTableCell';
 
 export default function RenderElement(props) {
   const { attributes, children, element } = props;
@@ -19,7 +21,23 @@ export default function RenderElement(props) {
      */
     case 'image':
       return <Image style={styles} {...props} />;
-
+    case 'table':
+      return (
+        // <table>
+        //   <tbody className="slate-table" style={styles} {...attributes}>{children}</tbody>
+        // </table>
+        <RenderTable className="slate-table" style={styles} {...props}/>
+      )
+    case 'table-row':
+      return (
+      // <tr style={styles} {...attributes}>{children}</tr>
+      <RenderTableRow style={styles} {...props} />
+    )
+    case 'table-cell':
+      return (
+      // <td style={styles} {...attributes}>{children}</td>
+      <RenderTableCell style={styles} {...props} />
+    )
     case 'check-list':
       return <CheckList style={styles} {...props}/>;
     /**

@@ -20,7 +20,7 @@ export const isBlockActive = (editor, format, blockType = 'type') => {
 const isInTable = (editor) => {
   const [tableNode] = Editor.nodes(editor, {
     match: (n) =>
-      !Editor.isEditor(n) && Element.isElement(n) && n.type === "table",
+      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "table",
     mode: "highest",
   });
   return !!tableNode;
@@ -34,7 +34,8 @@ export const isMarkActive = (editor, format) => {
 
 export const toggleBlock = (editor, format) => {
   if(format === 'table'){
-    if(isInTable) return;
+  
+    if(isInTable(editor)) return;
     insertTable(editor);
     return;
   }

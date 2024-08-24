@@ -1,5 +1,5 @@
 import React from 'react'
-
+import styles from './index.less'
 export function RenderTableCell(props) {
   const { attributes, children, element } = props
   const { colSpan = 1, rowSpan = 1 } = element
@@ -8,7 +8,7 @@ export function RenderTableCell(props) {
       {...attributes}
       colSpan={colSpan}
       rowSpan={rowSpan}
-      className="yt-e-table-cell"
+      className={styles["yt-e-table-cell"]}
     >
       {children}
     </td>

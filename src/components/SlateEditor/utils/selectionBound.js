@@ -11,14 +11,20 @@ export default function selectionBound(editor, selectPath) {
   const originSelectPath = []
   selectPath.forEach((cellPath) => {
     const relativePath = Path.relative(cellPath, tablePath)
-    const originRange = originTable[relativePath[0]][relativePath[1]]
-    if (Array.isArray(originRange[0])) {
-      originSelectPath.push(
-        originRange[0],
-        originRange[1],
-      )
-    } else {
-      originSelectPath.push(originRange)
+    const originRange = 
+      originTable[relativePath[0]]
+        ?originTable[relativePath[0]][relativePath[1]]
+        :originTable[relativePath[0]];
+
+    if(originRange){
+      if (Array.isArray(originRange[0])) {
+        originSelectPath.push(
+          originRange[0],
+          originRange[1],
+        )
+      } else {
+        originSelectPath.push(originRange)
+      }
     }
   })
   const { xRange, yRange } = getRange(...originSelectPath)

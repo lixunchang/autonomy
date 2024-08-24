@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Transforms,
   createEditor,
@@ -112,7 +112,16 @@ const parseValue = (value) => {
 // ];
 
 const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
-  const renderElement = useCallback(RenderElement, []);
+
+  const [editorEventState, setEditorEventState] = useState({
+    mouseDown: false,
+    mouseUp: false,
+    blur: false,
+    resetSelection: false
+  })
+
+
+  const renderElement = useCallback((p)=>RenderElement({...p, editorEventState}), [editorEventState]);
   const renderLeaf = useCallback(RenderLeaf, []);
   const editor = useMemo(
     () => withShortcuts(withTables(withImages(withReact(withHistory(createEditor()))))),
@@ -353,6 +362,9 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         // onClick={handleEditableClick}
         onCopy={handleEditableCopy}
         onPaste={handleEditablePaste}
+        onMouseDown={(e)=>{
+
+        }}
         onKeyDown={(event) => {
           const editorDom = ReactEditor.toDOMNode(editor, editor)
           if (

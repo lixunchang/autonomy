@@ -1,7 +1,7 @@
 import React from 'react'
 import { ReactEditor, RenderElementProps, useSlate } from 'slate-react'
 import { getNextRowSpan } from '../../../utils/util'
-
+import styles from './index.less'
 function TableRow(props) {
   const { attributes, children, element } = props
 
@@ -12,7 +12,7 @@ function TableRow(props) {
 
   return (
     <>
-      <tr {...attributes} className="yt-e-table-row">
+      <tr {...attributes} className={styles["yt-e-table-row"]}>
         {children}
       </tr>
       {minRow > 1 &&

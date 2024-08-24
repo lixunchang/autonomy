@@ -8,7 +8,7 @@ var location = ''; // new Object();
 
 const Music = () => {
   const {musicList} = useState({
-    musicList:[1,2,3]
+    musicList:['网易云音乐', 'QQ音乐']
   })
   const onSearch = (value) => {
     // console.log('value:', value);

@@ -10,6 +10,7 @@ import {
   setTableNodeOrigin,
 } from '../../../utils/util'
 import { ContextMenu } from './ContextMenu/ContextMenu'
+import styles from './index.less'
 
 const TableComponent = (props) => {
   const { children, element } = props
@@ -56,47 +57,48 @@ const TableComponent = (props) => {
   //   }
   // }, [editor])
 
-  // useEffect(() => {
-  //   const mousedownCallback = (e) => {
-  //     const isTable = e.target && tableRef.current?.contains(e.target)
-  //     if (!isTable || e.button !== 2) {
-  //       // 不在表格位置 || 不是鼠标右键
-  //       // collapse 选区
-  //       Transforms.collapse(editor)
-  //       setShowWrap(false)
-  //       setShowMenu(false)
-  //       setSelectCells([])
-  //     }
-  //   }
-  //   const mouseupCallback = () => {
-  //     setStartPath(null)
-  //   }
+  useEffect(() => {
+    const mousedownCallback = (e) => {
+      const isTable = e.target && tableRef.current?.contains(e.target)
+      if (!isTable || e.button !== 2) {
+        // 不在表格位置 || 不是鼠标右键
+        // collapse 选区
+        Transforms.collapse(editor)
+        setShowWrap(false)
+        setShowMenu(false)
+        // setSelectCells([])
+      }
+    }
+    const mouseupCallback = () => {
+      setStartPath(null)
+    }
 
-  //   const blurCallback = () => {
-  //     setShowMenu(false)
-  //   }
+    const blurCallback = () => {
+      setShowMenu(false)
+      // setSelectCells([])
+    }
 
-  //   const reset = () => {
-  //     setShowWrap(false)
-  //     setSelectCells([])
-  //   }
-  //   console.log('editor====>', editor)
-  //   if (editor) {
-  //     editor.onMouseDown(mousedownCallback)
-  //     editor.onBlur(blurCallback)
-  //     editor.onResetTableSelection(reset)
-  //     // editor.on('mousedown', mousedownCallback)
-  //     // editor.on('blur', blurCallback)
-  //     // editor.on('resetTableSelection', reset)
-  //     window.addEventListener('mouseup', mouseupCallback)
-  //   }
-  //   return () => {
-  //     // editor.off('mousedown', mousedownCallback)
-  //     // editor.off('blur', blurCallback)
-  //     // editor.off('resetTableSelection', reset)
-  //     window.removeEventListener('mouseup', mouseupCallback)
-  //   }
-  // }, [editor])
+    // const reset = () => {
+    //   setShowWrap(false)
+    //   setSelectCells([])
+    // }
+    console.log('editor====>', editor)
+    if (editor) {
+      // editor.onMouseDown(mousedownCallback)
+      // editor.onBlur(blurCallback)
+      // editor.onResetTableSelection(reset)
+      window.addEventListener('mousedown', mousedownCallback)
+      tableRef.current?.addEventListener('blur', blurCallback)
+      // editor.addEventListener('resetTableSelection', reset)
+      window.addEventListener('mouseup', mouseupCallback)
+    }
+    return () => {
+      window.removeEventListener('mousedown', mousedownCallback)
+      // tableRef.current&&tableRef.current?.removeEventListener('blur', blurCallback)
+      // editor.removeEventListener('resetTableSelection', reset)
+      window.removeEventListener('mouseup', mouseupCallback)
+    }
+  }, [editor])
 
   useEffect(() => {
     // 注意避免死循环
@@ -141,7 +143,7 @@ const TableComponent = (props) => {
     <>
       <table
         ref={tableRef}
-        className={`slate-table yt-e-table${showWrap ? ' ye-e-table-selected' : ''}`}
+        className={`${styles['slate-table']} ${styles['yt-e-table']} ${showWrap ? styles['ye-e-table-selected'] : ''}`}
         onDragStart={(e) => e.preventDefault()}
         onMouseDown={(e) => {
           const node = getTableCellNode(editor, e.target)
@@ -170,7 +172,7 @@ const TableComponent = (props) => {
         <tbody>{children}</tbody>
       </table>
       <div
-        className="yt-e-table-selection"
+        className={styles["yt-e-table-selection"]}
         style={{
           display: `${showWrap ? 'block' : 'none'}`,
           top: `${bound.y}px`,
@@ -191,7 +193,7 @@ const TableComponent = (props) => {
 
 export function RenderTable(props) {
   return (
-    <div className="yt-e-table-wrap">
+    <div className={styles["yt-e-table-wrap"]}>
       <TableComponent {...props} />
     </div>
   )

@@ -1,4 +1,4 @@
-const { app, Menu, ipcMain, dialog } = require('electron');
+const { app, Menu, ipcMain, dialog, BrowserWindow } = require('electron');
 const isDev = require('electron-is-dev');
 const menuTemplate = require('./src/menuTemplate.cjs');
 const AppWindow = require('./src/AppWindow.cjs');
@@ -8,7 +8,7 @@ const path = require('path');
 const url = require('url');
 
 const settingsStore = new Store({ name: 'settings' });
-let mainWindow, newWindow;
+let mainWindow, newWindow, loadingWindow;
 
 const createManager = () => {
   const accessKey = settingsStore.get('accessKey');
@@ -17,22 +17,70 @@ const createManager = () => {
   return new QiniuManager(accessKey, secretKey, bucket);
 };
 
-app.on('ready', () => {
-  const mainWindowConfig = {
-    width: 1200,
-    height: 800,
-  };
-  const mainUrlLocation = isDev
-    ? 'http://localhost:3000/'
-    : url.format({
-        pathname: path.join(__dirname, './build/index.html'),
-        protocol: 'file:',
-        slashes: true,
-      });
-  mainWindow = new AppWindow(mainWindowConfig, mainUrlLocation);
-  mainWindow.on('close', () => {
-    mainWindow = null;
+// function showLoadingWindow() {
+//   splashWindow = new BrowserWindow({
+//     width: 1200,
+//     height: 800,
+//     frame: false,
+//     transparent: true,
+//     alwaysOnTop: true
+//   });
+ 
+//   splashWindow.loadURL(url.format({
+//     pathname: path.join(__dirname, './build/splash.html'),
+//     protocol: 'file:',
+//     slashes: true
+//   }));
+// }
+
+// 加载loading页面窗口
+const showLoadingWindow = () => {
+  return new Promise((resolve) => {
+    loadingWindow = new BrowserWindow({
+      width: 1200,
+      height: 800,
+      frame: false, // 无边框（窗口、工具栏等），只包含网页内容
+      transparent: true, // 窗口是否支持透明，如果想做高级效果最好为true
+      alwaysOnTop: true
+    });
+    loadingWindow.loadURL(url.format({
+      pathname: path.join(__dirname, './build/splash.html'),
+      protocol: 'file:',
+      slashes: true
+    }));
+    loadingWindow.show()
+    resolve();
   });
+};
+
+const showMainWindow = () => {
+   return new Promise((resolve)=>{
+      const mainWindowConfig = {
+        width: 1200,
+        height: 800,
+      };
+      const mainUrlLocation = isDev
+        ? 'http://localhost:3000/'
+        : url.format({
+            pathname: path.join(__dirname, './build/index.html'),
+            protocol: 'file:',
+            slashes: true,
+          });
+      mainWindow = new AppWindow(mainWindowConfig, mainUrlLocation, ()=>{
+        loadingWindow.hide();
+        loadingWindow.close();
+      });
+      mainWindow.on('close', () => {
+        mainWindow = null;
+      });
+      resolve()
+   })
+}
+
+
+app.on('ready', async () => {
+  await showLoadingWindow();
+  await showMainWindow();
  
   // main event
   ipcMain.on('open-new-window', (_, urlPath) => {

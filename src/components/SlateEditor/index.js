@@ -362,9 +362,6 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         // onClick={handleEditableClick}
         onCopy={handleEditableCopy}
         onPaste={handleEditablePaste}
-        onMouseDown={(e)=>{
-
-        }}
         onKeyDown={(event) => {
           const editorDom = ReactEditor.toDOMNode(editor, editor)
           if (

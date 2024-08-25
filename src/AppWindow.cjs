@@ -1,7 +1,7 @@
 const { BrowserWindow, protocol } = require('electron');
 
 class AppWindow extends BrowserWindow {
-  constructor(config, urlLocation) {
+  constructor(config, urlLocation, readyToShow=()=>{}) {
     const baseConfig = {
       width: 800,
       minWidth: 600,
@@ -23,6 +23,7 @@ class AppWindow extends BrowserWindow {
     super(finalConfig);
     this.loadURL(urlLocation);
     this.once('ready-to-show', () => {
+      readyToShow();
       this.show();
     });
     //===========自定义file:///协议的解析=======================

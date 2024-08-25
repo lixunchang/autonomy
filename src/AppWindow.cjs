@@ -23,8 +23,10 @@ class AppWindow extends BrowserWindow {
     super(finalConfig);
     this.loadURL(urlLocation);
     this.once('ready-to-show', () => {
-      readyToShow();
-      this.show();
+      setTimeout(()=>{
+        readyToShow();
+        this.show();
+      }, 12000)
     });
     //===========自定义file:///协议的解析=======================
     // protocol.interceptFileProtocol(

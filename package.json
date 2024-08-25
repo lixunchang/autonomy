@@ -1,6 +1,6 @@
 {
   "name": "autonomy",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "main.cjs",
   "private": true,
   "description": "自治领",

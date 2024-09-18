@@ -1,7 +1,7 @@
 const { BrowserWindow, protocol } = require('electron');
 
 class AppWindow extends BrowserWindow {
-  constructor(config, urlLocation, readyToShow=()=>{}) {
+  constructor(config, urlLocation, readyToShow=()=>{}, waitSecond = 3000) {
     const baseConfig = {
       width: 800,
       minWidth: 600,
@@ -26,7 +26,7 @@ class AppWindow extends BrowserWindow {
       setTimeout(()=>{
         readyToShow();
         this.show();
-      }, 12000)
+      }, waitSecond)
     });
     //===========自定义file:///协议的解析=======================
     // protocol.interceptFileProtocol(

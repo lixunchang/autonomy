@@ -10,6 +10,7 @@ import { HashRouter as Router, Switch, Route } from 'react-router-dom'; // Âè™ËÉ
 import fileHelper from './utils/fileHelper';
 import Iframe from './music/Iframe';
 import moment from 'moment';
+import Splash from './splash';
 
 
 moment.locale('zh-cn',{
@@ -17,6 +18,7 @@ moment.locale('zh-cn',{
       dow : 1, 
    }
 }); 
+
 
 fileHelper.mkAppDirSync('aim');
 fileHelper.mkAppDirSync('note');
@@ -32,6 +34,9 @@ ReactDOM.render(
       </Route>
       <Route path="/setting">
         <Setting />
+      </Route>
+      <Route path="/splash">
+        <Splash />
       </Route>
       <Route path="/crash">
         <Crash />

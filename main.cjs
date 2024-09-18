@@ -8,7 +8,7 @@ const path = require('path');
 const url = require('url');
 
 const settingsStore = new Store({ name: 'settings' });
-let mainWindow, newWindow, loadingWindow;
+let mainWindow, newWindow, splashWindow;
 
 const createManager = () => {
   const accessKey = settingsStore.get('accessKey');
@@ -34,21 +34,40 @@ const createManager = () => {
 // }
 
 // 加载loading页面窗口
-const showLoadingWindow = () => {
+const showSplashWindow = () => {
   return new Promise((resolve) => {
-    loadingWindow = new BrowserWindow({
-      width: 1200,
-      height: 800,
-      frame: false, // 无边框（窗口、工具栏等），只包含网页内容
-      transparent: true, // 窗口是否支持透明，如果想做高级效果最好为true
-      alwaysOnTop: true
-    });
-    loadingWindow.loadURL(url.format({
-      pathname: path.join(__dirname, './build/splash.html'),
-      protocol: 'file:',
-      slashes: true
-    }));
-    loadingWindow.show()
+    // loadingWindow = new BrowserWindow({
+    //   width: 1200,
+    //   height: 800,
+    //   frame: false, // 无边框（窗口、工具栏等），只包含网页内容
+    //   transparent: true, // 窗口是否支持透明，如果想做高级效果最好为true
+    //   alwaysOnTop: true
+    // });
+    // loadingWindow.loadURL(url.format({
+    //   pathname: path.join(__dirname, './build/splash.html'),
+    //   protocol: 'file:',
+    //   slashes: true
+    // }));
+    // loadingWindow.show()
+    const splasUrlLocation = isDev
+      ? `http://localhost:3000/#/splash`
+      : url.format({
+          pathname: path.join(__dirname, '/build/index.html'),
+          protocol: 'file:',
+          slashes: true,
+          hash: 'splash',
+        });
+    splashWindow = new AppWindow(
+      {
+        width: 1200,
+        height: 800,    
+        frame: false, // 无边框（窗口、工具栏等），只包含网页内容
+        // transparent: true, // 窗口是否支持透明，如果想做高级效果最好为true
+        // alwaysOnTop: false
+      },
+      splasUrlLocation
+    );
+
     resolve();
   });
 };
@@ -66,10 +85,15 @@ const showMainWindow = () => {
             protocol: 'file:',
             slashes: true,
           });
-      mainWindow = new AppWindow(mainWindowConfig, mainUrlLocation, ()=>{
-        loadingWindow.hide();
-        loadingWindow.close();
-      });
+      mainWindow = new AppWindow(
+        mainWindowConfig, 
+        mainUrlLocation, 
+        ()=>{
+          splashWindow.hide();
+          splashWindow.close();
+        },
+        5000
+      );
       mainWindow.on('close', () => {
         mainWindow = null;
       });
@@ -79,7 +103,7 @@ const showMainWindow = () => {
 
 
 app.on('ready', async () => {
-  await showLoadingWindow();
+  await showSplashWindow();
   await showMainWindow();
  
   // main event

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Input, Button } from 'antd';
+import { Menu, Input, Button, DatePicker, InputNumber } from 'antd';
 import {
   AppstoreOutlined,
   MailOutlined,
@@ -7,12 +7,16 @@ import {
 } from '@ant-design/icons';
 import { getSaveLocation } from '../utils/helper';
 import styles from './index.less';
+import moment from 'moment';
 
 const isDev = window.require('electron-is-dev');
 const { remote, ipcRenderer } = window.require('electron');
 const Store = window.require('electron-store');
 const settingStore = new Store({
   name: isDev ? 'Settings_dev' : 'Settings',
+});
+const splashStorage = new Store({
+  name: isDev ? 'Splashs_dev' : 'Splashs',
 });
 
 const { SubMenu } = Menu;
@@ -85,6 +89,7 @@ const Setting = () => {
           }}
         >
           <SubMenu key="sub1" icon={<MailOutlined />} title="主题">
+            <Menu.Item key="start">启动页</Menu.Item>
             <Menu.Item key="side">侧边栏</Menu.Item>
             <Menu.Item key="editor">编辑器</Menu.Item>
           </SubMenu>
@@ -101,6 +106,24 @@ const Setting = () => {
       <div style={{ flex: 1 }}>
         <h3 className={styles.dragArea2}>设置</h3>
         <div style={{ margin: '0 26px' }}>
+          {activeKey === 'start' && (
+            <div>
+              <div style={{marginBottom: 14}}><span style={{marginRight: 24, color: '#999'}}>出生年月日（公历）:</span>
+              <DatePicker defaultValue={moment(splashStorage.get('birthday')||'1995-05-20')} onChange={e=>splashStorage.set('birthday', moment(e).format('YYYY/MM/DD'))} /></div>
+              <div style={{marginBottom: 14}}><span style={{marginRight: 10, color: '#999'}}>人生开始年岁（通识）:</span>
+              <InputNumber min={0} max={100} defaultValue={splashStorage.get('lifeStart')||0} onChange={e=>splashStorage.set('lifeStart', e)} />岁</div>
+              <div style={{marginBottom: 14}}><span style={{marginRight: 10, color: '#999'}}>人生结束年岁（通识）:</span>
+              <InputNumber min={1} max={100} defaultValue={splashStorage.get('lifeEnd')||80} onChange={e=>splashStorage.set('lifeEnd', e)} />岁</div>
+              <div style={{marginBottom: 14}}><span style={{marginRight: 10, color: '#999'}}>事业开始年份（通识）:</span>
+              <InputNumber min={1} max={100} defaultValue={splashStorage.get('careerStart')||25} onChange={e=>splashStorage.set('careerStart', e)} />岁</div>
+              <div style={{marginBottom: 14}}><span style={{marginRight: 10, color: '#999'}}>事业定型年份（通识）:</span>
+              <InputNumber min={1} max={100} defaultValue={splashStorage.get('careerEnd')||45} onChange={e=>splashStorage.set('careerEnd', e)} />岁</div>
+              <div style={{marginBottom: 14}}><span style={{marginRight: 10, color: '#999'}}>成年开始年份（通识）:</span>
+              <InputNumber min={1} max={100} defaultValue={splashStorage.get('aduitStart')||18} onChange={e=>splashStorage.set('aduitStart', e)} />岁</div>
+              <div style={{marginBottom: 14}}><span style={{marginRight: 10, color: '#999'}}>成年结束年份（通识）:</span>
+              <InputNumber min={1} max={100} defaultValue={splashStorage.get('aduitEnd')||80} onChange={e=>splashStorage.set('aduitEnd', e)} />岁</div>
+            </div>
+          )}
           {activeKey === 'path' && (
             <div>
               <h5>选择文件保存位置</h5>
@@ -190,7 +213,7 @@ const Setting = () => {
               </Button>
             </div>
           )}
-          {activeKey !== 'path' && activeKey !== 'qiniu' && (
+          {activeKey !== 'path' && activeKey !== 'qiniu' && activeKey !== 'start' && (
             <span style={{ color: 'orangered', marginTop: 26 }}>
               ## 功能开发中...
             </span>

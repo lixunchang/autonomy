@@ -11,7 +11,7 @@ import {
 } from 'slate-react';
 import { css } from '@emotion/css';
 import Button from '../components/Button';
-import { DeleteOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, FullscreenOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import fileHelper from '../../../utils/fileHelper';
 import { imageCopyPrefix, imagePastePrefix } from '../constant';
@@ -37,7 +37,6 @@ export const isImageUrl = (url) => {
 export const insertImage = (editor, url) => {
   const text = { text: '' };
   const image = { type: 'image', url, children: [text] };
-  console.log('iiiImage=====>00000', url)
   Transforms.insertNodes(editor, image);
 };
 
@@ -85,14 +84,20 @@ const withImages = (editor) => {
   return editor;
 };
 
-export const Image = ({ attributes, children, element, style }) => {
+export const Image = ({ attributes, scaleSize, children, element, style, onChange }) => {
   const editor = useSlateStatic();
   const path = ReactEditor.findPath(editor, element);
   const formatter = (value) => `${value}%`;
   const selected = useSelected();
   const focused = useFocused();
-  const [ imageScale, setImageScale ] = useState(attributes.size||80);
+  console.log('images===>>', attributes, scaleSize)
+  const [ imageScale, setImageScale ] = useState(scaleSize||80);
   const [ previewVisible, setPreviewVisible ] = useState(false);
+
+  const handleScaleImage=(v)=>{
+    setImageScale(v);
+    onChange({scaleSize:v})
+  }
   return (
     <div className={styles.antd_img} {...attributes}>
       {children}
@@ -105,6 +110,7 @@ export const Image = ({ attributes, children, element, style }) => {
         `}
       >
         <div className={css`
+            width: 100%;
             display: inline-block;
             position: relative;
             border: ${selected ? '1px solid #9999994a' : 'none'}
@@ -136,7 +142,8 @@ export const Image = ({ attributes, children, element, style }) => {
               box-shadow: ${selected && focused ? '0 0 0 1px #6e6e6e' : 'none'};
             `}
           /> */}
-          <Button
+          {/* TODO 画廊 */}
+          {/* <Button
             active
             onClick={() => Transforms.removeNodes(editor, { at: path })}
             className={css`
@@ -144,6 +151,21 @@ export const Image = ({ attributes, children, element, style }) => {
               position: absolute;
               top: 0.5em;
               left: 0.5em;
+              background-color: #00000066;
+              color: white !important;
+              padding: 0 4px;
+            `}
+          >
+            <PlusOutlined />
+          </Button> */}
+          <Button
+            active
+            onClick={() => Transforms.removeNodes(editor, { at: path })}
+            className={css`
+              display: ${selected && focused ? 'inline' : 'none'};
+              position: absolute;
+              top: 0.5em;
+              left: 2.5em;
               background-color: #00000066;
               color: white !important;
               padding: 0 4px;
@@ -164,7 +186,7 @@ export const Image = ({ attributes, children, element, style }) => {
               width: 100px;
             `}
           >
-            <Slider style={{marginBlock: 5}} min={6} value= {imageScale} tooltip={{ formatter }} onChange={(v)=>{setImageScale(v); attributes.size = v}}/>
+            <Slider style={{marginBlock: 5}} min={6} value= {imageScale} tooltip={{ formatter }} onChange={handleScaleImage}/>
           </Button>
           <Button
             active

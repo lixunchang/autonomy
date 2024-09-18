@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChromePicker } from 'react-color';
 import EditorIcon from '../../../Icon';
-import { Editor } from 'slate';
+import { Editor, Transforms } from 'slate';
 import styles from './index.less';
 import { useSlate } from 'slate-react';
 
@@ -23,13 +23,19 @@ function ColorPicker() {
   const editor = useSlate();
   const [visible, setVisible] = useState(false);
   const [color, setColor] = useState({ hex: '#520520' });
+  const [curSelect, setCurSelect] = useState();
 
-  const handleChange = (color, event) => {
+  const handleChange = (color) => {
+    console.log('handleChange', color, editor.selection)
+    Transforms.select(editor, curSelect);
     setColor(color);
     Editor.addMark(editor, 'color', color.hex);
   };
 
-  const handleOpenColorPicker = () => {
+  const handleOpenColorPicker = (e) => {
+    e.preventDefault();
+    console.log('handleChange', color, JSON.stringify(editor.selection))
+    setCurSelect(editor.selection);
     setVisible(true);
   };
 
@@ -41,7 +47,7 @@ function ColorPicker() {
     <span>
       <EditorIcon
         type="icon-editor-text-color"
-        onClick={handleOpenColorPicker}
+        onMouseDown={handleOpenColorPicker}
         style={{ userSelect: 'none', color: '#aaaaaa' }}
       />
       {visible ? (

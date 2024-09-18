@@ -41,7 +41,7 @@ import { CaretLeftOutlined, CaretRightOutlined } from '@ant-design/icons';
 const isDev = require('electron-is-dev');
 const pdfjsLib = require('pdfjs-dist');
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-const fs = require('fs');
+// const fs = require('fs');
 const { remote, ipcRenderer } = window.require('electron');
 const { join, basename, extname, dirname } = window.require('path');
 const Store = window.require('electron-store');

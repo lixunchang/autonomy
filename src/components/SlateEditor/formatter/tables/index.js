@@ -170,9 +170,9 @@ export const withTables =(editor) => {
   }
 
   e.addMark = (key, value) => {
-    const { selection: tableSelection, showSelection } = e.tableState
+    const { selection: tableSelection, showSelection } = e.tableState || {};
 
-    if (showSelection) {
+    if (showSelection&&tableSelection) {
       tableSelection.forEach((cell) => {
         const cellPostion = Editor.range(e, cell)
         Transforms.select(e, cellPostion)
@@ -184,9 +184,9 @@ export const withTables =(editor) => {
   }
 
   e.removeMark = (key) => {
-    const { selection: tableSelection, showSelection } = e.tableState
+    const { selection: tableSelection, showSelection } = e.tableState || {}
 
-    if (showSelection) {
+    if (showSelection && tableSelection) {
       tableSelection.forEach((cell) => {
         const cellPostion = Editor.range(e, cell)
         Transforms.select(e, cellPostion)
@@ -229,10 +229,10 @@ export const withTables =(editor) => {
 
   e.deleteFragment = (...args) => {
     // 编辑器选择内容 backspace delete 时
-    const { selection: tableSelection, showSelection } = e.tableState
+    const { selection: tableSelection, showSelection } = e.tableState||{};
 
     // 表格中选择，但是结束不在表格内
-    if (!showSelection && tableSelection.length > 0) return
+    if (!showSelection && tableSelection && tableSelection.length > 0) return
 
     if (showSelection) {
       const isAllCells = getIsAllCellsByTable(editor, tableSelection)

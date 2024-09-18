@@ -11,16 +11,20 @@ import { RenderTableCell } from './tables/components/RenderTableCell';
 
 export default function RenderElement(props) {
   const { attributes, children, element } = props;
-  const { type, children:ccc, url, style, ...rest} = element;
+  const { type, children:ccc, url, style, scaleSize, ...rest} = element;
   const styles = {...style, ...rest};
   const editor = useSlateStatic()
-  console.log('element-type', element, styles)
+  console.log('images===>>element-type', props, element, styles, attributes, scaleSize)
   switch (element.type) {
     /**
      * 图片
      */
     case 'image':
-      return <Image style={styles} {...props} />;
+      const onChange = (attrs) => {
+        const path = ReactEditor.findPath(editor, element)
+        Transforms.setNodes(editor, attrs, { at: path })
+      }
+      return <Image style={styles} scaleSize={scaleSize} {...props} onChange={onChange}/>;
     case 'table':
       return (
         // <table>

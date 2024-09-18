@@ -222,7 +222,6 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
 
           const { text } = SlateNode.leaf(editor, path);
           const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1);
-          console.log('handleDOMBeforeInput22', beforeText);
           if (!(beforeText in SHORTCUTS)) {
             return;
           }

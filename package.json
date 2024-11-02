@@ -221,6 +221,25 @@
         "height": 500
       }
     },
+    "win": {
+      "icon": "public/autonomy.ico",
+      "artifactName": "${productName}-Win-${version}-${arch}.${ext}",
+      "publisherName": "自治领",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
     "nsis": {
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,

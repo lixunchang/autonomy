@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Input, Tree } from 'antd';
 import { getChildNode } from '../utils/helper.js';
 import {
@@ -29,6 +29,8 @@ const FileList = ({
   const [inputValue, setInputValue] = useState('');
   const [selectKey, setSelectKey] = useState([activeId]);
   const { expandedKeys, setExpandedKeys } = expanded;
+
+const inputRef = useRef(null);
 
   const handleSaveInput = (path, type, isLeaf) => {
     if (!inputValue) {
@@ -168,6 +170,10 @@ const FileList = ({
     if (newFile) {
       setEditStatus(newFile.id);
       setInputValue(newFile.title);
+      setTimeout(()=>{
+        inputRef.current.focus();
+        console.log('input-focus')
+      }, 500)
     }
   }, [newFile]);
 
@@ -249,6 +255,7 @@ const FileList = ({
             >
               {editStatus === id ? (
                 <Input
+                  ref={inputRef}
                   autoFocus
                   placeholder="请输入"
                   value={inputValue}

@@ -8,8 +8,6 @@ import {
   Text,
   Node
 } from 'slate';
-import { Button } from 'ant'
-import { serialize } from 'remark-slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import withShortcuts from './formatter/shortcuts';
@@ -40,6 +38,7 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import { CodeBlockType, CodeLineType, languageTypes, ParagraphType } from './components/BlockCode/index.jsx';
 import { isCanEditInTable } from './utils/util.js';
+import { slateToMarkdown } from './utils/transformer.js';
 // import copy from 'copy-to-clipboard';
 // import { TableOutlined } from '@ant-design/icons';
 
@@ -133,7 +132,7 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
 
   // useEffect(() => {
   //   // editor.children = value;
-  // }, [editor, value]);
+  // }, [editor, value]); 这是副标题文本呢
 
   const handleEditableCopy=()=>{
     // const selectedText = Editor.string(editor, editor.selection, {voids: true});
@@ -193,7 +192,7 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
   }
 
   const copyMarkdown =()=>{
-    clipboard.writeText(value.map((v) => serialize(v)).join(''))
+    clipboard.writeText(slateToMarkdown(value))
   }
 
   // const handleEditableClick=(event)=>{
@@ -357,7 +356,7 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
           icon={<ToolIcon type="icon-editor-align-justify" />}
         />
         <ToolIcon type="icon-editor-fengexian" className={styles.fengexian}/>
-        <Button
+        <BlockButton
           onClick={copyMarkdown}
           icon={<ToolIcon type="icon-editor-markdown" />}
         />
@@ -393,7 +392,7 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
             event.preventDefault();
             Transforms.select(editor, []);
           }
-          console.log('event==>', event, event.metaKey&&event.code === 'Enter', event.ctrlKey && event.key ==='q')
+          // console.log('event==>', event, event.metaKey&&event.code === 'Enter', event.ctrlKey && event.key ==='q')
           if(event.ctrlKey&&event.key === '`'){
             event.preventDefault();
             if(isBlockActive(editor, 'code-block')){

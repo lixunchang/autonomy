@@ -31,7 +31,7 @@ export const Button = React.forwardRef(
   )
 );
 
-export const BlockButton = ({ format, icon }) => {
+export const BlockButton = ({ format, icon, onClick }) => {
   const editor = useSlate();
   return (
     <Button
@@ -41,6 +41,10 @@ export const BlockButton = ({ format, icon }) => {
         TEXT_ALIGN_TYPES.includes(format) ? 'textAlign' : 'type'
       )}
       onMouseDown={(event) => {
+        if(!format){
+          onClick&&onClick()
+          return;
+        }
         event.preventDefault();
         toggleBlock(editor, format);
       }}
@@ -56,8 +60,10 @@ export const MarkButton = ({ format, icon }) => {
     <Button
       active={isMarkActive(editor, format)}
       onMouseDown={(event) => {
+        if(!format){
+          return;
+        }
         event.preventDefault();
-        console.log('handleChange-markbutton', editor.selection)
         toggleMark(editor, format);
       }}
     >

@@ -8,6 +8,8 @@ import {
   Text,
   Node
 } from 'slate';
+import { Button } from 'ant'
+import { serialize } from 'remark-slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
 import withShortcuts from './formatter/shortcuts';
@@ -38,6 +40,7 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import { CodeBlockType, CodeLineType, languageTypes, ParagraphType } from './components/BlockCode/index.jsx';
 import { isCanEditInTable } from './utils/util.js';
+// import copy from 'copy-to-clipboard';
 // import { TableOutlined } from '@ant-design/icons';
 
 const { clipboard } = require('electron')
@@ -188,6 +191,10 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
 
   const handleEditablePaste =(e)=>{
     console.log('paste=', e)
+  }
+
+  const copyMarkdown =()=>{
+    clipboard.writeText(value.map((v) => serialize(v)).join(''))
   }
 
   // const handleEditableClick=(event)=>{
@@ -349,6 +356,11 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         <BlockButton
           format="justify"
           icon={<ToolIcon type="icon-editor-align-justify" />}
+        />
+        <ToolIcon type="icon-editor-fengexian" className={styles.fengexian}/>
+        <Button
+          onClick={copyMarkdown}
+          icon={<ToolIcon type="icon-editor-markdown" />}
         />
       </Toolbar>
       <SetNodeToDecorations />

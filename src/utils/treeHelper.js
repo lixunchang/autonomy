@@ -90,19 +90,57 @@ export const importChildren = (arr, id, data) => {
 };
 //  递归多次 return;
 export const deleteItemById = (arr, id) => {
-  for (let i = 0; i < arr.length; i++) {
-    arr = arr.filter((item) => item.id !== id);
-    if (arr[i].children) {
-      let len = arr[i].children.length;
-      arr[i].children = arr[i].children.filter((item) => item.id !== id);
-      if (arr[i].children.length < len) {
-        break;
+  const deleteIndex = arr.findIndex(item=>item.id === id);
+  if(deleteIndex!==-1){
+    arr.splice(deleteIndex, 1)
+  }else{
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].children) {
+        // let len = arr[i].children.length;
+        // arr[i].children = arr[i].children.filter((item) => item.id !== id);
+        // if (arr[i].children.length < len) {
+        //   break;
+        // }
+        arr[i].children = deleteItemById(arr[i].children, id);
       }
-      deleteItemById(arr[i].children, id);
     }
   }
   return [...arr];
 };
+
+
+export const moveDeleteItemToCache = (arr, id)=>{
+  const originData = findItemById(arr, id);
+  if(!originData || originData.isCrash){
+    return arr;
+  }
+  const [data] = deepTree([originData], (item)=>{
+    return {
+      ...item,
+      key: 'crash_' + item.key,
+      id: 'crash_' + item.id,
+      isCrash: true
+    }
+  });
+  return arr.map(item=>{
+    if(item.type === 'crash'){
+      item.isLeaf = false;
+      if(!item.children || item.children.length === 0){
+        item.children = defaultCacheChildren;
+      }
+      item.children.map(ite=>{
+        if(!ite.children){
+          ite.children = []
+        }
+        if(ite.type === data.type){
+          ite.children.unshift(data)
+        }
+        return ite;
+      })
+    }
+    return item;
+  })
+}
 
 export const createItemByFatherId = (arr, fatherId, data) => {
   for (let i = 0; i < arr.length; i++) {
@@ -160,8 +198,37 @@ export const initAllFiles = (files = [], defaultFiles = []) => {
     });
 };
 
-export const defaultFiles = [
+export const defaultCacheChildren = [
   {
+    id: 'crash-todo',
+    title: '待办',
+    key: 'crash-todo',
+    type: 'todo',
+    icon: 'DeleteFilled',
+    isLeaf: false,
+    children: []
+  },
+  {
+    id: 'crash-note',
+    title: '笔记',
+    key: 'crash-note',
+    type: 'note',
+    icon: 'DeleteFilled',
+    isLeaf: false,
+    children: []
+  },
+  {
+    id: 'crash-aim',
+    title: '目标',
+    key: 'crash-aim',
+    type: 'aim',
+    icon: 'DeleteFilled',
+    isLeaf: false,
+    children: []
+  },
+]
+
+export const defaultAutonomyNode =  {
     sort: 0,
     id: 'autonomy',
     title: '自治领',
@@ -169,7 +236,18 @@ export const defaultFiles = [
     type: 'note',
     icon: 'WalletFilled',
     children: [],
-  },
+  };
+
+export const defaultFiles = [
+  // {
+  //   sort: 0,
+  //   id: 'autonomy',
+  //   title: '自治领',
+  //   key: 'autonomy',
+  //   type: 'note',
+  //   icon: 'WalletFilled',
+  //   children: [],
+  // },
   {
     sort: 1,
     id: 'note',
@@ -193,7 +271,7 @@ export const defaultFiles = [
         key: '0-0-1',
         type: 'todo',
         icon: 'AimOutlined',
-        path: `${savedLocation}todo/today.json`,
+        path: `${savedLocation}/todo/today.json`,
         isLeaf: true,
       },
       {
@@ -202,7 +280,7 @@ export const defaultFiles = [
         key: '0-0-2',
         type: 'todo',
         icon: 'CalendarOutlined',
-        path: `${savedLocation}todo/week.json`,
+        path: `${savedLocation}/todo/week.json`,
         isLeaf: true,
       },
       {
@@ -211,7 +289,7 @@ export const defaultFiles = [
         key: '0-0-3',
         type: 'todo',
         icon: 'QuestionCircleOutlined',
-        path: `${savedLocation}todo/question.json`,
+        path: `${savedLocation}/todo/question.json`,
         isLeaf: true,
       },
       {
@@ -220,7 +298,7 @@ export const defaultFiles = [
         key: '0-0-4',
         type: 'todo',
         icon: 'CheckCircleOutlined',
-        path: `${savedLocation}todo/done.json`,
+        path: `${savedLocation}/todo/done.json`,
         isLeaf: true,
       },
       {
@@ -261,35 +339,35 @@ export const defaultFiles = [
   //   icon: 'ThunderboltFilled',
   //   isLeaf: false,
   // },
-  {
-    sort: 4,
-    id: 'amount',
-    title: '记账本',
-    status: 'develop',
-    key: 'amount',
-    type: 'amount',
-    icon: 'DollarCircleFilled',
-    children: [
-      // {
-      //   id: '01044',
-      //   title: 'leaf 1-0',
-      //   key: '0-4-0',
-      //   type: 'amount',
-      //   icon: 'AccountBookOutlined',
-      //   isLeaf: true,
-      // },
-    ],
-  },
-  {
-    sort: 5,
-    id: 'music',
-    status: 'develop',
-    title: '天禅乐',
-    key: 'music',
-    type: 'music',
-    icon: 'CustomerServiceOutlined',
-    isLeaf: true,
-  },
+  // {
+  //   sort: 4,
+  //   id: 'amount',
+  //   title: '记账本',
+  //   status: 'develop',
+  //   key: 'amount',
+  //   type: 'amount',
+  //   icon: 'DollarCircleFilled',
+  //   children: [
+  //     // {
+  //     //   id: '01044',
+  //     //   title: 'leaf 1-0',
+  //     //   key: '0-4-0',
+  //     //   type: 'amount',
+  //     //   icon: 'AccountBookOutlined',
+  //     //   isLeaf: true,
+  //     // },
+  //   ],
+  // },
+  // {
+  //   sort: 5,
+  //   id: 'music',
+  //   status: 'develop',
+  //   title: '天禅乐',
+  //   key: 'music',
+  //   type: 'music',
+  //   icon: 'CustomerServiceOutlined',
+  //   isLeaf: true,
+  // },
   // {
   //   sort: 6,
   //   id: 'import',
@@ -308,7 +386,8 @@ export const defaultFiles = [
     key: 'crash',
     type: 'crash',
     icon: 'DeleteFilled',
-    isLeaf: true,
+    isLeaf: false,
+    children: defaultCacheChildren
   },
   {
     sort: 8,
@@ -332,7 +411,7 @@ export const defaultKeys = [
   'setting',
 ];
 export const noInportKeys = ['setting', 'crash'];
-export const noDeleteKeys = ['autonomy', 'setting', 'crash'];
+export const noDeleteKeys = ['autonomy', 'setting', 'crash', 'crash-todo', 'crash-note', 'crash-aim'];
 
 export const getIconByFileType = (type, isLeaf) => {
   if (!isLeaf) {

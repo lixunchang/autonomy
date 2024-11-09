@@ -85,8 +85,12 @@ const fileHelper = {
     // console.log(path, newPath);
     return fsPs.rename(path, newPath);
   },
-  deleteFile: (path) => {
-    return fsPs.unlink(path);
+  deleteFile: (path, isCached = false) => {
+    if(isCached){
+      // 移动到回收站，物理删除
+      return fsPs.unlink(path);
+    } 
+    return Promise.resolve()
   },
   exists: (path) => {
     return fs.existsSync(path);
@@ -96,7 +100,7 @@ const fileHelper = {
     if (!fs.existsSync(saveLoaction)) {
       fs.mkdirSync(saveLoaction);
     }
-    const targetLocation = `${saveLoaction}${path}`;
+    const targetLocation = `${saveLoaction}/${path}`;
     if (!fs.existsSync(targetLocation)) {
       fs.mkdirSync(targetLocation);
     }

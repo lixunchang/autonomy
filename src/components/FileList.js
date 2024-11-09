@@ -153,7 +153,10 @@ const inputRef = useRef(null);
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const { dataset } = getChildNode(current.childNodes, 'file-item');
+            const { dataset } = getChildNode(current.childNodes, 'file-item')||{};
+            if(!dataset){
+              return;
+            }
             const { id, path, isleaf } = dataset;
             if (noDeleteKeys.includes(id)) {
               return;

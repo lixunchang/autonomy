@@ -36,7 +36,7 @@ export const getSaveLocation = () => {
   const savePath = isDev ? 'Autonomy_dev' : 'Autonomy';
   return (
     settingStore.get('savedFileLocation') ||
-    `${remote.app.getPath('documents')}/${savePath}/`
+    `${remote.app.getPath('documents')}/${savePath}`
   );
 };
 

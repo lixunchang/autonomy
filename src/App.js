@@ -22,6 +22,8 @@ import {
   deepClone,
   defaultKeys,
   deepTree,
+  moveDeleteItemToCache,
+  defaultAutonomyNode,
 } from './utils/treeHelper';
 import emptyImg from '../public/empty.png';
 import shortid from 'shortid';
@@ -74,9 +76,10 @@ const reportTypes = [
  */
 function App() {
   const [files, setFiles] = useState(
-    fileStore.get('files')||defaultFiles
+    fileStore.get('files') && fileStore.get('files').length>0 ? fileStore.get('files') : defaultFiles
   );
-  // console.log('remote.app.getPath', remote.app.getPath('userData'));
+  console.log('files==>', files)
+  console.log('remote.app.getPath', remote.app.getPath('userData'));
   const [activeFileId, setActiveFileId] = useState(
     fileStore.get('activeFileId')
   );
@@ -189,7 +192,11 @@ function App() {
   const deleteFile = (id, path, isLeaf = false) => {
     //删除默认文件夹
     if (defaultKeys.includes(id)) {
+      
       const newFiles = deleteItemById(files, id);
+      if(newFiles.length<=2){
+        newFiles.push(defaultAutonomyNode)
+      }
       saveFile2Store(newFiles);
       setFiles(newFiles);
       closeOpenedFile(id);
@@ -198,7 +205,8 @@ function App() {
     }
     if (isLeaf && isLeaf !== 'false') {
       fileHelper.deleteFile(path).then(() => {
-        const newFiles = deleteItemById(files, id);
+        const cacheFiles = moveDeleteItemToCache(files, id)
+        const newFiles = deleteItemById(cacheFiles, id);
         saveFile2Store(newFiles);
         setFiles(newFiles);
         closeOpenedFile(id);
@@ -210,7 +218,8 @@ function App() {
       Promise.all(
         allDeletePath.map((path) => fileHelper.deleteFile(path))
       ).then(() => {
-        const newFiles = deleteItemById(files, id);
+        const cacheFiles = moveDeleteItemToCache(files, id)
+        const newFiles = deleteItemById(cacheFiles, id);
         saveFile2Store(newFiles);
         setFiles(newFiles);
         closeOpenedFile(id);
@@ -221,7 +230,7 @@ function App() {
   const createNewFile = (fatherId, type, isLeaf, nId) => {
     const newId = nId || shortid.generate();
     const newPath = join(
-      `${savedLocation}${type}/`,
+      `${savedLocation}/${type}/`,
       `${newId}.json` //${type === 'note' ? '.md' : '.json'}
     );
 
@@ -386,7 +395,7 @@ function App() {
     // }
   };
 
-  const onImportFiles = (id, type, dialogCfg) => {
+  const onImportFiles = (id, type, dialogCfg={}) => {
     const { extension = ['md'], title = '选择导入MD文档' } = dialogCfg;
     remote.dialog
       .showOpenDialog({
@@ -405,8 +414,8 @@ function App() {
 
             if(isBook){
               newId = 'book_' + newId;
-              lastPath = join(`${savedLocation}pdf-books/`, title+extname(path))
-              fileHelper.copyFile(path, `${savedLocation}pdf-books/`, title+extname(path))
+              lastPath = join(`${savedLocation}/pdf-books/`, title+extname(path))
+              fileHelper.copyFile(path, `${savedLocation}/pdf-books/`, title+extname(path))
             }else{
               newId = 'import_' + newId
             }
@@ -418,7 +427,7 @@ function App() {
                 ? {
                     type: 'book',
                     pdf: lastPath,
-                    path: join(`${savedLocation}${type}/`, `${newId}.json`),
+                    path: join(`${savedLocation}/${type}/`, `${newId}.json`),
                   }
                 : { type, path }),
               title,

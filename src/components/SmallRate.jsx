@@ -1,5 +1,6 @@
 import React from "react";
 import styles from './SmallRate.less';
+import { StarFilled } from '@ant-design/icons';
 
 
 
@@ -10,9 +11,10 @@ const SmallRate =({value=0,count=4, style})=>{
   // }
 
   return <div className={`${styles.SmallRate} ${styles['star_'+value]}`} style={style}>
-    {Array.from(new Array(value)).map((_, it)=>{
+    <StarFilled />
+    {/* {Array.from(new Array(value)).map((_, it)=>{
       return <div key={it} className={`${styles.line} ${styles.active}`}/>
-    })}
+    })} */}
   </div>
 }
 

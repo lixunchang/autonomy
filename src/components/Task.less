@@ -26,18 +26,27 @@
   }
 
   .collapseIcon{
+    min-width: 72px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     color: #e2e2e2;
     cursor: pointer;
     &:hover{
-      color: #1890ff;
+      span{
+        color: #1890ff;
+      }
     }
     :global{
       .anticon{
         font-size: 12px;
         margin-left: 5px;
+      }
+    }
+    .progress{
+      &:hover{
+        font-size: 14px;
+        color: #fc4646;
       }
     }
   }

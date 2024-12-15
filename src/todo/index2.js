@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 // import { useIdb } from 'react-use-idb';
-import moment from 'moment';
-import styles from './index.less';
-import shortid from 'shortid';
-import { ITodo, newTodo, ESort, initTodo } from './initial';
-import { message } from 'antd';
-import TodoList from './TodoList';
+import moment from "moment";
+import styles from "./index.less";
+import shortid from "shortid";
+import { ITodo, newTodo, ESort, initTodo } from "./initial";
+import { message } from "antd";
+import TodoList from "./TodoList";
 
 const defaultTodo = {
   // sort: ESort.normal,
   columns: [
     {
-      id: 'column-todo',
-      name: '代办',
+      id: "column-todo",
+      name: "待办",
       tasks: [],
     },
     {
-      id: 'column-inprogress',
-      name: '进行中',
+      id: "column-inprogress",
+      name: "进行中",
       tasks: [],
     },
     {
-      id: 'column-done',
-      name: '已完成',
+      id: "column-done",
+      name: "已完成",
       tasks: [],
     },
   ],

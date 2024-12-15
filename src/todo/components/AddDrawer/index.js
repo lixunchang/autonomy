@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Drawer, Form, Input, Rate, Button } from 'antd';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import styles from './index.less';
-import DynamicTags from '../../../components/DynamicTags';
+import React, { useState } from "react";
+import { Drawer, Form, Input, Rate, Button } from "antd";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import styles from "./index.less";
+import DynamicTags from "../../../components/DynamicTags";
 
 export const RateTask = [
-  '（低）不紧急且不重要',
-  '（中）不重要但紧急',
-  '（高）重要不紧急',
-  '（急）重要且紧急',
+  "（低）不紧急且不重要",
+  "（中）不重要但紧急",
+  "（高）重要不紧急",
+  "（急）重要且紧急",
 ];
 
 const formItemLayoutWithOutLabel = {
@@ -20,7 +20,7 @@ const formItemLayoutWithOutLabel = {
 
 const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
   const [rateText, setRateText] = useState(
-    RateTask[form.getFieldValue('rate') - 1] || ''
+    RateTask[form.getFieldValue("rate") - 1] || "",
   );
   const handleClose = () => {
     form?.resetFields();
@@ -63,7 +63,7 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
             rules={[
               {
                 required: true,
-                message: '请输入标题',
+                message: "请输入标题",
               },
             ]}
           >
@@ -85,7 +85,7 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
             name="desc"
             rules={[
               {
-                message: '请输入描述',
+                message: "请输入描述",
               },
             ]}
           >
@@ -108,31 +108,31 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
                 {fields.map((field, index) => (
                   <Form.Item
                     {...(index === 0 ? {} : formItemLayoutWithOutLabel)}
-                    label={index === 0 ? '子任务' : ''}
+                    label={index === 0 ? "子任务" : ""}
                     required={false}
                     key={field.key}
                   >
                     <Form.Item
                       {...field}
-                      validateTrigger={['onChange', 'onBlur']}
+                      validateTrigger={["onChange", "onBlur"]}
                       rules={[
                         {
                           required: true,
                           whitespace: true,
-                          message: '请输入子任务内容',
+                          message: "请输入子任务内容",
                         },
                       ]}
                       noStyle
-                      name={[field.name, 'title']}
+                      name={[field.name, "title"]}
                     >
                       <Input
                         prefix={
                           <span className={styles.littleIndex}>
-                            {index + 1}.{' '}
+                            {index + 1}.{" "}
                           </span>
                         }
                         placeholder="子任务"
-                        style={{ width: '88%' }}
+                        style={{ width: "88%" }}
                       />
                     </Form.Item>
                     {fields.length > 1 ? (
@@ -147,7 +147,7 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
                 <Form.Item>
                   <Button
                     type="dashed"
-                    onClick={() => add({createTime: Date.now()})}
+                    onClick={() => add({ createTime: Date.now() })}
                     className={styles.addTask}
                     icon={<PlusOutlined />}
                   >
@@ -178,7 +178,7 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
               rules={[
                 {
                   required: true,
-                  message: '请选择四象限',
+                  message: "请选择四象限",
                 },
               ]}
             >
@@ -188,8 +188,8 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
                 // defaultValue={ERate.zero}
                 count={4}
                 tooltips={RateTask}
-                style={{ fontSize: 14, color: 'orangered' }}
-                onChange={(num) => setRateText(RateTask[num - 1] || '')}
+                style={{ fontSize: 14, color: "orangered" }}
+                onChange={(num) => setRateText(RateTask[num - 1] || "")}
               />
             </Form.Item>
             <span className={styles.rateText}>{rateText}</span>
@@ -197,19 +197,19 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
         </Form>
 
         {/* <Form.Item> */}
-          <Button
-            type="primary"
-            htmlType="submit"
-            onClick={() => form.submit()}
-            style={{ width: 100, marginLeft: '25%' }}
-          >
-            保存
-          </Button>
+        <Button
+          type="primary"
+          htmlType="submit"
+          onClick={() => form.submit()}
+          style={{ width: 100, marginLeft: "25%" }}
+        >
+          保存
+        </Button>
         {/* </Form.Item> */}
         {/* <Input.Group compact style={{ width: '80%', margin: '10px auto 16px' }}>
           <Input
             size="middle"
-            placeholder="添加代办事项标题"
+            placeholder="添加待办事项标题"
             style={{
               width: '50%',
             }}

@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import styles from './App.less';
-import moment from 'moment';
-import FileSearch from './components/FileSearch';
-import FileList from './components/FileList';
-import Note from './note';
-import Todo from './todo';
-import Aim from './aim';
-import { ConfigProvider, Dropdown } from 'antd';
+import { useState, useEffect } from "react";
+import styles from "./App.less";
+import moment from "moment";
+import FileSearch from "./components/FileSearch";
+import FileList from "./components/FileList";
+import Note from "./note";
+import Todo from "./todo";
+import Aim from "./aim";
+import { ConfigProvider, Dropdown } from "antd";
 // import zhCN from 'antd/locale/zh_CN';
 import {
   defaultFiles,
@@ -24,31 +24,30 @@ import {
   deepTree,
   moveDeleteItemToCache,
   defaultAutonomyNode,
-} from './utils/treeHelper';
-import emptyImg from '../public/empty.png';
-import shortid from 'shortid';
-import fileHelper from './utils/fileHelper';
-import useIpcRenderer from './hooks/useIpcRenderer';
-import Draggable from 'react-draggable';
-import { getSaveLocation, getAutoSync } from './utils/helper.js';
-import Music from './music';
-import { DEFAULT_NOTE } from './components/SlateEditor/constant.js';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
-import Book from './book/index.jsx';
-import Report from './todo/components/Report';
-import { CaretLeftOutlined, CaretRightOutlined } from '@ant-design/icons';
-
+} from "./utils/treeHelper";
+import emptyImg from "../public/empty.png";
+import shortid from "shortid";
+import fileHelper from "./utils/fileHelper";
+import useIpcRenderer from "./hooks/useIpcRenderer";
+import Draggable from "react-draggable";
+import { getSaveLocation, getAutoSync } from "./utils/helper.js";
+import Music from "./music";
+import { DEFAULT_NOTE } from "./components/SlateEditor/constant.js";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
+import Book from "./book/index.jsx";
+import Report from "./todo/components/Report";
+import { CaretLeftOutlined, CaretRightOutlined } from "@ant-design/icons";
 
 // Node API
-const isDev = require('electron-is-dev');
-const pdfjsLib = require('pdfjs-dist');
+const isDev = require("electron-is-dev");
+const pdfjsLib = require("pdfjs-dist");
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 // const fs = require('fs');
-const { remote, ipcRenderer } = window.require('electron');
-const { join, basename, extname, dirname } = window.require('path');
-const Store = window.require('electron-store');
+const { remote, ipcRenderer } = window.require("electron");
+const { join, basename, extname, dirname } = window.require("path");
+const Store = window.require("electron-store");
 
-const fileStore = new Store({ name: isDev ? 'Dev Data' : 'Files Data' });
+const fileStore = new Store({ name: isDev ? "Dev Data" : "Files Data" });
 // fileStore.set('files', defaultFiles); //重置操作 22.14.13
 
 const savedLocation = getSaveLocation();
@@ -57,14 +56,13 @@ const defaultSiderWidth = 260;
 const miniSiderWidth = 190;
 const maxSiderWidth = 360;
 
-
 const reportTypes = [
-  {key:'day',label:'日报',},
-  {key:'week',label:'周报',},
-  {key:'month',label:'月报',},
-  {key:'',label:'季报',},
-  {key:'year',label:'年报',},
-]
+  { key: "day", label: "日报" },
+  { key: "week", label: "周报" },
+  { key: "month", label: "月报" },
+  { key: "quarter", label: "季报" },
+  { key: "year", label: "年报" },
+];
 
 /**
  * state分析
@@ -76,26 +74,28 @@ const reportTypes = [
  */
 function App() {
   const [files, setFiles] = useState(
-    fileStore.get('files') && fileStore.get('files').length>0 ? fileStore.get('files') : defaultFiles
+    fileStore.get("files") && fileStore.get("files").length > 0
+      ? fileStore.get("files")
+      : defaultFiles,
   );
-  console.log('files==>', files)
-  console.log('remote.app.getPath', remote.app.getPath('userData'));
+  console.log("files==>", files);
+  console.log("remote.app.getPath", remote.app.getPath("userData"));
   const [activeFileId, setActiveFileId] = useState(
-    fileStore.get('activeFileId')
+    fileStore.get("activeFileId"),
   );
   const [openedFileIds, setOpenedFileIds] = useState([]);
-  const [siderClose, setSiderClose]= useState(false);
+  const [siderClose, setSiderClose] = useState(false);
   const [unsavedFileIds, setUnsavedFileIds] = useState([]);
   const [newFile, setNewFile] = useState(null);
   const [siderWidth, setSiderWidth] = useState(defaultSiderWidth);
-  const [reportType, setReportOpen] = useState('none');
+  const [reportType, setReportOpen] = useState("none");
   const [expandedKeys, setExpandedKeys] = useState(
-    fileStore.get('expandedKeys') || []
+    fileStore.get("expandedKeys") || [],
   );
 
   useEffect(() => {
     if (fileStore) {
-      fileStore.set('expandedKeys', expandedKeys || []);
+      fileStore.set("expandedKeys", expandedKeys || []);
     }
   }, [expandedKeys]);
 
@@ -109,13 +109,13 @@ function App() {
   // const unsavedFiles = findItemsByIds(files, unsavedFileIds);
   useEffect(() => {
     if (fileStore && activeFileId) {
-      fileStore.set('activeFileId', activeFileId);
+      fileStore.set("activeFileId", activeFileId);
     }
   }, [activeFileId]);
 
   const saveFile2Store = (data) => {
     const newData = deleteExtraAttr(deepClone(data));
-    newData && fileStore.set('files', newData);
+    newData && fileStore.set("files", newData);
   };
 
   const clearUnsavedFile = (id) => {
@@ -129,7 +129,7 @@ function App() {
     if (newOpenedFileIds.length > 0) {
       setActiveFileId(newOpenedFileIds[newOpenedFileIds.length - 1]);
     } else {
-      setActiveFileId('');
+      setActiveFileId("");
     }
   };
 
@@ -149,7 +149,7 @@ function App() {
     if (!isLoaded && path) {
       // TODO
       if (getAutoSync()) {
-        ipcRenderer.send('download-file', {
+        ipcRenderer.send("download-file", {
           key: `${curFile.title}.md`,
           path: curFile.path,
           id: curFile.id,
@@ -157,9 +157,9 @@ function App() {
         });
       } else {
         if (!isExists) {
-          fileHelper.writeFile(path, '').then(() => {
+          fileHelper.writeFile(path, "").then(() => {
             const newFiles = editItemById(files, id, {
-              body: '',
+              body: "",
               isLoaded: true,
             });
             setFiles(newFiles);
@@ -192,10 +192,9 @@ function App() {
   const deleteFile = (id, path, isLeaf = false) => {
     //删除默认文件夹
     if (defaultKeys.includes(id)) {
-      
       const newFiles = deleteItemById(files, id);
-      if(newFiles.length<=2){
-        newFiles.push(defaultAutonomyNode)
+      if (newFiles.length <= 2) {
+        newFiles.push(defaultAutonomyNode);
       }
       saveFile2Store(newFiles);
       setFiles(newFiles);
@@ -203,9 +202,9 @@ function App() {
       clearUnsavedFile(id);
       return;
     }
-    if (isLeaf && isLeaf !== 'false') {
+    if (isLeaf && isLeaf !== "false") {
       fileHelper.deleteFile(path).then(() => {
-        const cacheFiles = moveDeleteItemToCache(files, id)
+        const cacheFiles = moveDeleteItemToCache(files, id);
         const newFiles = deleteItemById(cacheFiles, id);
         saveFile2Store(newFiles);
         setFiles(newFiles);
@@ -216,9 +215,9 @@ function App() {
       const curFolder = findItemById(files, id);
       const allDeletePath = getChildrenFilePath(curFolder.children);
       Promise.all(
-        allDeletePath.map((path) => fileHelper.deleteFile(path))
+        allDeletePath.map((path) => fileHelper.deleteFile(path)),
       ).then(() => {
-        const cacheFiles = moveDeleteItemToCache(files, id)
+        const cacheFiles = moveDeleteItemToCache(files, id);
         const newFiles = deleteItemById(cacheFiles, id);
         saveFile2Store(newFiles);
         setFiles(newFiles);
@@ -231,10 +230,10 @@ function App() {
     const newId = nId || shortid.generate();
     const newPath = join(
       `${savedLocation}/${type}/`,
-      `${newId}.json` //${type === 'note' ? '.md' : '.json'}
+      `${newId}.json`, //${type === 'note' ? '.md' : '.json'}
     );
 
-    const defalutBody = type === 'note' ? JSON.stringify(DEFAULT_NOTE) : '';
+    const defalutBody = type === "note" ? JSON.stringify(DEFAULT_NOTE) : "";
 
     const folder = isLeaf
       ? {
@@ -244,7 +243,7 @@ function App() {
       : { children: [] };
     const newFile = {
       id: newId,
-      title: '',
+      title: "",
       key: newId,
       type,
       icon: getIconByFileType(type, isLeaf),
@@ -275,12 +274,12 @@ function App() {
   const renameFile = (id, path, title, type, isLeaf = false) => {
     if (isLeaf) {
       const newPath = `${dirname(path)}/${title}${
-        type === 'note' ? '.md' : '.json'
+        type === "note" ? ".md" : ".json"
       }`;
       fileHelper.renameFile(path, newPath).then(() => {
         const newFiles = editItemById(files, id, { title, path: newPath });
         // 默认打开 openClickedFile(newId, true, newPath);
-        console.log('newFiles==', newFiles)
+        console.log("newFiles==", newFiles);
         setActiveFileId(id);
         if (!openedFileIds.includes(id)) {
           setOpenedFileIds([...openedFileIds, id]);
@@ -297,12 +296,13 @@ function App() {
     }
   };
 
-  const handleDropEnd=(info)=>{
+  const handleDropEnd = (info) => {
     console.log(info);
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
-    const dropPos = info.node.pos.split('-');
-    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]); // the drop position relative to the drop node, inside 0, top -1, bottom 1
+    const dropPos = info.node.pos.split("-");
+    const dropPosition =
+      info.dropPosition - Number(dropPos[dropPos.length - 1]); // the drop position relative to the drop node, inside 0, top -1, bottom 1
 
     const loop = (data, key, callback) => {
       for (let i = 0; i < data.length; i++) {
@@ -344,12 +344,12 @@ function App() {
         ar.splice(i + 1, 0, dragObj);
       }
     }
-    saveFile2Store(data)
+    saveFile2Store(data);
     setFiles(data);
-  }
+  };
 
   const fileChange = (id, value, info, autoSave = false) => {
-    if (typeof value !== 'string') {
+    if (typeof value !== "string") {
       value = JSON.stringify(value);
     }
     if (
@@ -386,7 +386,7 @@ function App() {
     return fileHelper.writeFile(path, body).then(() => {
       setUnsavedFileIds(unsavedFileIds.filter((id) => id !== activeFileId));
       if (getAutoSync()) {
-        ipcRenderer.send('upload-file', {
+        ipcRenderer.send("upload-file", {
           key: `${title}.md`,
           path: path,
         });
@@ -395,37 +395,44 @@ function App() {
     // }
   };
 
-  const onImportFiles = (id, type, dialogCfg={}) => {
-    const { extension = ['md'], title = '选择导入MD文档' } = dialogCfg;
+  const onImportFiles = (id, type, dialogCfg = {}) => {
+    const { extension = ["md"], title = "选择导入MD文档" } = dialogCfg;
     remote.dialog
       .showOpenDialog({
         title,
-        filters: [{ name: 'Markdown Files', extension }],
-        properties: ['openFile', 'multiSelections'],
+        filters: [{ name: "Markdown Files", extension }],
+        properties: ["openFile", "multiSelections"],
       })
       .then(async ({ filePaths }) => {
         if (Array.isArray(filePaths)) {
           // TODO 过滤已经添加过的文件
           const children = filePaths.map((path) => {
             let newId = shortid.generate();
-            const isBook = path.endsWith('.pdf');
+            const isBook = path.endsWith(".pdf");
             const title = basename(path, extname(path));
             let lastPath = path;
 
-            if(isBook){
-              newId = 'book_' + newId;
-              lastPath = join(`${savedLocation}/pdf-books/`, title+extname(path))
-              fileHelper.copyFile(path, `${savedLocation}/pdf-books/`, title+extname(path))
-            }else{
-              newId = 'import_' + newId
+            if (isBook) {
+              newId = "book_" + newId;
+              lastPath = join(
+                `${savedLocation}/pdf-books/`,
+                title + extname(path),
+              );
+              fileHelper.copyFile(
+                path,
+                `${savedLocation}/pdf-books/`,
+                title + extname(path),
+              );
+            } else {
+              newId = "import_" + newId;
             }
-            console.log('----1111---', newId, lastPath)
+            console.log("----1111---", newId, lastPath);
             return {
               id: newId,
               key: newId,
               ...(isBook
                 ? {
-                    type: 'book',
+                    type: "book",
                     pdf: lastPath,
                     path: join(`${savedLocation}/${type}/`, `${newId}.json`),
                   }
@@ -447,12 +454,12 @@ function App() {
               };
             }
           });
-          console.log('new-files', files, id, children, newFiles);
+          console.log("new-files", files, id, children, newFiles);
           saveFile2Store(newFiles);
           setFiles(newFiles);
           if (children.length > 0) {
             remote.dialog.showMessageBox({
-              type: 'info',
+              type: "info",
               title: `导入成功`,
               message: `成功导入了${children.length}个文件`,
             });
@@ -477,7 +484,7 @@ function App() {
     fileHelper.readFile(curFile.path).then((value) => {
       // // console.log('readFile++++++', value);
       let newData;
-      if (data.status === 'downloaded-success') {
+      if (data.status === "downloaded-success") {
         newData = {
           body: value,
           isLoaded: true,
@@ -502,31 +509,30 @@ function App() {
     setSiderWidth(dragWidth);
   };
 
-  const handleCloseSider=()=>{
-    setSiderClose(!siderClose)
-  }
+  const handleCloseSider = () => {
+    setSiderClose(!siderClose);
+  };
 
   useIpcRenderer({
-    'active-file-uploaded': activeFileUploaded,
-    'file-downloaded': activeFileDownloaded,
-    'save-edit-file': saveEditFile,
+    "active-file-uploaded": activeFileUploaded,
+    "file-downloaded": activeFileDownloaded,
+    "save-edit-file": saveEditFile,
   });
   // console.log('activeFileId', activeFile, files, JSON.stringify(files));
   return (
     <div className={styles.App}>
-      <div style={{ height: '100%', display: 'flex' }}>
+      <div style={{ height: "100%", display: "flex" }}>
         <div
           style={{
             width: siderWidth,
-            background: '#6E6E6E',
-            color: 'white',
+            background: "#6E6E6E",
+            color: "white",
             minWidth: siderWidth,
-            position: 'relative',
+            position: "relative",
           }}
-          className={`${styles.siderBar} ${siderClose?styles.sider_hide:styles.sider_show}`}
+          className={`${styles.siderBar} ${siderClose ? styles.sider_hide : styles.sider_show}`}
         >
-          {
-            !siderClose&&
+          {!siderClose && (
             <>
               <div className={styles.dragArea} />
               <FileSearch
@@ -551,7 +557,7 @@ function App() {
                 onFileRename={renameFile}
               />
             </>
-          }
+          )}
           <Draggable
             axis="x"
             bounds={{
@@ -561,22 +567,27 @@ function App() {
             defaultPosition={{ x: 0, y: 0 }}
             onDrag={handleDrag}
           >
-            <div className={styles.handle} style={siderClose?{left: '0px'}:{}} >
-              <span className={styles.actions} onClick={handleCloseSider} style={siderClose?{display:'inline-flex'}:{}} >
-                {
-                  siderClose?<CaretRightOutlined />:<CaretLeftOutlined />
-                }
+            <div
+              className={styles.handle}
+              style={siderClose ? { left: "0px" } : {}}
+            >
+              <span
+                className={styles.actions}
+                onClick={handleCloseSider}
+                style={siderClose ? { display: "inline-flex" } : {}}
+              >
+                {siderClose ? <CaretRightOutlined /> : <CaretLeftOutlined />}
               </span>
             </div>
           </Draggable>
         </div>
         <div
-          style={{ flex: 1, backgroundColor: '#fafbfc', overflow: 'hidden' }}
+          style={{ flex: 1, backgroundColor: "#fafbfc", overflow: "hidden" }}
         >
           {!activeFile ? (
             <div className={styles.empty}>
               <div
-                style={{ width: '100%', position: 'absolute', top: 0 }}
+                style={{ width: "100%", position: "absolute", top: 0 }}
                 className={styles.dragArea}
               />
               <img src={emptyImg} alt="没有数据" />
@@ -587,46 +598,50 @@ function App() {
               <h1
                 className={styles.dragArea}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   height: 58,
-                  padding: '0 58px',
+                  padding: "0 58px",
                   fontSize: 26,
                   fontWeight: 600,
                   margin: 0,
-                  backgroundColor: '#fafbfc',
-                  position: 'relative',
+                  backgroundColor: "#fafbfc",
+                  position: "relative",
                 }}
               >
                 {unsavedFileIds.includes(activeFileId) && (
                   <span className={styles.unsaveIcon} />
                 )}
-                {activeFile.title || ''}
-                {/* <Dropdown 
-                  menu={{ 
+                {activeFile.title || ""}
+                {/* <Dropdown
+                  menu={{
                     items: reportTypes,
                     onClick: onMenuClick
                   }}> */}
-                  {
-                    activeFile.type === 'todo'&&
-                    <span className={styles.report_text} onClick={()=>setReportOpen('week')}>生成周报</span>
-                  }
+                {activeFile.type === "todo" && (
+                  <span
+                    className={styles.report_text}
+                    onClick={() => setReportOpen("week")}
+                  >
+                    生成周报
+                  </span>
+                )}
                 {/* </Dropdown> */}
               </h1>
-              {activeFile.type === 'todo' ? (
-                <Todo activeFile={activeFile} onChange={fileChange}/>
-              ) : activeFile.type === 'note' ? (
+              {activeFile.type === "todo" ? (
+                <Todo activeFile={activeFile} onChange={fileChange} />
+              ) : activeFile.type === "note" ? (
                 <Note activeFile={activeFile} onChange={fileChange} />
-              ) : activeFile.type === 'book' ? (
+              ) : activeFile.type === "book" ? (
                 <Book activeFile={activeFile} onChange={fileChange} />
-              ) : activeFile.type === 'aim' ? (
+              ) : activeFile.type === "aim" ? (
                 <Aim activeFile={activeFile} onChange={fileChange} />
-              ) : activeFile.type === 'music' ? (
+              ) : activeFile.type === "music" ? (
                 <Music activeFile={activeFile} onChange={fileChange} />
               ) : (
                 <div className={styles.empty}>
-                  <h3 style={{ color: 'red' }}>
+                  <h3 style={{ color: "red" }}>
                     {activeFile.title}, 正在开发中...
                   </h3>
                 </div>
@@ -634,13 +649,15 @@ function App() {
             </>
           )}
         </div>
-        {
-          reportType !== 'none' &&(
-            <Report type={reportType} activeFile={activeFile} closeReport={()=>{
-              setReportOpen('none')
-            }}/>
-          )
-        }
+        {reportType !== "none" && (
+          <Report
+            type={reportType}
+            activeFile={activeFile}
+            closeReport={() => {
+              setReportOpen("none");
+            }}
+          />
+        )}
       </div>
     </div>
   );

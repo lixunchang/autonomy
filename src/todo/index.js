@@ -1,21 +1,21 @@
-import React, { useState, useCallback } from 'react';
-import moment from 'moment';
-import styles from './index.less';
-import { IColumn, ITask, EStatus, ERate, ERepeat } from './initial';
-import shortid from 'shortid';
-import { DragDropContext } from 'react-beautiful-dnd';
-import Column from '../components/Column';
-import { Input, Rate, Form, Button, Menu } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import { ITodo } from './initial';
-import AddModal from './components/AddDrawer';
-import useContextMenu from '../hooks/useContextMenu';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import React, { useState, useCallback } from "react";
+import moment from "moment";
+import styles from "./index.less";
+import { IColumn, ITask, EStatus, ERate, ERepeat } from "./initial";
+import shortid from "shortid";
+import { DragDropContext } from "react-beautiful-dnd";
+import Column from "../components/Column";
+import { Input, Rate, Form, Button, Menu } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { ITodo } from "./initial";
+import AddModal from "./components/AddDrawer";
+import useContextMenu from "../hooks/useContextMenu";
+import { PlusCircleOutlined } from "@ant-design/icons";
 
-const emptyString = ['undefined', 'null', ''];
+const emptyString = ["undefined", "null", ""];
 
 const switchColumnTask = (todoData, source, destination) => {
-  console.log('******', source, destination);
+  console.log("******", source, destination);
   const { columns } = todoData;
   let task;
   let targetColumnIndex;
@@ -30,10 +30,10 @@ const switchColumnTask = (todoData, source, destination) => {
     return column;
   });
   if ((targetColumnIndex || targetColumnIndex === 0) && task) {
-    if(destination.droppableId === 'column-inprogress'){
+    if (destination.droppableId === "column-inprogress") {
       task.inprogressTime = Date.now();
     }
-    if(destination.droppableId === 'column-done'){
+    if (destination.droppableId === "column-done") {
       task.finishTime = Date.now();
     }
     newColumns[targetColumnIndex].tasks.splice(destination.index, 0, task);
@@ -57,9 +57,9 @@ const getTaskText = (task = {}) => {
   return [
     task.content,
     task.desc,
-    task.items.map((item) => item.title).join('-'),
-    task.tags.join('-'),
-  ].join('-');
+    task.items.map((item) => item.title).join("-"),
+    task.tags.join("-"),
+  ].join("-");
 };
 
 const sortTaskByRate = (columns, searchFilter) =>
@@ -68,7 +68,7 @@ const sortTaskByRate = (columns, searchFilter) =>
       ...column,
       tasks: column.tasks
         .filter((task) =>
-          getTaskText(task).includes(searchFilter[column.id] || '')
+          getTaskText(task).includes(searchFilter[column.id] || ""),
         )
         .sort((a, b) => b.rate - a.rate),
     };
@@ -76,27 +76,28 @@ const sortTaskByRate = (columns, searchFilter) =>
 
 const defalutColumns = [
   {
-    id: 'column-todo',
-    name: '代办',
+    id: "column-todo",
+    name: "待办",
     tasks: [],
   },
   {
-    id: 'column-inprogress',
-    name: '进行中',
+    id: "column-inprogress",
+    name: "进行中",
     tasks: [],
   },
   {
-    id: 'column-done',
-    name: '已完成',
+    id: "column-done",
+    name: "已完成",
     tasks: [],
   },
 ];
 
 const TodoList = React.memo((props) => {
   const { activeFile, onChange } = props;
+  console.log('activeFile==', activeFile, activeFile?.body)
   const columns =
     activeFile?.body?.length > 0 && !emptyString.includes(activeFile.body)
-      ? typeof activeFile?.body === 'string'
+      ? typeof activeFile?.body === "string"
         ? JSON.parse(activeFile.body)
         : activeFile?.body
       : [...defalutColumns];
@@ -109,18 +110,18 @@ const TodoList = React.memo((props) => {
   const [form] = Form.useForm();
   const [modalColumnId, setModalColumnId] = useState();
   const [searchFilter, setSearchFilter] = useState({});
-  const [sortType, setSortType] = useState('normal');
+  const [sortType, setSortType] = useState("normal");
 
-  console.log('sortedColumns111', columns);
+  console.log("sortedColumns111", columns);
   const clickItem = useContextMenu(
     [
       {
-        label: '编辑',
+        label: "编辑",
         click: () => {
           const { current } = clickItem;
           if (current !== null) {
             const task = JSON.parse(current.dataset.task);
-            console.log('task==', task);
+            console.log("task==", task);
             setOpen(true);
             setModalColumnId(current.dataset.columnid);
             form.setFieldsValue({
@@ -135,7 +136,7 @@ const TodoList = React.memo((props) => {
         },
       },
       {
-        label: '移至回收站',
+        label: "移至回收站",
         click: () => {
           const { current } = clickItem;
           if (current !== null) {
@@ -157,8 +158,8 @@ const TodoList = React.memo((props) => {
         },
       },
     ],
-    'context_menu_task',
-    [columns]
+    "context_menu_task",
+    [columns],
   );
 
   const handleDeleteTask = (columnId, taskId) => {
@@ -175,7 +176,7 @@ const TodoList = React.memo((props) => {
         return column;
       }),
       {},
-      true
+      true,
     );
   };
 
@@ -231,7 +232,7 @@ const TodoList = React.memo((props) => {
       repeat: taskRepeat,
       items,
       tags,
-      createTime: Date.now()
+      createTime: Date.now(),
     };
     onChange(
       todoData.id,
@@ -245,7 +246,7 @@ const TodoList = React.memo((props) => {
                     return {
                       ...task,
                       ...newTodo,
-                      createTime: task.createTime || Date.now()
+                      createTime: task.createTime || Date.now(),
                     };
                   }
                   return task;
@@ -256,13 +257,13 @@ const TodoList = React.memo((props) => {
         return column;
       }),
       {},
-      true
+      true,
     );
     // setInputTask('');
     // setInputTaskDesc('');
     // setTaskRate(ERate.zero);
   };
-  const handleTaskChange = (columnItem, newTask,)=>{
+  const handleTaskChange = (columnItem, newTask) => {
     onChange(
       todoData.id,
       columns.map((column) => {
@@ -273,8 +274,8 @@ const TodoList = React.memo((props) => {
               if (task.id === newTask.id) {
                 return {
                   ...task,
-                  ...newTask
-                }
+                  ...newTask,
+                };
               }
               return task;
             }),
@@ -283,15 +284,15 @@ const TodoList = React.memo((props) => {
         return column;
       }),
       {},
-      true
+      true,
     );
-  }
+  };
   const handleCheckLittleTask = (
     columnItem,
     taskItem,
     little,
     checked,
-    index
+    index,
   ) => {
     onChange(
       todoData.id,
@@ -308,7 +309,7 @@ const TodoList = React.memo((props) => {
                       return {
                         ...item,
                         checked,
-                        finishTime: checked? Date.now(): 0
+                        finishTime: checked ? Date.now() : 0,
                       };
                     }
                     return item;
@@ -322,12 +323,13 @@ const TodoList = React.memo((props) => {
         return column;
       }),
       {},
-      true
+      true,
     );
   };
   // console.log('todo==', todoData, columns);
-  const sortedColumns = sortType === 'rate'?sortTaskByRate(columns, searchFilter): columns;
-  console.log('sortedColumns', sortedColumns, columns, searchFilter);
+  const sortedColumns =
+    sortType === "rate" ? sortTaskByRate(columns, searchFilter) : columns;
+  console.log("sortedColumns", sortedColumns, columns, searchFilter);
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       {/* <div className={styles.title}>象限法则日程</div> */}
@@ -344,7 +346,7 @@ const TodoList = React.memo((props) => {
                 actions={
                   <>
                     <Input
-                      placeholder={''}
+                      placeholder={""}
                       bordered={false}
                       suffix={<SearchOutlined />}
                       className={styles.search}

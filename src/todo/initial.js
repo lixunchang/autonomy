@@ -1,5 +1,5 @@
-import shortid from 'shortid';
-import moment from 'moment';
+import shortid from "shortid";
+import moment from "moment";
 
 export const ERepeat = {
   once: 0,
@@ -31,24 +31,24 @@ export const newTodo = (momentFn, id) => {
   const curTime = momentFn.valueOf();
   return {
     id,
-    title: momentFn.format('YYYYMMDD'),
+    title: momentFn.format("YYYYMMDD"),
     createTime: curTime,
     modifyTime: curTime,
     sort: ESort.normal,
     columns: [
       {
-        id: 'column-todo',
-        name: '代办',
+        id: "column-todo",
+        name: "待办",
         tasks: [],
       },
       {
-        id: 'column-inprogress',
-        name: '进行中',
+        id: "column-inprogress",
+        name: "进行中",
         tasks: [],
       },
       {
-        id: 'column-done',
-        name: '已完成',
+        id: "column-done",
+        name: "已完成",
         tasks: [],
       },
     ],
@@ -58,7 +58,7 @@ export const newTodo = (momentFn, id) => {
 export const initTodo = (newTodo, newId) => {
   return {
     currentId: newId,
-    editId: '',
+    editId: "",
     data: [newTodo],
   };
 };

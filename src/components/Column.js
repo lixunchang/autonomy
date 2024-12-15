@@ -35,8 +35,8 @@ const Column = ({ column, actions, onEditTask, handleTaskChange, onCheckLittleTa
                       e.stopPropagation();
                       onEditTask(column, task);
                     }}
-                    onCollapseChange={(collapse)=>{
-                      handleTaskChange(column, {...task, collapse})
+                    onTaskChange={(data={})=>{
+                      handleTaskChange(column, {...task, ...data})
                     }}
                     onCheckLittleTask={(item, checked, index) =>
                       onCheckLittleTask(column, task, item, checked, index)

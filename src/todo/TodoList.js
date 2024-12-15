@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import moment from 'moment';
-import styles from './index.less';
-import { IColumn, ITask, EStatus, ERate, ERepeat } from './initial';
-import shortid from 'shortid';
-import { DragDropContext } from 'react-beautiful-dnd';
-import Column from '../components/Column';
-import { Input, Rate, Dropdown, Button, Menu } from 'antd';
-import { ITodo } from './initial';
+import React, { useState } from "react";
+import moment from "moment";
+import styles from "./index.less";
+import { IColumn, ITask, EStatus, ERate, ERepeat } from "./initial";
+import shortid from "shortid";
+import { DragDropContext } from "react-beautiful-dnd";
+import Column from "../components/Column";
+import { Input, Rate, Dropdown, Button, Menu } from "antd";
+import { ITodo } from "./initial";
 
 const switchColumnTask = (todoData, source, destination) => {
   const { columns } = todoData;
@@ -48,18 +48,18 @@ const sortTaskByRate = (columns) =>
 
 const defalutColumns = [
   {
-    id: 'column-todo',
-    name: '代办',
+    id: "column-todo",
+    name: "待办",
     tasks: [],
   },
   {
-    id: 'column-inprogress',
-    name: '进行中',
+    id: "column-inprogress",
+    name: "进行中",
     tasks: [],
   },
   {
-    id: 'column-done',
-    name: '已完成',
+    id: "column-done",
+    name: "已完成",
     tasks: [],
   },
 ];
@@ -68,7 +68,7 @@ const TodoList = (props) => {
   const { todoData, onChange } = props;
   const { columns = defalutColumns } = todoData;
   const [taskRate, setTaskRate] = useState(ERate.zero);
-  const [inputTask, setInputTask] = useState('');
+  const [inputTask, setInputTask] = useState("");
   const [taskRepeat, setTaskRepeat] = useState(ERepeat.once);
 
   const handleDragEnd = (result) => {
@@ -94,10 +94,10 @@ const TodoList = (props) => {
       defaultValue={ERate.zero}
       count={4}
       tooltips={[
-        '（低）不紧急且不重要',
-        '（中）不重要但紧急',
-        '（高）重要不紧急',
-        '（急）重要且紧急',
+        "（低）不紧急且不重要",
+        "（中）不重要但紧急",
+        "（高）重要不紧急",
+        "（急）重要且紧急",
       ]}
       style={{ fontSize: 14 }}
       onChange={setTaskRate}
@@ -115,7 +115,7 @@ const TodoList = (props) => {
       repeat: taskRepeat,
     });
     onChange({ ...todoData, columns });
-    setInputTask('');
+    setInputTask("");
     setTaskRate(ERate.zero);
   };
 
@@ -126,17 +126,17 @@ const TodoList = (props) => {
       <Input.Search
         value={inputTask}
         className={styles.inputSearch}
-        placeholder="添加代办事项，记得打上紧急重要分哦～"
+        placeholder="添加待办事项，记得打上紧急重要分哦～"
         enterButton={
-          <Button type="primary" style={{ width: 80, background: '#6E6E6E' }}>
+          <Button type="primary" style={{ width: 80, background: "#6E6E6E" }}>
             添加
           </Button>
         }
         onChange={(e) => setInputTask(e.target.value)}
         style={{
-          display: 'block',
-          width: '46%',
-          margin: '0 auto 12px',
+          display: "block",
+          width: "46%",
+          margin: "0 auto 12px",
           marginTop: 30,
         }}
         size="middle"

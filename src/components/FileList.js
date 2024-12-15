@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Input, Tree } from 'antd';
-import { getChildNode } from '../utils/helper.js';
+import React, { useState, useEffect, useRef } from "react";
+import { Input, Tree } from "antd";
+import { getChildNode } from "../utils/helper.js";
 import {
   noDeleteKeys,
   noInportKeys,
   switchFileIcons,
-} from '../utils/treeHelper';
-import styles from './FileList.less';
-import useContextMenu from '../hooks/useContextMenu';
-import useIpcRenderer from '../hooks/useIpcRenderer';
+} from "../utils/treeHelper";
+import styles from "./FileList.less";
+import useContextMenu from "../hooks/useContextMenu";
+import useIpcRenderer from "../hooks/useIpcRenderer";
 
-const { ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require("electron");
 
 const { DirectoryTree } = Tree;
 const FileList = ({
@@ -25,12 +25,12 @@ const FileList = ({
   onFileRename,
   onImportFiles,
 }) => {
-  const [editStatus, setEditStatus] = useState('');
-  const [inputValue, setInputValue] = useState('');
+  const [editStatus, setEditStatus] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [selectKey, setSelectKey] = useState([activeId]);
   const { expandedKeys, setExpandedKeys } = expanded;
 
-const inputRef = useRef(null);
+  const inputRef = useRef(null);
 
   const handleSaveInput = (path, type, isLeaf) => {
     if (!inputValue) {
@@ -40,99 +40,99 @@ const inputRef = useRef(null);
     if (isLeaf) {
       setSelectKey([editStatus]);
     }
-    setEditStatus('');
-    setInputValue('');
+    setEditStatus("");
+    setInputValue("");
   };
   const clickItem = useContextMenu(
     [
       {
-        label: '新建笔记',
+        label: "新建笔记",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const childNode = getChildNode(current.childNodes, 'file-item');
+            const childNode = getChildNode(current.childNodes, "file-item");
             const { id } = childNode.dataset;
-            createNewFile(id, 'note', true);
+            createNewFile(id, "note", true);
           }
         },
       },
       {
-        label: '新建代办',
+        label: "新建待办",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const childNode = getChildNode(current.childNodes, 'file-item');
+            const childNode = getChildNode(current.childNodes, "file-item");
             const { id } = childNode.dataset;
-            createNewFile(id, 'todo', true);
+            createNewFile(id, "todo", true);
           }
         },
       },
       {
-        label: '新建打卡记录',
+        label: "新建打卡记录",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const childNode = getChildNode(current.childNodes, 'file-item');
+            const childNode = getChildNode(current.childNodes, "file-item");
             const { id } = childNode.dataset;
-            createNewFile(id, 'aim', true);
+            createNewFile(id, "aim", true);
           }
         },
       },
       {
-        type: 'separator',
+        type: "separator",
       },
       {
-        label: '新建文件夹',
+        label: "新建文件夹",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const childNode = getChildNode(current.childNodes, 'file-item');
+            const childNode = getChildNode(current.childNodes, "file-item");
             const { id, type } = childNode.dataset;
             createNewFile(id, type, false);
           }
         },
       },
       {
-        type: 'separator',
+        type: "separator",
       },
       {
-        label: '重命名',
+        label: "重命名",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const { dataset } = getChildNode(current.childNodes, 'file-item');
+            const { dataset } = getChildNode(current.childNodes, "file-item");
             setEditStatus(dataset.id);
             setInputValue(dataset.title);
           }
         },
       },
       {
-        type: 'separator',
+        type: "separator",
       },
       {
-        label: '导入PDF书籍',
+        label: "导入PDF书籍",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const childNode = getChildNode(current.childNodes, 'file-item');
+            const childNode = getChildNode(current.childNodes, "file-item");
             const { id, type, isleaf } = childNode.dataset;
-            console.log('导入pdf', type, id, isleaf);
+            console.log("导入pdf", type, id, isleaf);
             if (!isleaf || noInportKeys.includes(id)) {
               return;
             }
             onImportFiles(id, type, {
-              extension: ['pdf'],
-              title: '选择导入PDF书籍',
+              extension: ["pdf"],
+              title: "选择导入PDF书籍",
             });
           }
         },
       },
       {
-        label: '导入笔记',
+        label: "导入笔记",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const childNode = getChildNode(current.childNodes, 'file-item');
+            const childNode = getChildNode(current.childNodes, "file-item");
             const { id, type, isleaf } = childNode.dataset;
             if (!isleaf || noInportKeys.includes(id)) {
               return;
@@ -142,65 +142,65 @@ const inputRef = useRef(null);
         },
       },
       {
-        label: '复制文件路径',
+        label: "复制文件路径",
         click: () => {},
       },
       {
-        type: 'separator',
+        type: "separator",
       },
       {
-        label: '移至回收站',
+        label: "移至回收站",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
-            const { dataset } = getChildNode(current.childNodes, 'file-item')||{};
-            if(!dataset){
+            const { dataset } =
+              getChildNode(current.childNodes, "file-item") || {};
+            if (!dataset) {
               return;
             }
             const { id, path, isleaf } = dataset;
             if (noDeleteKeys.includes(id)) {
               return;
             }
-            setEditStatus('');
+            setEditStatus("");
             onFileDelete(id, path, isleaf);
           }
         },
       },
     ],
-    'ant-tree-treenode'
+    "ant-tree-treenode",
   );
   useEffect(() => {
     if (newFile) {
       setEditStatus(newFile.id);
       setInputValue(newFile.title);
-      setTimeout(()=>{
+      setTimeout(() => {
         inputRef.current.focus();
-        console.log('input-focus')
-      }, 500)
+        console.log("input-focus");
+      }, 500);
     }
   }, [newFile]);
 
-  const allowDrop=({ dropNode, dropPosition })=>{
-
-    if(dropPosition === 0){
-      return !dropNode.isLeaf
+  const allowDrop = ({ dropNode, dropPosition }) => {
+    if (dropPosition === 0) {
+      return !dropNode.isLeaf;
     }
 
-    console.log('allowDrop', dropNode, dropPosition)
+    console.log("allowDrop", dropNode, dropPosition);
     return true;
-  }
+  };
 
   const onItemClick = (isLeaf, id, path, isLoaded, type) => {
     if (!isLeaf) {
       return;
     }
     switch (type) {
-      case 'setting':
-        ipcRenderer.send('open-new-window', 'setting');
+      case "setting":
+        ipcRenderer.send("open-new-window", "setting");
         // history.push('/setting');
         break;
-      case 'crash':
-        ipcRenderer.send('open-new-window', 'crash');
+      case "crash":
+        ipcRenderer.send("open-new-window", "crash");
         // history.push('/crash');
         break;
       default:
@@ -210,21 +210,21 @@ const inputRef = useRef(null);
   };
 
   useIpcRenderer({
-    'create-new-todo': () => createNewFile('todo', 'todo', true),
-    'create-new-note': () => createNewFile('note', 'note', true),
-    'create-new-aim': () => createNewFile('aim', 'aim', true),
-    'create-new-account': () => createNewFile('account', 'account', true),
+    "create-new-todo": () => createNewFile("todo", "todo", true),
+    "create-new-note": () => createNewFile("note", "note", true),
+    "create-new-aim": () => createNewFile("aim", "aim", true),
+    "create-new-account": () => createNewFile("account", "account", true),
   });
   // console.log('file', files);
   return (
     <div className={styles.FileList}>
       <DirectoryTree
         style={{
-          background: '#6E6E6E',
-          color: 'white',
+          background: "#6E6E6E",
+          color: "white",
         }}
         draggable={{
-          icon: false
+          icon: false,
         }}
         allowDrop={allowDrop}
         onDrop={onDropEnd}
@@ -247,7 +247,7 @@ const inputRef = useRef(null);
             <div
               key={key}
               className={`${styles.treeItem} ${
-                type !== 'crash' && type !== 'import' ? 'file-item' : ''
+                type !== "crash" && type !== "import" ? "file-item" : ""
               }`}
               // data-isloaded={isLoaded}
               data-isleaf={isLeaf} //
@@ -269,7 +269,7 @@ const inputRef = useRef(null);
                   onChange={(e) => setInputValue(e.target.value)}
                 />
               ) : (
-                <span>{title || '未命名文件'}</span>
+                <span>{title || "未命名文件"}</span>
               )}
             </div>
           );

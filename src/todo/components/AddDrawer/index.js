@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Drawer, Form, Input, Rate, Button } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Drawer, Form, Input, Rate, Button, InputNumber, Space, Select } from "antd";
+import { MinusCircleOutlined, PlusOutlined, DownOutlined, UpOutlined, StarFilled } from "@ant-design/icons";
 import styles from "./index.less";
 import DynamicTags from "../../../components/DynamicTags";
 
@@ -10,6 +10,8 @@ export const RateTask = [
   "（高）重要不紧急",
   "（急）重要且紧急",
 ];
+
+const colors = ['#666','#00ac84','#1677ff','#fac814','#fc4646']
 
 const formItemLayoutWithOutLabel = {
   wrapperCol: {
@@ -22,10 +24,55 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
   const [rateText, setRateText] = useState(
     RateTask[form.getFieldValue("rate") - 1] || "",
   );
+  const [tasks, setOriginTasks] = useState(form.getFieldValue('items')||[])
+  const [doneCollapse, setDoneCollapse] = useState(true);
+  // const tasks = form.getFieldValue('items')||[];
+  const progress = tasks.filter(ite=>ite.checked).length;
+
+  const totalLength = tasks.length;
+
+
+  const handleDownCollapseChange=(newDoneCollapse)=>{
+    if(newDoneCollapse){
+      const showTasks = tasks.filter(item=>!item.checked);
+      if(!showTasks.length){
+        const emptyTask = {createTime: Date.now(), key: Date.now()}
+        showTasks.push(emptyTask)
+        setOriginTasks([...tasks, emptyTask])
+      }
+      form.setFieldValue('items', showTasks.map(item=>({...item, key: item.createTime, fieldKey: item.createTime})))
+    }else{
+      form.setFieldValue('items', tasks.map(item=>({...item, key: item.createTime, fieldKey: item.createTime})))
+    }
+    setDoneCollapse(newDoneCollapse)
+  }
+  useEffect(()=>{
+    handleDownCollapseChange(doneCollapse)
+  },[])
+
   const handleClose = () => {
     form?.resetFields();
     closeModal(false);
   };
+
+  const handleDeleteOriginField=(index)=>{
+    const currentTasks = form.getFieldValue('items');
+    setOriginTasks(tasks.filter((item)=>item.createTime!==currentTasks[index].createTime))
+  }
+
+  const handleTaskChange = (index, data) => {
+    const currentTasks = form.getFieldValue('items');
+    setOriginTasks(tasks.map(item=>{
+      if(currentTasks[index].createTime === item.createTime){
+        return {
+          ...currentTasks[index],
+          ...data
+        }
+      }
+      return item;
+    }))
+  }
+
   return (
     <>
       <Drawer
@@ -49,7 +96,8 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
             maxWidth: 600,
           }}
           onFinish={(values) => {
-            handleAddTodo(values);
+            console.log('on-finish', values, tasks)
+            handleAddTodo({...values, items: tasks});
             handleClose();
           }}
           autoComplete="off"
@@ -102,67 +150,111 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
             //     },
             //   },
             // ]}
+            initialValues={{level: 1}}
           >
             {(fields, { add, remove }, { errors }) => (
               <>
-                {fields.map((field, index) => (
+                {fields.map(({key, name, ...restField}, index, rest) => (
                   <Form.Item
                     {...(index === 0 ? {} : formItemLayoutWithOutLabel)}
                     label={index === 0 ? "子任务" : ""}
                     required={false}
-                    key={field.key}
+                    key={key}
                   >
-                    <Form.Item
-                      {...field}
-                      validateTrigger={["onChange", "onBlur"]}
-                      rules={[
-                        {
-                          required: true,
-                          whitespace: true,
-                          message: "请输入子任务内容",
-                        },
-                      ]}
-                      noStyle
-                      name={[field.name, "title"]}
-                    >
-                      <Input
-                        prefix={
-                          <span className={styles.littleIndex}>
-                            {index + 1}.{" "}
-                          </span>
-                        }
-                        placeholder="子任务"
-                        style={{ width: "88%" }}
-                      />
-                    </Form.Item>
+                    <Space.Compact style={{ width: "calc(100% - 24px)" }}>
+                      <Form.Item
+                        {...restField}
+                        validateTrigger={["onChange", "onBlur"]}
+                        rules={[
+                          {
+                            required: true,
+                            whitespace: true,
+                            message: "请输入子任务内容",
+                          },
+                        ]}
+                        noStyle
+                        name={[name, "title"]}
+                      >
+                        <Input
+                          prefix={
+                            <span className={styles.littleIndex}>
+                              {index + 1}.{" "}
+                            </span>
+                          }
+                          placeholder="子任务"
+                          style={{ width: "calc(100% - 38px)" }}
+                          onChange={(e)=>handleTaskChange(name, {title: e.target.value})}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        validateTrigger={["onChange", "onBlur"]}
+                        noStyle
+                        initialValue={1}
+                        name={[name, "level"]}
+                      >
+                        <Select
+                          style={{ width: 38 }}
+                          suffixIcon={null}
+                          options={[
+                            { value: 1, label: <StarFilled style={{color: '#00ac84'}}/> },
+                            { value: 2, label: <StarFilled style={{color: '#1677ff'}}/> },
+                            { value: 3, label: <StarFilled style={{color: '#fac814'}}/>},
+                            { value: 4, label: <StarFilled style={{color: '#fc4646'}}/> },
+                          ]}
+                          onChange={(value)=>handleTaskChange(name, {level: value})}
+                        />
+                      </Form.Item>
+                    </Space.Compact>
+                    {/* {JSON.stringify(field)} */}
                     {fields.length > 1 ? (
                       <MinusCircleOutlined
                         className={styles.remove}
-                        onClick={() => remove(field.name)}
+                        onClick={() => {
+                          handleDeleteOriginField(name)
+                          remove(name)
+                        }}
                         style={{ marginLeft: 10 }}
                       />
                     ) : null}
                   </Form.Item>
                 ))}
-                <Form.Item>
-                  <Button
-                    type="dashed"
-                    onClick={() => add({ createTime: Date.now() })}
-                    className={styles.addTask}
-                    icon={<PlusOutlined />}
-                  >
-                    添加子任务
-                  </Button>
-                  {/* <Button
-                    type="dashed"
-                    onClick={() => {
-                      add('The head item', 0);
-                    }}
-                    style={{ width: '60%', marginTop: '20px' }}
-                    icon={<PlusOutlined />}
-                  >
-                    Add field at head
-                  </Button> */}
+                <Form.Item {...formItemLayoutWithOutLabel}>
+                    <Button
+                      type="dashed"
+                      onClick={() => {
+                        const newTask = { createTime: Date.now() }
+                        setOriginTasks([...tasks, newTask])
+                        add(newTask)
+                      }}
+                      className={styles.addTask}
+                      icon={<PlusOutlined />}
+                    >
+                      添加子任务
+                    </Button>
+                    {
+                      totalLength>0&&
+                      <span className={styles.collapseIcon} >
+                        <span onClick={()=>handleDownCollapseChange(!doneCollapse)}>
+                          {progress}
+                          <i style={{marginInline:'2px'}}>/</i>
+                          {totalLength}
+                          {
+                            doneCollapse ? <DownOutlined className="icon"/>: <UpOutlined className="icon"/>
+                          }
+                        </span>
+                      </span>
+                    } 
+                    {/* <Button
+                      type="dashed"
+                      onClick={() => {
+                        add('The head item', 0);
+                      }}
+                      style={{ width: '60%', marginTop: '20px' }}
+                      icon={<PlusOutlined />}
+                    >
+                      Add field at head
+                    </Button> */}
                 </Form.Item>
               </>
             )}
@@ -188,7 +280,7 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
                 // defaultValue={ERate.zero}
                 count={4}
                 tooltips={RateTask}
-                style={{ fontSize: 14, color: "orangered" }}
+                style={{ fontSize: 14, color: colors[form.getFieldValue('rate')||1] }}
                 onChange={(num) => setRateText(RateTask[num - 1] || "")}
               />
             </Form.Item>

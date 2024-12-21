@@ -5,6 +5,8 @@ import { Checkbox, Tag, Card } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import SmallRate from './SmallRate';
 
+const colors = ['#333','#888','#666','#444','#222'];
+
 const Task = ({ columnId, task, index, onTaskChange, onCheckLittleTask, ...restProps }) => {
   // console.log('task.items==>', task);
   // const [collapse, setCollapse] = useState(task.collapse||true);
@@ -35,7 +37,8 @@ const Task = ({ columnId, task, index, onTaskChange, onCheckLittleTask, ...restP
         return todos.filter(item=>!item.checked);
     }
   }
-  const showTodos = handleFilterTodo(task?.items)
+  const showTodos = handleFilterTodo(task?.items).sort((prev,next)=>(next.level||1) - (prev.level||1))
+  // console.log('showTodos===', showTodos)
   return (
     <Draggable
       key={task.id}
@@ -99,7 +102,7 @@ const Task = ({ columnId, task, index, onTaskChange, onCheckLittleTask, ...restP
                     <div  style={{marginTop: 8}}>
                       {showTodos.map((item, index) => {
                         return (
-                          <div key={item.title} className={styles.smallTitle}>
+                          <div key={item.createTime||index} className={styles.smallTitle}>
                             <Checkbox
                               size="small"
                               style={{ marginRight: 6 }}
@@ -108,7 +111,7 @@ const Task = ({ columnId, task, index, onTaskChange, onCheckLittleTask, ...restP
                                 onCheckLittleTask(item, target.checked, index)
                               }
                             ></Checkbox>
-                            <div>{item.title}</div>
+                            <div style={{color: colors[item.level||1]}}>{item.title}</div>
                           </div>
                         );
                       })}

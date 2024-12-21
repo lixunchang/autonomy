@@ -94,7 +94,7 @@ const defalutColumns = [
 
 const TodoList = React.memo((props) => {
   const { activeFile, onChange } = props;
-  console.log('activeFile==', activeFile, activeFile?.body)
+  // console.log('activeFile==', activeFile, activeFile?.body)
   const columns =
     activeFile?.body?.length > 0 && !emptyString.includes(activeFile.body)
       ? typeof activeFile?.body === "string"
@@ -112,7 +112,7 @@ const TodoList = React.memo((props) => {
   const [searchFilter, setSearchFilter] = useState({});
   const [sortType, setSortType] = useState("normal");
 
-  console.log("sortedColumns111", columns);
+  // console.log("sortedColumns111", columns);
   const clickItem = useContextMenu(
     [
       {
@@ -329,7 +329,7 @@ const TodoList = React.memo((props) => {
   // console.log('todo==', todoData, columns);
   const sortedColumns =
     sortType === "rate" ? sortTaskByRate(columns, searchFilter) : columns;
-  console.log("sortedColumns", sortedColumns, columns, searchFilter);
+  // console.log("sortedColumns", sortedColumns, columns, searchFilter);
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       {/* <div className={styles.title}>象限法则日程</div> */}

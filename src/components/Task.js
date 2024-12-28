@@ -16,7 +16,7 @@ const Task = ({ columnId, task, index, onTaskChange, onCheckLittleTask, ...restP
   const handleCollapse=(e)=>{
     e.stopPropagation();
     // setCollapse(!collapse)
-    setFilter(1)
+    setFilter(0)
     onTaskChange({collapse: !task.collapse})
   }
   const handleSwitchFilter=(e)=>{

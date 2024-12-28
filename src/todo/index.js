@@ -122,16 +122,7 @@ const TodoList = React.memo((props) => {
           if (current !== null) {
             const task = JSON.parse(current.dataset.task);
             console.log("task==", task);
-            setOpen(true);
-            setModalColumnId(current.dataset.columnid);
-            form.setFieldsValue({
-              id: task.id,
-              title: task.content,
-              desc: task.desc,
-              rate: task.rate,
-              items: task.items,
-              tags: task.tags,
-            });
+            handleTaskEdit({id: current.dataset.columnid}, task)
           }
         },
       },
@@ -166,7 +157,6 @@ const TodoList = React.memo((props) => {
     onChange(
       todoData.id,
       columns.map((column) => {
-        debugger;
         if (column.id === columnId) {
           return {
             ...column,

@@ -24,7 +24,7 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
   const [rateText, setRateText] = useState(
     RateTask[form.getFieldValue("rate") - 1] || "",
   );
-  const [tasks, setOriginTasks] = useState(form.getFieldValue('items')||[])
+  const [tasks, setOriginTasks] = useState([])
   const [doneCollapse, setDoneCollapse] = useState(true);
   // const tasks = form.getFieldValue('items')||[];
   const progress = tasks.filter(ite=>ite.checked).length;
@@ -32,22 +32,28 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
   const totalLength = tasks.length;
 
 
-  const handleDownCollapseChange=(newDoneCollapse)=>{
+  const handleDownCollapseChange=(newDoneCollapse, initTask)=>{
+    const curTasks = initTask || tasks;
     if(newDoneCollapse){
-      const showTasks = tasks.filter(item=>!item.checked);
+      const showTasks = curTasks.filter(item=>!item.checked);
       if(!showTasks.length){
-        const emptyTask = {createTime: Date.now(), key: Date.now()}
+        const emptyTask = {createTime: Date.now()}
         showTasks.push(emptyTask)
-        setOriginTasks([...tasks, emptyTask])
+        setOriginTasks([...curTasks, emptyTask])
       }
-      form.setFieldValue('items', showTasks.map(item=>({...item, key: item.createTime, fieldKey: item.createTime})))
+      form.setFieldValue('items', showTasks)
     }else{
-      form.setFieldValue('items', tasks.map(item=>({...item, key: item.createTime, fieldKey: item.createTime})))
+      form.setFieldValue('items', curTasks)
     }
     setDoneCollapse(newDoneCollapse)
   }
   useEffect(()=>{
-    handleDownCollapseChange(doneCollapse)
+    setTimeout(()=>{
+      const tasks = form.getFieldValue('items');
+      setOriginTasks(tasks||[])
+      // console.log('uuuuEEEEFFFF', tasks)
+      handleDownCollapseChange(doneCollapse, tasks)
+    }, 0)
   },[])
 
   const handleClose = () => {
@@ -62,8 +68,9 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
 
   const handleTaskChange = (index, data) => {
     const currentTasks = form.getFieldValue('items');
+    // console.log('cccc', currentTasks[index], data)
     setOriginTasks(tasks.map(item=>{
-      if(currentTasks[index].createTime === item.createTime){
+      if(item.createTime === currentTasks[index].createTime){
         return {
           ...currentTasks[index],
           ...data
@@ -71,6 +78,9 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
       }
       return item;
     }))
+  }
+  const showStatusClass=(index)=>{
+    return form.getFieldValue('items')[index].checked? styles.doneTaskIndex:'';
   }
 
   return (
@@ -154,7 +164,7 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
           >
             {(fields, { add, remove }, { errors }) => (
               <>
-                {fields.map(({key, name, ...restField}, index, rest) => (
+                {fields.map(({key, name, ...restField}, index) => (
                   <Form.Item
                     {...(index === 0 ? {} : formItemLayoutWithOutLabel)}
                     label={index === 0 ? "子任务" : ""}
@@ -177,8 +187,8 @@ const AddDrawer = ({ form, handleAddTodo, open, closeModal }) => {
                       >
                         <Input
                           prefix={
-                            <span className={styles.littleIndex}>
-                              {index + 1}.{" "}
+                            <span className={`${styles.littleIndex}`}>
+                              <span className={showStatusClass(index)}>{index + 1}</span>.{" "}
                             </span>
                           }
                           placeholder="子任务"

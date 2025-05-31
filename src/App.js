@@ -35,7 +35,7 @@ import Music from "./music";
 import { DEFAULT_NOTE } from "./components/SlateEditor/constant.js";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import Book from "./book/index.jsx";
-import Report from "./todo/components/Report";
+import Report, { REPORT_TYPE } from './todo/components/Report';
 import { CaretLeftOutlined, CaretRightOutlined } from "@ant-design/icons";
 
 // Node API
@@ -56,13 +56,10 @@ const defaultSiderWidth = 260;
 const miniSiderWidth = 190;
 const maxSiderWidth = 360;
 
-const reportTypes = [
-  { key: "day", label: "日报" },
-  { key: "week", label: "周报" },
-  { key: "month", label: "月报" },
-  { key: "quarter", label: "季报" },
-  { key: "year", label: "年报" },
-];
+const reportTypes = Object.entries(REPORT_TYPE).map(([key, label]) => ({
+  key,
+  label
+}));
 
 /**
  * state分析
@@ -620,12 +617,21 @@ function App() {
                     onClick: onMenuClick
                   }}> */}
                 {activeFile.type === "todo" && (
-                  <span
-                    className={styles.report_text}
-                    onClick={() => setReportOpen("week")}
+                  <Dropdown
+                    menu={{
+                      items: [
+                        ...reportTypes.map(item => ({
+                          key: item.key,
+                          label: `生成${item.label}`
+                        }))
+                      ],
+                      onClick: ({ key }) => setReportOpen(key)
+                    }}
                   >
-                    生成周报
-                  </span>
+                    <span className={styles.report_text}>
+                      生成报告
+                    </span>
+                  </Dropdown>
                 )}
                 {/* </Dropdown> */}
               </h1>

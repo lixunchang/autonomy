@@ -312,6 +312,34 @@ export const defaultFiles = [
     ],
   },
   {
+    sort: 2.5,
+    id: 'album',
+    title: '相册',
+    key: 'album',
+    type: 'album',
+    icon: 'PictureFilled',
+    children: [
+      {
+        id: 'album-wallpaper',
+        title: '壁纸',
+        key: 'album-wallpaper', 
+        type: 'album',
+        icon: 'PictureOutlined',
+        path: `${savedLocation}/album/wallpaper.json`,
+        isLeaf: true
+      },
+      {
+        id: 'album-screenshots',
+        title: '截图',
+        key: 'album-screenshots',
+        type: 'album', 
+        icon: 'FileImageOutlined',
+        path: `${savedLocation}/album/screenshots.json`,
+        isLeaf: true
+      }
+    ]
+  },
+  {
     sort: 3,
     id: 'aim',
     title: '打卡',
@@ -426,6 +454,8 @@ export const getIconByFileType = (type, isLeaf) => {
       return 'ProfileOutlined';
     case 'amount':
       return 'AccountBookOutlined';
+    case 'album':
+      return isLeaf ? 'PictureOutlined' : 'FolderOutlined';
     default:
       return 'ProfileOutlined';
   }

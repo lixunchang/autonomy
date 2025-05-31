@@ -6,7 +6,8 @@ import {
   Element as SlateElement,
   Node as SlateNode,
   Text,
-  Node
+  Node,
+  Path
 } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
@@ -39,6 +40,7 @@ import 'prismjs/components/prism-java'
 import { CodeBlockType, CodeLineType, languageTypes, ParagraphType } from './components/BlockCode/index.jsx';
 import { isCanEditInTable } from './utils/util.js';
 import { slateToMarkdown } from './utils/transformer.js';
+import { useKeyDown } from './hooks/useKeyDown.js';
 // import copy from 'copy-to-clipboard';
 // import { TableOutlined } from '@ant-design/icons';
 
@@ -89,28 +91,28 @@ const parseValue = (value) => {
 //   //   type: 'paragraph',
 //   //   children: [
 //   //     {
-//   //       text: 'Order when you start a line with "## " you get a level-two heading, like this:',
-//   //     },
-//   //   ],
-//   // },
-//   // {
-//   //   type: 'heading-two',
-//   //   children: [{ text: 'Try it out!' }],
-//   // },
-//   // {
-//   //   type: 'image',
-//   //   url: 'https://source.unsplash.com/zOwZKwZOZq8',
-//   //   children: [{ text: '' }],
-//   // },
-//   // {
-//   //   type: 'paragraph',
-//   //   textAlign: 'right',
-//   //   children: [
-//   //     {
-//   //       text: 'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
-//   //     },
-//   //   ],
-//   // },
+   //       text: 'Order when you start a line with "## " you get a level-two heading, like this:',
+   //     },
+   //   ],
+   // },
+   // {
+   //   type: 'heading-two',
+   //   children: [{ text: 'Try it out!' }],
+   // },
+   // {
+   //   type: 'image',
+   //   url: 'https://source.unsplash.com/zOwZKwZOZq8',
+   //   children: [{ text: '' }],
+   // },
+   // {
+   //   type: 'paragraph',
+   //   textAlign: 'right',
+   //   children: [
+   //     {
+   //       text: 'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
+   //     },
+   //   ],
+   // },
 // ];
 
 const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
@@ -195,6 +197,22 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
     clipboard.writeText(slateToMarkdown(value))
   }
 
+  const handleEditableClick = (event) => {
+    const [imageNode] = Editor.nodes(editor, {
+      match: n => n.type === 'image',
+    });
+
+    if (imageNode) {
+      const [, path] = imageNode;
+      Transforms.insertNodes(
+        editor,
+        { type: 'paragraph', children: [{ text: '' }] },
+        { at: Path.next(path) }
+      );
+      Transforms.select(editor, Path.next(path));
+    }
+  };
+
   // const handleEditableClick=(event)=>{
   //   const lastNodeType = editor.children[editor.children.length - 1].type;
 
@@ -252,6 +270,8 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
     [editor]
   );
   console.log('SlateEditor', id, value);
+  const handleKeyDown = useKeyDown(editor);
+
   return (
     <Slate
       key={id + '-' + page}
@@ -368,158 +388,10 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
         onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        // onClick={handleEditableClick}
+        onClick={handleEditableClick}
         onCopy={handleEditableCopy}
         onPaste={handleEditablePaste}
-        onKeyDown={(event) => {
-          const editorDom = ReactEditor.toDOMNode(editor, editor)
-          if (
-            !isCanEditInTable(editor) &&
-            !isHotkey(['delete', 'backspace'], event) &&
-            editorDom.getAttribute('contenteditable') === 'true'
-          ) {
-            // 非 delete backspace 按键时
-            editorDom.setAttribute('contenteditable', 'false')
-            Promise.resolve()
-              .then(() => editorDom.setAttribute('contenteditable', 'true'))
-              .catch(() => {})
-          }
-          if (isHotkey('tab', event)) {
-            event.preventDefault();
-            Editor.insertText(editor, '  ')
-          }
-          if (isHotkey('mod+a', event)) {
-            event.preventDefault();
-            Transforms.select(editor, []);
-          }
-          // console.log('event==>', event, event.metaKey&&event.code === 'Enter', event.ctrlKey && event.key ==='q')
-          if(event.ctrlKey&&event.key === '`'){
-            event.preventDefault();
-            if(isBlockActive(editor, 'code-block')){
-              Transforms.unwrapNodes(editor, {
-                match: (n) =>
-                  !Editor.isEditor(n) &&
-                  SlateElement.isElement(n) &&
-                  n.type === 'code-block',
-              });
-              Transforms.setNodes(
-                editor,
-                { type: ParagraphType }
-              )
-            }else{
-              Transforms.wrapNodes(
-                editor,
-                { type: CodeBlockType, language: 'html', children: [] },
-                {
-                  match: n => SlateElement.isElement(n) && n.type === ParagraphType,
-                  split: true,
-                }
-              )
-              Transforms.setNodes(
-                editor,
-                { type: CodeLineType, children: [{text: ""}] },
-                { match: n => SlateElement.isElement(n) && n.type === ParagraphType }
-              )
-            }
-            return;
-          }
-          if(event.metaKey && event.key ==='Enter'){
-            event.preventDefault();
-            // let nextsilbingNode;
-            // for(let node of Editor.levels(
-            //   editor,
-            //   {
-            //     match:n=>!Editor.isEditor(n)&&n.type === 'code-block' ? true : false, 
-            //     reverse:true
-            //   }
-            // )){
-            //   nextsilbingNode = Editor.next(editor,{at:node[1]})
-            // }
-            // console.log('=====', nextsilbingNode);
-            // if(nextsilbingNode){
-            //   Transforms.select(editor, nextsilbingNode[1])
-            //   Transforms.collapse(editor, {fedge:'end'})
-            // }else{
-              // Transforms.collapse(editor, {fedge:'end'})
-
-            //   function getDepth(editor, at = editor.selection) {
-            //     const { anchor } = at;
-            //     if (anchor.depth === 0) {
-            //         return 0;
-            //     }
-            //     let depth = 1;
-            //     let block = editor.value.document.getParent(anchor.path);
-            //     while (block && block.type !== editor.value.document.type) {
-            //         block = editor.value.document.getParent(block.parent.path);
-            //         depth += 1;
-            //     }
-            //     return depth;
-            // }
-
-              Editor.insertNode(editor, {
-                type: 'paragraph',
-                children: [{ text: '' }],
-              })
-              // 将光标移动到编辑器末尾
-              // Transforms.moveToEnd(editor);?
-              // Transforms.collapse(editor, {fedge:'end'})
-              if(Array.from(Node.levels(editor, editor.selection.focus.path)).length>3){
-                Transforms.liftNodes(editor);
-              }
-              // 插入新块
-              // Transforms.insertNodes(editor, {
-              //   type: 'paragraph',
-              //   children: [{ text: '' }],
-              // });
-              // Transforms.setNodes(editor, {type:'paragraph'})
-            // }
-          }else if(event.key ==='Enter') {
-            // const textBeforeCursor = Editor.before(editor, editor.selection.anchor, { unit: 'block' });
-            // const start = Editor.start(editor, textBeforeCursor.path);
-            const range = { anchor: editor.selection.anchor, focus:{ ...editor.selection.focus, offset: 0} };
-            const beforeText = Editor.string(editor, range)
-            const codePrefix = beforeText.startsWith('```')? languageTypes[beforeText.replace('```','')||'html']: '';
-            // 获取当前选区中的块级节点
-            // const [ node ] = Editor.nodes(editor, {
-            //   match: (n) => Editor.isBlock(editor, n),
-            //   mode: 'all',
-            // });
-            // const [match] = Editor.nodes(editor, {
-            //   match: n => n.type === 'code-block',
-            // })
-            // Range.isCollapsed(range),
-            console.log('node===>', codePrefix, Editor.isStart(editor, editor.selection))
-            if(codePrefix){
-              event.preventDefault();
-              Transforms.insertText(editor, '', {at: range})
-              if(isBlockActive(editor, 'code-block')){
-                Transforms.liftNodes(editor);
-                Transforms.setNodes(editor, {type:'paragraph'})
-                return;
-              }
-              Transforms.wrapNodes(
-                editor,
-                { type: CodeBlockType, language: codePrefix, children: [] },
-                {
-                  match: n => SlateElement.isElement(n) && n.type === ParagraphType,
-                  split: true,
-                }
-              )
-              Transforms.setNodes(
-                editor,
-                { type: CodeLineType, children: [{text: ""}] },
-                { match: n => SlateElement.isElement(n) && n.type === ParagraphType }
-              )
-            }
-          }
-          for (const hotkey in HOTKEYS) {
-            if (isHotkey(hotkey, event)) {
-              event.preventDefault();
-              const mark = HOTKEYS[hotkey];
-              toggleMark(editor, mark);
-            }
-          }
-        }}
+        onKeyDown={handleKeyDown}
         placeholder={
           <span style={{display: 'inline-block', marginTop: 12 }}>
             写点什么...

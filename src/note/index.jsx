@@ -8,7 +8,7 @@ import Editor from '../components/SlateEditor';
 
 
 const Note = ({ activeFile, onChange }) => {
-  const { id, body = '', isLoaded = false } = activeFile;
+  const { id, body = '', isLoaded = false, title } = activeFile;
   // const [activeId, setActiveId]=useState(id);
   const [data, setData] = useState('');
   const handleContentChange = (data) => {
@@ -24,7 +24,7 @@ const Note = ({ activeFile, onChange }) => {
     <div className={styles.Note}>
       {
         body&&
-        <Editor key={id} id={id} value={body} onChange={handleContentChange} isLoaded={isLoaded}/>
+        <Editor key={id} id={id} title={title} value={body} onChange={handleContentChange} isLoaded={isLoaded}/>
       }
     </div>
   );

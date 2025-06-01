@@ -41,10 +41,12 @@ import { CodeBlockType, CodeLineType, languageTypes, ParagraphType } from './com
 import { isCanEditInTable } from './utils/util.js';
 import { slateToMarkdown } from './utils/transformer.js';
 import { useKeyDown } from './hooks/useKeyDown.js';
-// import copy from 'copy-to-clipboard';
-// import { TableOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 
-const { clipboard } = require('electron')
+const { clipboard } = window.require('electron');
+const { dialog } = window.require('electron').remote;
+const fs = window.require('fs');
+const path = window.require('path');
 
 const parseValue = (value) => {
   if (Array.isArray(value)) {
@@ -115,7 +117,7 @@ const parseValue = (value) => {
    // },
 // ];
 
-const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
+const SlateEditor = ({ id, page = 1, value, onChange, isLoaded, title }) => {
 
   const [editorEventState, setEditorEventState] = useState({
     mouseDown: false,
@@ -193,11 +195,58 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded }) => {
     console.log('paste=', e)
   }
 
-  const copyMarkdown =()=>{
-    clipboard.writeText(slateToMarkdown(value))
+  const copyMarkdown = async () => {
+    const markdownContent = slateToMarkdown(value);
+    // clipboard.writeText(markdownContent); // 添加复制到剪贴板
+
+    try {
+      const result = await dialog.showSaveDialog({
+        title: '导出 Markdown',
+        defaultPath: `${title}.md`,
+        filters: [
+          { name: 'Markdown Files', extensions: ['md'] }
+        ]
+      });
+
+      if (result.filePath) {
+        fs.writeFileSync(result.filePath, markdownContent, 'utf-8');
+        message.success('导出成功');
+      }
+    } catch (err) {
+      message.error('导出失败：' + err.message);
+    }
   }
 
   const handleEditableClick = (event) => {
+    if (event.target.getAttribute('data-slate-editor')) {
+      const lastNode = editor.children[editor.children.length - 1];
+      
+      if (lastNode.type === 'code-block') {
+        try {
+          // 获取编辑器根节点
+          const path = [editor.children.length];
+          
+          // 在末尾插入新段落
+          Transforms.insertNodes(
+            editor,
+            { 
+              type: 'paragraph',
+              children: [{ text: '' }]
+            },
+            { at: path }
+          );
+
+          Transforms.select(editor, Editor.start(editor, path));
+          
+          event.preventDefault();
+          return;
+        } catch (err) {
+          console.error('Error inserting new paragraph:', err);
+        }
+      }
+    }
+
+    // 处理图片节点的原有逻辑
     const [imageNode] = Editor.nodes(editor, {
       match: n => n.type === 'image',
     });

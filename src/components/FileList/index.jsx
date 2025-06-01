@@ -37,7 +37,6 @@ import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import Book from "./book/index.jsx";
 import Report, { REPORT_TYPE } from './todo/components/Report';
 import { CaretLeftOutlined, CaretRightOutlined } from "@ant-design/icons";
-import Album from './components/Album';
 
 // Node API
 const isDev = require("electron-is-dev");
@@ -145,7 +144,8 @@ function App() {
     const isExists = fileHelper.exists(path);
     const curFile = findItemById(files, id);
     if (!isLoaded && path) {
-      if (getAutoSync() && curFile.type !== 'album') { // 相册类型不需要同步
+      // TODO
+      if (getAutoSync()) {
         ipcRenderer.send("download-file", {
           key: `${curFile.title}.md`,
           path: curFile.path,
@@ -154,7 +154,7 @@ function App() {
         });
       } else {
         if (!isExists) {
-          fileHelper.writeFile(path, curFile.type === 'album' ? JSON.stringify({ images: [] }) : "").then(() => {
+          fileHelper.writeFile(path, "").then(() => {
             const newFiles = editItemById(files, id, {
               body: "",
               isLoaded: true,
@@ -230,19 +230,7 @@ function App() {
       `${newId}.json`, //${type === 'note' ? '.md' : '.json'}
     );
 
-    // 为相册类型设置默认内容
-    const getDefaultBody = (type) => {
-      switch(type) {
-        case 'note':
-          return JSON.stringify(DEFAULT_NOTE);
-        case 'album':
-          return JSON.stringify({ images: [] });
-        default:
-          return '';
-      }
-    };
-
-    const defalutBody = getDefaultBody(type);
+    const defalutBody = type === "note" ? JSON.stringify(DEFAULT_NOTE) : "";
 
     const folder = isLeaf
       ? {
@@ -651,8 +639,8 @@ function App() {
                 <Todo activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === "note" ? (
                 <Note activeFile={activeFile} onChange={fileChange} />
-              ) : activeFile.type === "album" ? (
-                <Album activeFile={activeFile} onChange={fileChange} />
+              ) : activeFile.type === "book" ? (
+                <Book activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === "aim" ? (
                 <Aim activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === "music" ? (

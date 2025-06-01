@@ -62,7 +62,7 @@ const withImages = (editor) => {
             console.log('files==', file, reader, event);
             const fileName = moment().format('YYYYMMDDHHmmss.SSS')+'.png';
             // const imgPath = join(imagePathPrefix, moment().format('YYYYMMDDHHmmss.SSS')+'.png');
-            fileHelper.writeImage(imagePastePrefix, fileName, url).then(res=>{
+            fileHelper.writeCopyImage(imagePastePrefix, fileName, url).then(res=>{
               insertImage(editor, 'file://'+join(imagePastePrefix, fileName));
             })
             
@@ -165,7 +165,7 @@ export const Image = ({ attributes, scaleSize, children, element, style, onChang
               display: ${selected && focused ? 'inline' : 'none'};
               position: absolute;
               top: 0.5em;
-              left: 2.5em;
+              left: 0.5em;
               background-color: #00000066;
               color: white !important;
               padding: 0 4px;

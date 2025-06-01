@@ -68,6 +68,17 @@ const FileList = ({
         },
       },
       {
+        label: "新建相册",
+        click: () => {
+          const { current = { childNodes: [] } } = clickItem;
+          if (current !== null) {
+            const childNode = getChildNode(current.childNodes, "file-item");
+            const { id } = childNode.dataset;
+            createNewFile(id, "album", true);
+          }
+        },
+      },
+      {
         label: "新建打卡记录",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;

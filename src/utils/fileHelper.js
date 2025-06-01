@@ -5,6 +5,7 @@ import {
   getPdfPageTextWithStatus,
   getPdfPageImages,
 } from './pdf.js';
+const dirname = window.require('path').dirname;
 
 const { join } = window.require('path');
 const fs = window.require('fs');
@@ -50,12 +51,25 @@ const fileHelper = {
     return fsPs.readFile(path, { encoding: 'utf-8' });
   },
   writeFile: (path, content) => {
+    
+    // 递归创建目录
+    const mkdirP = (dir) => {
+      if (fs.existsSync(dir)) {
+        return;
+      }
+      mkdirP(dirname(dir));
+      fs.mkdirSync(dir);
+    };
+
+    // 确保目录存在
+    mkdirP(dirname(path));
+
     if (typeof content !== 'string') {
       content = JSON.stringify(content);
     }
     return fsPs.writeFile(path, content, { encoding: 'utf-8' });
   },
-  writeImage: (path, fileName, content)=>{
+  writeCopyImage: (path, fileName, content)=>{
     if (!fs.existsSync(path)) {
       const saveLoaction = getSaveLocation();
       const imgPath = join(saveLoaction, 'images/')
@@ -65,6 +79,30 @@ const fileHelper = {
       fs.mkdirSync(path);
     }
     return fsPs.writeFile(join(path, fileName), content.split(',')[1], {encoding: 'base64'})
+  },
+  writeImage: (path, fileName, content) => {
+    const mkdirP = (dir) => {
+      if (fs.existsSync(dir)) {
+        return;
+      }
+      mkdirP(dirname(dir));
+      fs.mkdirSync(dir);
+    };
+
+    // 确保目录存在
+    mkdirP(path);
+    
+    // 处理不同格式的图片数据
+    let imageData = content;
+    if (typeof content === 'string' && content.includes('base64')) {
+      imageData = content.split(',')[1];
+    } else if (content instanceof Uint8Array) {
+      imageData = content;
+    } else {
+      throw new Error('不支持的图片数据格式');
+    }
+    
+    return fsPs.writeFile(join(path, fileName), imageData, {encoding: 'base64'});
   },
   copyFile: (from, path, fileName)=>{
     if (!fs.existsSync(path)) {
@@ -103,6 +141,11 @@ const fileHelper = {
     const targetLocation = `${saveLoaction}/${path}`;
     if (!fs.existsSync(targetLocation)) {
       fs.mkdirSync(targetLocation);
+    }
+  },
+  mkdirIfNotExists: (path) => {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
     }
   },
 };

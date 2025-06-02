@@ -126,3 +126,27 @@
     transform: rotate(360deg);
   }
 }
+
+.reportHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  right: 24px;
+
+  :global {
+    .ant-select {
+      min-width: 60px;
+    }
+  }
+}
+
+.periodArrow {
+  font-size: 12px;
+  cursor: pointer;
+  color: #666;
+
+  &:hover {
+    color: #1890ff;
+  }
+}

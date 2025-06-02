@@ -6,7 +6,7 @@ import FileList from "./components/FileList";
 import Note from "./note";
 import Todo from "./todo";
 import Aim from "./aim";
-import { ConfigProvider, Dropdown } from "antd";
+import { ConfigProvider, Dropdown, Select } from "antd";
 // import zhCN from 'antd/locale/zh_CN';
 import {
   defaultFiles,
@@ -36,7 +36,7 @@ import { DEFAULT_NOTE } from "./components/SlateEditor/constant.js";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 import Book from "./book/index.jsx";
 import Report, { REPORT_TYPE } from './todo/components/Report';
-import { CaretLeftOutlined, CaretRightOutlined } from "@ant-design/icons";
+import { CaretLeftOutlined, RightOutlined, LeftOutlined, CaretRightOutlined } from "@ant-design/icons";
 import Album from './components/Album';
 
 // Node API
@@ -623,29 +623,14 @@ function App() {
                   <span className={styles.unsaveIcon} />
                 )}
                 {activeFile.title || ""}
-                {/* <Dropdown
-                  menu={{
-                    items: reportTypes,
-                    onClick: onMenuClick
-                  }}> */}
                 {activeFile.type === "todo" && (
-                  <Dropdown
-                    menu={{
-                      items: [
-                        ...reportTypes.map(item => ({
-                          key: item.key,
-                          label: `生成${item.label}`
-                        }))
-                      ],
-                      onClick: ({ key }) => setReportOpen(key)
-                    }}
+                  <span 
+                    className={styles.report_text}
+                    onClick={() => setReportOpen('day')} 
                   >
-                    <span className={styles.report_text}>
-                      生成报告
-                    </span>
-                  </Dropdown>
+                    生成报告
+                  </span>
                 )}
-                {/* </Dropdown> */}
               </h1>
               {activeFile.type === "todo" ? (
                 <Todo activeFile={activeFile} onChange={fileChange} />

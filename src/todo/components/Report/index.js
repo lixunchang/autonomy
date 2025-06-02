@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Button, Drawer } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Drawer, Segmented } from 'antd';
 import moment from 'moment';
 import styles from './index.less';
 import { CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 export const REPORT_TYPE = {
   'day': '日报',
@@ -33,11 +34,25 @@ const inCycle=(time, cycleType = 'week', backCount = 0)=>{
 }
 
 const Report = ({ type, activeFile, closeReport }) => {
+  const [backCount, setBackCount] = useState(0);
+  const [reportType, setReportType] = useState(type);
 
-  const [backCount, setBackCount] = useState(0)
+  // 获取当前周期的起止时间
+  const getCurrentPeriod = () => {
+    const targetTime = moment().subtract(backCount, reportType);
+    const start = targetTime.startOf(reportType).format('YYYY-MM-DD');
+    const end = targetTime.endOf(reportType).format('YYYY-MM-DD');
+    return `${start} 至 ${end}`;
+  };
 
-  const activeContent =  JSON.parse(activeFile.body||'[]')
-  console.log('activeContent===>', activeContent)
+  // 1. 使用 useEffect 监听 reportType 变化
+  useEffect(() => {
+    // 切换周期类型时重置回溯计数
+    setBackCount(0);
+  }, [reportType]);
+
+  const activeContent = JSON.parse(activeFile.body||'[]');
+  // 2. 修改 inCycle 调用时使用 reportType 替代 type
   const { newTodo=[], newInprogress=[], newFinish=[] } = activeContent.reduce((total, column)=>{
     // 检查 column.tasks 是否存在
     if (!column.tasks || !Array.isArray(column.tasks)) {
@@ -47,11 +62,10 @@ const Report = ({ type, activeFile, closeReport }) => {
     const {newTodo=[], newInprogress=[], newFinish=[]} = column.tasks.reduce((taskTotal, task)=>{
       const newTd=[], newIP=[], newFI=[];
 
-      // 检查新建任务
-      if(inCycle(task.createTime, type, backCount)){
+      if(inCycle(task.createTime, reportType, backCount)){
         newTd.push({...task, items: task.items || []});
       }else if(task.items && task.items.length){
-        const inCycleItems = task.items.filter(item=>inCycle(item.createTime, type, backCount));
+        const inCycleItems = task.items.filter(item=>inCycle(item.createTime, reportType, backCount));
         if(inCycleItems.length > 0){
           newTd.push({
             ...task,
@@ -61,15 +75,15 @@ const Report = ({ type, activeFile, closeReport }) => {
       }
 
       // 检查进行中任务
-      if(inCycle(task.inprogressTime, type, backCount)){
+      if(inCycle(task.inprogressTime, reportType, backCount)){
         newIP.push({...task, items: task.items || []});
       }
 
       // 检查已完成任务
-      if(inCycle(task.finishTime, type, backCount)){
+      if(inCycle(task.finishTime, reportType, backCount)){
         newFI.push({...task, items: task.items || []});
       }else if(task.items && task.items.length){
-        const inCycleItems = task.items.filter(item=>inCycle(item.finishTime, type, backCount));
+        const inCycleItems = task.items.filter(item=>inCycle(item.finishTime, reportType, backCount));
         if(inCycleItems.length > 0){
           newFI.push({
             ...task,
@@ -97,26 +111,41 @@ const Report = ({ type, activeFile, closeReport }) => {
 
   return (
     <Drawer 
-      title={'生成' + REPORT_TYPE[type]} 
+      title="生成报告"
       width={560}
       open={type!=='open'} 
-      onOk={closeReport} 
-      onCancel={closeReport}
       onClose={closeReport}
       className={styles.report_drawer}
       bodyStyle={{ paddingTop: 12, paddingBottom: 12 }}
       extra={
-        <>
-          <Button onClick={()=>setBackCount(backCount+1)}>上一周期</Button>
-          <Button style={{marginLeft: 12}} disabled={backCount === 0} onClick={()=>setBackCount(backCount-1)}>下一周期</Button>
-        </>
-    }
+        <div className={styles.periodSelector}>
+          <LeftOutlined 
+            className={styles.arrow} 
+            onClick={()=>setBackCount(backCount+1)}
+          />
+          <Segmented
+            value={reportType}
+            onChange={setReportType}
+            options={Object.entries(REPORT_TYPE)
+              .filter(([key]) => !['lastMonth', 'lastYear'].includes(key))
+              .map(([key, label]) => ({
+                label,
+                value: key,
+              }))}
+          />
+          <RightOutlined 
+            className={styles.arrow}
+            onClick={()=>setBackCount(Math.max(0, backCount-1))}
+          />
+        </div>
+      }
     >
       <div className={styles.report_content}>
+        <div className={styles.periodTime}>{getCurrentPeriod()}</div>
         {
           newFinish.length + newInprogress.length + newTodo.length > 0 ?
           <>
-            <h3>任务进展</h3>
+            <h4>任务进展</h4>
             <div className={styles.section}>
               {
                 (newFinish.length > 0 || newInprogress.length > 0) ? 
@@ -146,7 +175,7 @@ const Report = ({ type, activeFile, closeReport }) => {
                 }) : <div className={styles.empty_text}>暂无数据</div>
               }
             </div>
-            <h3>本期新增</h3>
+            <h4>本期新增</h4>
             <div className={styles.section}>
               {
                 newTodo.length>0?newTodo.map(item=>{

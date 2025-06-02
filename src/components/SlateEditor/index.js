@@ -16,11 +16,12 @@ import withImages from './formatter/images';
 import {withTables} from './formatter/tables/index';
 import Toolbar from './components/Toolbar';
 import isHotkey from 'is-hotkey';
+import { HOTKEYS } from './constant';
 import styles from './index.less';
 import RenderElement, { RenderLeaf } from './formatter';
 import { BlockButton, MarkButton } from './components/Button';
 import { isBlockActive, toggleMark } from './formatter/utils';
-import { DEFAULT_NOTE, HOTKEYS, SHORTCUTS } from './constant';
+import { DEFAULT_NOTE, SHORTCUTS } from './constant';
 import ToolIcon from '../Icon';
 import ColorPicker from './components/ColorPicker';
 import InsertImage from './components/InsertImage';
@@ -40,7 +41,6 @@ import 'prismjs/components/prism-java'
 import { CodeBlockType, CodeLineType, languageTypes, ParagraphType } from './components/BlockCode/index.jsx';
 import { isCanEditInTable } from './utils/util.js';
 import { slateToMarkdown } from './utils/transformer.js';
-import { useKeyDown } from './hooks/useKeyDown.js';
 import { message } from 'antd';
 
 const { clipboard } = window.require('electron');
@@ -319,7 +319,56 @@ const SlateEditor = ({ id, page = 1, value, onChange, isLoaded, title }) => {
     [editor]
   );
   console.log('SlateEditor', id, value);
-  const handleKeyDown = useKeyDown(editor);
+
+  const handleKeyDown = useCallback((event) => {
+    const editorDom = ReactEditor.toDOMNode(editor, editor)
+    if (
+      !isCanEditInTable(editor) &&
+      !isHotkey(['delete', 'backspace'], event) &&
+      editorDom.getAttribute('contenteditable') === 'true'
+    ) {
+      editorDom.setAttribute('contenteditable', 'false')
+      Promise.resolve()
+        .then(() => editorDom.setAttribute('contenteditable', 'true'))
+        .catch(() => {})
+    }
+
+    // 处理列表的删除键退出
+    if (event.key === 'Backspace') {
+      const [currentListItem] = Editor.nodes(editor, {
+        match: n => n.type === 'list-item',
+        mode: 'lowest'
+      });
+
+      if (currentListItem) {
+        const [itemNode] = currentListItem;
+        const itemText = Node.string(itemNode).trim();
+
+        if (itemText === '') {
+          event.preventDefault();
+          const [parentList] = Editor.parent(editor, currentListItem[1]);
+          
+          if (['numbered-list', 'bulleted-list', 'check-list'].includes(parentList.type)) {
+            Transforms.setNodes(editor, { type: 'paragraph' });
+            Transforms.unwrapNodes(editor, {
+              match: n => ['numbered-list', 'bulleted-list', 'check-list'].includes(n.type),
+              split: true
+            });
+          }
+          return;
+        }
+      }
+    }
+    
+    // 其他键盘事件处理
+    for (const hotkey in HOTKEYS) {
+      if (isHotkey(hotkey, event)) {
+        event.preventDefault();
+        const mark = HOTKEYS[hotkey];
+        toggleMark(editor, mark);
+      }
+    }
+  }, [editor]);
 
   return (
     <Slate

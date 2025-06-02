@@ -113,6 +113,41 @@ export const useKeyDown = (editor) => {
       }
     }
 
+    // 处理列表的回车和删除
+    if (event.key === 'Enter' && !event.shiftKey) {
+      const [match] = Editor.nodes(editor, {
+        match: n => n.type === 'numbered-list' || n.type === 'bulleted-list' || n.type === 'check-list',
+      });
+
+      if (match) {
+        const [node, path] = match;
+        const isEmpty = Node.string(node).length === 0;
+
+        if (isEmpty) {
+          event.preventDefault();
+          Transforms.setNodes(editor, { type: 'paragraph' });
+          return;
+        }
+      }
+    }
+
+    if (event.key === 'Backspace') {
+      const [match] = Editor.nodes(editor, {
+        match: n => n.type === 'numbered-list' || n.type === 'bulleted-list' || n.type === 'check-list',
+      });
+
+      if (match) {
+        const [node, path] = match;
+        const isEmpty = Node.string(node).length === 0;
+
+        if (isEmpty) {
+          event.preventDefault();
+          Transforms.setNodes(editor, { type: 'paragraph' });
+          return;
+        }
+      }
+    }
+
     for (const hotkey in HOTKEYS) {
       if (isHotkey(hotkey, event)) {
         event.preventDefault();

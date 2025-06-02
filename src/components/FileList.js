@@ -79,7 +79,7 @@ const FileList = ({
         },
       },
       {
-        label: "新建打卡记录",
+        label: "新建打卡",
         click: () => {
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {

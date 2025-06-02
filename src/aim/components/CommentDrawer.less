@@ -1,0 +1,44 @@
+.commentList {
+  height: calc(100% - 200px);
+  overflow-y: auto;
+  padding-bottom: 16px;
+
+  .commentTime {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+  }
+
+  .commentContent {
+    color: #333;
+    line-height: 1.5;
+  }
+}
+
+.commentInput {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  
+  .textarea {
+    flex: 1;
+  }
+}
+
+.statsTable {
+  margin-bottom: 16px;
+  padding: 0 -24px;
+  
+  :global {
+    .ant-table-small {
+      border: 1px solid #f0f0f0;
+    }
+  }
+}

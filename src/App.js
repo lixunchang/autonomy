@@ -626,7 +626,7 @@ function App() {
                 {activeFile.type === "todo" && (
                   <span 
                     className={styles.report_text}
-                    onClick={() => setReportOpen('day')} 
+                    onClick={() => setReportOpen('week')} 
                   >
                     生成报告
                   </span>

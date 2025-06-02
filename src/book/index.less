@@ -11,5 +11,55 @@
       width: 100%;
       background-color: #fff;
     }
+    .slate_editor{
+      padding-inline: 120px;
+      padding-bottom: 60px; // 为分页器预留空间
+
+      p {
+        margin: 0;
+        line-height: 1.8;
+      }
+    }
+
+    span.textIndent {
+      text-indent: 2em;
+      display: inline-block;
+    }
   }
+}
+
+.pagination {
+  position: absolute;  // 改为相对Book定位
+  left: 0;        // 与内容区对齐
+  right: 0;       // 与内容区对齐
+  bottom: 0;
+  width: auto;        // 移除固定宽度
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;    // 移除水平内边距
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+
+  .pageButton {
+    cursor: pointer;
+    padding: 4px 12px;
+    color: #1890ff;
+    user-select: none;
+    
+    &:hover {
+      color: #40a9ff;
+    }
+  }
+
+  .pageInfo {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.65);
+  }
+}
+
+.slateBook{
+  
 }

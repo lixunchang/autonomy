@@ -660,6 +660,8 @@ function App() {
                 <Aim activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === "music" ? (
                 <Music activeFile={activeFile} onChange={fileChange} />
+              ) : activeFile.type === "book" ? (
+                <Book activeFile={activeFile} onChange={fileChange} />
               ) : (
                 <div className={styles.empty}>
                   <h3 style={{ color: "red" }}>

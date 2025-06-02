@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Pagination } from 'antd';
 import styles from './index.less';
 // import { getSaveLocation } from '../utils/helper';
 // import Editor from '../components/CKEditor'; 
@@ -34,17 +33,16 @@ const Book = ({ activeFile, onChange }) => {
   };
   useEffect(() => {
       async function initPdf(){
-        console.log('readPdfinit', current, bookBody)
         if(!bookBody?.[current]){
           const {data, info, images} = await fileHelper.readPdfPage(pdf, current);
-          // setImages(images)
-          console.log('page-data==>', data, info, images)
           const {result} = combinePdfTextToRichText(data, info, images);
+          
           const newBody = {
-              ...bookBody,
-              [current]: result
+            ...bookBody,
+            [current]: result
           };
-          onChange(id, newBody, {info:{...info, current}})
+          console.log('result=====>', current, newBody);
+          onChange(id, newBody, {info:{...info, current}});
         }
       }
       isLoaded&&pdf&&initPdf();
@@ -53,23 +51,23 @@ const Book = ({ activeFile, onChange }) => {
   console.log('idid', id, activeFile, current, bookBody?.[current])
   return (
     <div className={styles.Book}>
-      {
-        bookBody?.[current]&& //Object.keys(bookBody||{})?.length>0&&
-        <Editor id={id} page={current} value={bookBody?.[current]} onChange={handleContentChange} isLoaded={isLoaded}/>
-      }
-      {
-        info?.size&&
-        <Pagination
-         locale={'zhCN'} 
-         size='small' 
-         showQuickJumper 
-         showSizeChanger={false} 
-         current={current} 
-         total={info?.size} 
-         pageSize={1}
-         onChange={onPageChange}
-        />
-      }
+      <div className={styles.slateBook}>
+        {
+          bookBody?.[current]&&
+          <Editor id={id} page={current} value={bookBody?.[current]} onChange={handleContentChange} isLoaded={isLoaded}/>
+        }
+      </div>
+        <div className={styles.pagination}>
+          <div className={styles.pageButton} onClick={() => current > 1 && onPageChange(current - 1)}>
+            上一页
+          </div>
+          <div className={styles.pageInfo}>
+            {current} / {info&&info.size}
+          </div>
+          <div className={styles.pageButton} onClick={() => current < info.size && onPageChange(current + 1)}>
+            下一页
+          </div>
+        </div>
     </div>
   );
 };

@@ -65,7 +65,7 @@ const showSplashWindow = () => {
         // transparent: true, // 窗口是否支持透明，如果想做高级效果最好为true
         // alwaysOnTop: false
       },
-      splasUrlLocation
+      splasUrlLocation,
     );
 
     resolve();
@@ -88,11 +88,11 @@ const showMainWindow = () => {
       mainWindow = new AppWindow(
         mainWindowConfig, 
         mainUrlLocation, 
+        5000,
         ()=>{
           splashWindow.hide();
           splashWindow.close();
         },
-        5000
       );
       mainWindow.on('close', () => {
         mainWindow = null;
@@ -125,7 +125,7 @@ app.on('ready', async () => {
           slashes: true,
           hash: 'setting',
         });
-    newWindow = new AppWindow(newWindowConfig, settingsUrlLocation);
+    newWindow = new AppWindow(newWindowConfig, settingsUrlLocation, 1);
     if (urlPath === 'setting') {
       newWindow.removeMenu();
     }

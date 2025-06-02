@@ -32,6 +32,14 @@ const FileList = ({
 
   const inputRef = useRef(null);
 
+  useEffect(() => {
+    // 过滤掉回收站节点，不默认展开
+    if (expandedKeys?.length > 0) {
+      const filteredKeys = expandedKeys.filter((key) => key !== "crash");
+      setExpandedKeys(filteredKeys);
+    }
+  }, []);
+
   const handleSaveInput = (path, type, isLeaf) => {
     if (!inputValue) {
       return;
@@ -126,14 +134,14 @@ const FileList = ({
           const { current = { childNodes: [] } } = clickItem;
           if (current !== null) {
             const childNode = getChildNode(current.childNodes, "file-item");
-            const { id, type, isleaf } = childNode.dataset;
-            console.log("导入pdf", type, id, isleaf);
-            if (!isleaf || noInportKeys.includes(id)) {
+            const { id, type } = childNode.dataset;
+            // 移除 isleaf 判断，修改参数传递
+            if (noInportKeys.includes(id)) {
               return;
             }
-            onImportFiles(id, type, {
+            onImportFiles(id, 'book', {
               extension: ["pdf"],
-              title: "选择导入PDF书籍",
+              title: "选择导入PDF书籍"
             });
           }
         },

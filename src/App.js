@@ -71,9 +71,20 @@ const reportTypes = Object.entries(REPORT_TYPE).map(([key, label]) => ({
  * - 当前选中的文件
  */
 function App() {
+  const currentFiles = fileStore.get("files");
+  // currentFiles.splice(1,0,{
+  //   sort: 5,
+  //   id: 'music',
+  //   status: 'develop',
+  //   title: '音乐画廊',
+  //   key: 'music',
+  //   type: 'music',
+  //   icon: 'CustomerServiceOutlined',
+  //   isLeaf: true,
+  // },)
   const [files, setFiles] = useState(
     fileStore.get("files") && fileStore.get("files").length > 0
-      ? fileStore.get("files")
+      ? currentFiles
       : defaultFiles,
   );
   console.log("files==>", files);
@@ -591,7 +602,12 @@ function App() {
           </Draggable>
         </div>
         <div
-          style={{ flex: 1, backgroundColor: "#fafbfc", overflow: "hidden" }}
+          style={{ 
+            flex: 1, 
+            backgroundColor: "#fafbfc", 
+            overflow: "hidden",
+            height: activeFile?.type === 'music' ? '100vh' : 'auto'
+          }}
         >
           {!activeFile ? (
             <div className={styles.empty}>
@@ -604,34 +620,36 @@ function App() {
             </div>
           ) : (
             <>
-              <h1
-                className={styles.dragArea}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: 58,
-                  padding: "0 58px",
-                  fontSize: 26,
-                  fontWeight: 600,
-                  margin: 0,
-                  backgroundColor: "#fafbfc",
-                  position: "relative",
-                }}
-              >
-                {unsavedFileIds.includes(activeFileId) && (
-                  <span className={styles.unsaveIcon} />
-                )}
-                {activeFile.title || ""}
-                {activeFile.type === "todo" && (
-                  <span 
-                    className={styles.report_text}
-                    onClick={() => setReportOpen('week')} 
-                  >
-                    生成报告
-                  </span>
-                )}
-              </h1>
+              {activeFile.type !== 'music' && (
+                <h1
+                  className={styles.dragArea}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: 58,
+                    padding: "0 58px",
+                    fontSize: 26,
+                    fontWeight: 600,
+                    margin: 0,
+                    backgroundColor: "#fafbfc",
+                    position: "relative",
+                  }}
+                >
+                  {unsavedFileIds.includes(activeFileId) && (
+                    <span className={styles.unsaveIcon} />
+                  )}
+                  {activeFile.title || ""}
+                  {activeFile.type === "todo" && (
+                    <span 
+                      className={styles.report_text}
+                      onClick={() => setReportOpen('week')} 
+                    >
+                      生成报告
+                    </span>
+                  )}
+                </h1>
+              )}
               {activeFile.type === "todo" ? (
                 <Todo activeFile={activeFile} onChange={fileChange} />
               ) : activeFile.type === "note" ? (

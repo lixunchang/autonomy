@@ -1,59 +1,307 @@
-.Music {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
+.MusicGallery {
+  height: calc(100vh - 0px); // 修改这里，音乐画廊页面不需要减去标题栏高度
+  position: relative;
+  background: #000;
+  overflow: hidden;
 
-  .controls {
+  .header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+  }
+
+  .imageContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
-    gap: 20px;
+    justify-content: center;
+    padding: 20px;
 
-    .playerControls {
+    .galleryImage {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .emptyState {
+      text-align: center;
+      color: rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      padding: 32px;
+      border-radius: 8px;
+      transition: all 0.3s;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.02);
+        color: rgba(0, 0, 0, 0.4);
+      }
+
+      .anticon {
+        font-size: 48px;
+      }
+
+      div {
+        margin-top: 12px;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    color: white;
+    z-index: 10;
+
+    .progressBar {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
+      margin-bottom: 12px;
 
-      .controlIcon {
-        font-size: 24px;
+      .slider {
+        flex: 1;
+        margin: 0 8px 0 0;
+        padding: 4px 0;  // 增加可点击区域
         cursor: pointer;
-        color: #1890ff;
-        
+
+        :global {
+          .ant-slider-rail { 
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2); 
+          }
+          .ant-slider-track { 
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.5); 
+          }
+          .ant-slider-handle { 
+            background-color: #fff;
+            border: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+          }
+        }
+
         &:hover {
-          opacity: 0.8;
+          :global {
+            .ant-slider-handle {
+              opacity: 1;
+            }
+          }
+        }
+      }
+
+      .time {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.85);
+        flex-shrink: 0;
+      }
+    }
+
+    .playerControls {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .leftControls {
+        width: 200px; // 固定宽度
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .ant-btn {
+          color: rgba(255, 255, 255, 0.85);
+
+          &:hover {
+            color: #fff;
+          }
+
+          .anticon {
+            font-size: 28px;
+          }
+        }
+      }
+
+      .musicInfo {
+        font-size: 14px;
+        opacity: 0.85;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+
+        &.empty {
+          cursor: pointer;
+          color: rgba(255, 255, 255, 0.5);
+
+          &:hover {
+            color: rgba(255, 255, 255, 0.8);
+          }
+        }
+      }
+
+      .buttons {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        min-width: 200px;
+        justify-content: center;
+
+        .controlIcon {
+          font-size: 28px;
+          cursor: pointer;
+          color: inherit;
+          transition: all 0.3s;
+
+          &:hover {
+            color: #fff;
+            transform: scale(1.1);
+          }
+        }
+
+        .ant-btn {
+          color: rgba(255, 255, 255, 0.85);
+
+          &:hover {
+            color: #fff;
+          }
+
+          .anticon {
+            font-size: 28px;
+          }
+        }
+      }
+
+      .volume {
+        width: 120px; // 固定宽度
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .volumeSlider {
+          flex: 1;
+          :global {
+            .ant-slider-rail {
+              background-color: rgba(255, 255, 255, 0.2);
+            }
+            .ant-slider-track {
+              background-color: rgba(255, 255, 255, 0.8);
+            }
+            .ant-slider-handle {
+              background-color: #fff;
+              border: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  :global {
+    .playlistPopover {
+      .ant-popover-inner {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 8px;
+      }
+      .ant-popover-arrow {
+        display: none;
+      }
+    }
+  }
+
+  .playlistOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .playlistContainer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 90px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    color: white;
+    animation: slideUp 0.3s ease;
+    
+    .playlistHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      .clearBtn {
+        color: rgba(255, 255, 255, 0.85);
+        &:hover {
+          color: #fff;
         }
       }
     }
 
-    .nowPlaying {
-      flex: 1;
-      margin-left: 20px;
-      color: #666;
+    .playlist {
+      height: 200px;
+      overflow-y: auto;
+      padding: 0 20px;
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+      }
+
+      .playlistItem {
+        padding: 8px 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &:hover {
+          color: #fff;
+        }
+
+        &.playing {
+          color: #fff;
+        }
+      }
     }
   }
 
-  .musicList {
-    flex: 1;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    padding: 10px;
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
-    .musicItem {
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 4px;
-      
-      &:hover {
-        background: #f5f5f5;
-      }
-
-      &.active {
-        background: #e6f7ff;
-        color: #1890ff;
-      }
-    }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 }

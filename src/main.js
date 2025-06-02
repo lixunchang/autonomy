@@ -7,7 +7,7 @@ import {
   switchFileIcons,
 } from "../utils/treeHelper";
 import styles from "./FileList.less";
-import useContextMenu from "../hooks/useContextMenu";
+// import useContextMenu from "../hooks/useContextMenu";
 import useIpcRenderer from "../hooks/useIpcRenderer";
 
 const { ipcRenderer } = window.require("electron");
@@ -43,144 +43,144 @@ const FileList = ({
     setEditStatus("");
     setInputValue("");
   };
-  const clickItem = useContextMenu(
-    [
-      {
-        label: "新建笔记",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const childNode = getChildNode(current.childNodes, "file-item");
-            const { id } = childNode.dataset;
-            createNewFile(id, "note", true);
-          }
-        },
-      },
-      {
-        label: "新建待办",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const childNode = getChildNode(current.childNodes, "file-item");
-            const { id } = childNode.dataset;
-            createNewFile(id, "todo", true);
-          }
-        },
-      },
-      {
-        label: "新建相册",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const childNode = getChildNode(current.childNodes, "file-item");
-            const { id } = childNode.dataset;
-            createNewFile(id, "album", true);
-          }
-        },
-      },
-      {
-        label: "新建打卡",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const childNode = getChildNode(current.childNodes, "file-item");
-            const { id } = childNode.dataset;
-            createNewFile(id, "aim", true);
-          }
-        },
-      },
-      {
-        type: "separator",
-      },
-      {
-        label: "新建文件夹",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const childNode = getChildNode(current.childNodes, "file-item");
-            const { id, type } = childNode.dataset;
-            createNewFile(id, type, false);
-          }
-        },
-      },
-      {
-        type: "separator",
-      },
-      {
-        label: "重命名",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const { dataset } = getChildNode(current.childNodes, "file-item");
-            setEditStatus(dataset.id);
-            setInputValue(dataset.title);
-          }
-        },
-      },
-      {
-        type: "separator",
-      },
-      {
-        label: "导入PDF书籍",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const childNode = getChildNode(current.childNodes, "file-item");
-            const { id, type, isleaf } = childNode.dataset;
-            console.log("导入pdf", type, id, isleaf);
-            if (!isleaf || noInportKeys.includes(id)) {
-              return;
-            }
-            onImportFiles(id, type, {
-              extension: ["pdf"],
-              title: "选择导入PDF书籍",
-            });
-          }
-        },
-      },
-      {
-        label: "导入笔记",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const childNode = getChildNode(current.childNodes, "file-item");
-            const { id, type, isleaf } = childNode.dataset;
-            if (!isleaf || noInportKeys.includes(id)) {
-              return;
-            }
-            onImportFiles(id, type);
-          }
-        },
-      },
-      {
-        label: "复制文件路径",
-        click: () => {},
-      },
-      {
-        type: "separator",
-      },
-      {
-        label: "移至回收站",
-        click: () => {
-          const { current = { childNodes: [] } } = clickItem;
-          if (current !== null) {
-            const { dataset } =
-              getChildNode(current.childNodes, "file-item") || {};
-            if (!dataset) {
-              return;
-            }
-            const { id, path, isleaf } = dataset;
-            if (noDeleteKeys.includes(id)) {
-              return;
-            }
-            setEditStatus("");
-            onFileDelete(id, path, isleaf);
-          }
-        },
-      },
-    ],
-    "ant-tree-treenode",
-  );
+  // const clickItem = useContextMenu(
+  //   [
+  //     {
+  //       label: "新建笔记",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const childNode = getChildNode(current.childNodes, "file-item");
+  //           const { id } = childNode.dataset;
+  //           createNewFile(id, "note", true);
+  //         }
+  //       },
+  //     },
+  //     {
+  //       label: "新建待办",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const childNode = getChildNode(current.childNodes, "file-item");
+  //           const { id } = childNode.dataset;
+  //           createNewFile(id, "todo", true);
+  //         }
+  //       },
+  //     },
+  //     {
+  //       label: "新建相册",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const childNode = getChildNode(current.childNodes, "file-item");
+  //           const { id } = childNode.dataset;
+  //           createNewFile(id, "album", true);
+  //         }
+  //       },
+  //     },
+  //     {
+  //       label: "新建打卡",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const childNode = getChildNode(current.childNodes, "file-item");
+  //           const { id } = childNode.dataset;
+  //           createNewFile(id, "aim", true);
+  //         }
+  //       },
+  //     },
+  //     {
+  //       type: "separator",
+  //     },
+  //     {
+  //       label: "新建文件夹",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const childNode = getChildNode(current.childNodes, "file-item");
+  //           const { id, type } = childNode.dataset;
+  //           createNewFile(id, type, false);
+  //         }
+  //       },
+  //     },
+  //     {
+  //       type: "separator",
+  //     },
+  //     {
+  //       label: "重命名",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const { dataset } = getChildNode(current.childNodes, "file-item");
+  //           setEditStatus(dataset.id);
+  //           setInputValue(dataset.title);
+  //         }
+  //       },
+  //     },
+  //     {
+  //       type: "separator",
+  //     },
+  //     {
+  //       label: "导入PDF书籍",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const childNode = getChildNode(current.childNodes, "file-item");
+  //           const { id, type, isleaf } = childNode.dataset;
+  //           console.log("导入pdf", type, id, isleaf);
+  //           if (!isleaf || noInportKeys.includes(id)) {
+  //             return;
+  //           }
+  //           onImportFiles(id, type, {
+  //             extension: ["pdf"],
+  //             title: "选择导入PDF书籍",
+  //           });
+  //         }
+  //       },
+  //     },
+  //     {
+  //       label: "导入笔记",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const childNode = getChildNode(current.childNodes, "file-item");
+  //           const { id, type, isleaf } = childNode.dataset;
+  //           if (!isleaf || noInportKeys.includes(id)) {
+  //             return;
+  //           }
+  //           onImportFiles(id, type);
+  //         }
+  //       },
+  //     },
+  //     {
+  //       label: "复制文件路径",
+  //       click: () => {},
+  //     },
+  //     {
+  //       type: "separator",
+  //     },
+  //     {
+  //       label: "移至回收站",
+  //       click: () => {
+  //         const { current = { childNodes: [] } } = clickItem;
+  //         if (current !== null) {
+  //           const { dataset } =
+  //             getChildNode(current.childNodes, "file-item") || {};
+  //           if (!dataset) {
+  //             return;
+  //           }
+  //           const { id, path, isleaf } = dataset;
+  //           if (noDeleteKeys.includes(id)) {
+  //             return;
+  //           }
+  //           setEditStatus("");
+  //           onFileDelete(id, path, isleaf);
+  //         }
+  //       },
+  //     },
+  //   ],
+  //   "ant-tree-treenode",
+  // );
   useEffect(() => {
     if (newFile) {
       setEditStatus(newFile.id);
@@ -202,18 +202,15 @@ const FileList = ({
   };
 
   const onItemClick = (isLeaf, id, path, isLoaded, type) => {
-    // 快速判断设置节点
-    if (type === 'setting') {
-      ipcRenderer.send('open-new-window', 'setting');
-      console.log('open setting');
-      return;
-    }
     
     if (!isLeaf) {
       return;
     }
 
     switch (type) {
+      case 'setting':
+        ipcRenderer.send('open-new-window', 'setting');
+        break;
       case 'crash':
         ipcRenderer.send('open-new-window', 'crash');
         break;
